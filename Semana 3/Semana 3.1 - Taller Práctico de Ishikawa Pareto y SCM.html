@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 3.1: Taller Práctico Experimental de Diagrama de Ishikawa, Análisis de Pareto y Configuración de SCM en Git (APE - RA2) | UNIBE.">
+  <title>Semana 3.1: Taller Práctico de Ishikawa, Pareto y SCM | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(139, 92, 246, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #8b5cf6;
+      --color-secondary: #3b82f6;
+      --color-accent: #a78bfa;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(139, 92, 246, 0.12); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(139, 92, 246, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; display: flex; flex-direction: column; gap: 40px; min-width: 0;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 40px;
+    }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .hero-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-box {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; font-family: var(--font-mono); font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 12px 0;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Taller Práctico APE</div>
+      <h2 style="font-size: 1.15rem; color: #fff;">Semana 3.1</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Ishikawa, Pareto & SCM</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#objetivos" class="active">🎯 1. Objetivos del Taller</a></li>
+      <li><a href="#act1">🐟 2. Tarea 1: Diagrama Ishikawa</a></li>
+      <li><a href="#act2">📊 3. Tarea 2: Tabla de Pareto</a></li>
+      <li><a href="#act3">🛡️ 4. Tarea 3: Git SCM Setup</a></li>
+      <li><a href="#rubrica">📋 5. Rúbrica de Calificación</a></li>
+      <li><a href="Semana 3.0 - Herramientas Estadísticas de Calidad y SCM.html">📖 Volver a Teoría 3.0 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · APE 3</span>
+      <a href="#" style="color: var(--color-accent); text-decoration:none;">RA2</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="objetivos">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; margin-bottom: 8px;">
+        Aprendizaje Práctico-Experimental (APE) · 2 Horas
+      </div>
+      <h1 class="hero-title">Taller 3.1: Análisis Causa-Raíz, Pareto y Configuración de SCM</h1>
+      <p class="hero-desc">
+        En este laboratorio aplicarás las herramientas estadísticas para diagnosticar la causa raíz de un incidente crítico en un sistema de producción, priorizarás los focos de defectos mediante Pareto y configurarás las políticas de control de configuración (SCM) en GitHub con branch protection, tagging semántico de líneas base y plantillas de pull request.
+      </p>
+    </header>
+
+    <!-- Objetivos -->
+    <section class="card">
+      <div class="card-title">🎯 Competencias a Demostrar</div>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; color: var(--text-muted);">
+        <li>✅ <strong>Análisis de Causa Raíz:</strong> Diseñar un diagrama de Ishikawa completo con al menos 12 causas secundarias clasificadas en las 6 categorías de software.</li>
+        <li>✅ <strong>Construcción de Pareto:</strong> Tabular un dataset de 150 defectos de software, calculando frecuencias acumuladas y marcando el corte 80/20.</li>
+        <li>✅ <strong>Gestión de Configuración en Git:</strong> Establecer una línea base congelada mediante Git Tag (SemVer) y documentar los ítems de configuración (SCI).</li>
+      </ul>
+    </section>
+
+    <!-- Tarea 1: Ishikawa -->
+    <section class="card" id="act1">
+      <div class="card-title">🐟 Tarea 1: Diagrama de Causa-Efecto (Ishikawa)</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        <strong>Escenario del Incidente:</strong> En el sistema de matrículas universitarias, durante los primeros 10 minutos de apertura, el 65% de los estudiantes experimentaron caídas de sesión (HTTP 504 Gateway Timeout), perdiendo los cupos seleccionados.
+      </p>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+        Construye el diagrama de espina de pescado clasificando causas en:
+      </p>
+      <div class="code-box">
+Problema Central: "Caída de sesión y timeout masivo en matrículas bajo alta concurrencia"
+1. Personas: (Ej. Falta de capacitación en arquitectura de microservicios, desarrollador junior sin supervisión en consultas SQL).
+2. Procesos: (Ej. No se ejecutaron pruebas de estrés pre-apertura, no hubo plan de rollback).
+3. Entorno: (Ej. Pool de conexiones de base de datos insuficiente: max_connections = 50).
+4. Requisitos: (Ej. No se especificó el requisito de usuarios concurrentes en la historia de usuario).
+5. Código / BD: (Ej. Consultas N+1 en el ORM sin índices en tabla 'matricula_estudiante').
+6. Pruebas: (Ej. Solo se probaron flujos unitarios con 1 usuario simulado).
+      </div>
+    </section>
+
+    <!-- Tarea 2: Pareto -->
+    <section class="card" id="act2">
+      <div class="card-title">📊 Tarea 2: Análisis de Pareto sobre Incidentes Reportados</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        El equipo de soporte registró 250 incidentes en el último semestre. Con los siguientes datos brutos, completa la tabla y elabora la gráfica de Pareto indicando la zona vital (80%):
+      </p>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Categoría del Defecto</th>
+            <th>Frecuencia (Bugs)</th>
+            <th>% Individual</th>
+            <th>% Acumulado</th>
+            <th>Zona Pareto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Errores de validación de campos y formularios</td>
+            <td>105</td>
+            <td>42.0%</td>
+            <td>42.0%</td>
+            <td><strong style="color:var(--color-danger);">Vital</strong></td>
+          </tr>
+          <tr>
+            <td>Fallas de autenticación y caducidad de tokens</td>
+            <td>75</td>
+            <td>30.0%</td>
+            <td>72.0%</td>
+            <td><strong style="color:var(--color-danger);">Vital</strong></td>
+          </tr>
+          <tr>
+            <td>Timeouts en pasarela de pagos</td>
+            <td>32</td>
+            <td>12.8%</td>
+            <td>84.8%</td>
+            <td><strong style="color:var(--color-warning);">Umbral 80%</strong></td>
+          </tr>
+          <tr>
+            <td>Inconsistencias en reportes PDF</td>
+            <td>20</td>
+            <td>8.0%</td>
+            <td>92.8%</td>
+            <td>Trivial</td>
+          </tr>
+          <tr>
+            <td>Errores tipográficos en la interfaz UI</td>
+            <td>18</td>
+            <td>7.2%</td>
+            <td>100.0%</td>
+            <td>Trivial</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Tarea 3: Git SCM Setup -->
+    <section class="card" id="act3">
+      <div class="card-title">🛡️ Tarea 3: Implementación Práctica de SCM en GitHub</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        Ejecuta en tu repositorio del Proyecto Integrador la congelación de la <strong>Functional Baseline v0.1.0</strong> mediante comandos Git:
+      </p>
+
+      <div class="code-box">
+# 1. Crear y taggear la línea base funcional (Baseline)
+git checkout main
+git tag -a v0.1.0-baseline.functional -m "Línea Base Funcional Aprobada: Requisitos y Arquitectura Inicial"
+git push origin v0.1.0-baseline.functional
+
+# 2. Configurar el archivo .github/pull_request_template.md con checklist de calidad
+# Incluir en el PR template:
+# [ ] Casos de prueba unitaria agregados y pasando
+# [ ] Análisis de linter / SonarQube sin violaciones críticas
+# [ ] Requisito trazable con ID en la matriz RTM
+      </div>
+    </section>
+
+    <!-- Rúbrica -->
+    <section class="card" id="rubrica">
+      <div class="card-title">📋 Rúbrica de Evaluación (10.0 Puntos)</div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>Excelente (100%)</th>
+            <th>Aceptable (70%)</th>
+            <th>Deficiente (0-40%)</th>
+            <th>Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Diagrama de Ishikawa</strong></td>
+            <td>Desglose riguroso en las 6 ramas de software con causas secundarias creíbles y técnica 5 Porqués.</td>
+            <td>Menos de 8 causas o agrupadas sin coherencia en las categorías.</td>
+            <td>Diagrama incompleto o superficial.</td>
+            <td><strong>3.5 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Análisis de Pareto</strong></td>
+            <td>Cálculo matemático exacto de porcentajes acumulados e interpretación estratégica de foco.</td>
+            <td>Tabla con errores de cálculo en porcentaje acumulado.</td>
+            <td>No identifica la zona vital 80/20.</td>
+            <td><strong>3.5 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Configuración SCM en Git</strong></td>
+            <td>Evidencia en GitHub con tag semántico de baseline, protección de rama y pull request template.</td>
+            <td>Tag creado localmente sin publicar en remoto o sin plantilla de PR.</td>
+            <td>Sin evidencia de uso de Git.</td>
+            <td><strong>3.0 pts</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+</body>
+</html>

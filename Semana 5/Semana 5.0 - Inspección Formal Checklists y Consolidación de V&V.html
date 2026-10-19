@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 5.0: Metodología de Inspección Formal de Software (Fagan), Listas de Chequeo y Consolidación de V&V (RA3) | UNIBE.">
+  <title>Semana 5.0: Inspección Formal, Checklists y Consolidación | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(16, 185, 129, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #10b981;
+      --color-secondary: #3b82f6;
+      --color-accent: #34d399;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)); transition: width 0.1s ease; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(16, 185, 129, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(16, 185, 129, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 45px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 45px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-rda { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .hero-title {
+      font-size: 2.3rem; font-weight: 800; letter-spacing: -1px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #6ee7b7 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 850px; }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; }
+    .section-title { font-size: 1.75rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px; }
+    .section-title span.number {
+      display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(16, 185, 129, 0.2); color: var(--color-primary); font-size: 0.95rem; font-weight: 700;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; transition: all 0.2s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); transform: translateY(-2px); }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-container {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); margin: 14px 0;
+    }
+    .code-header { background: #131d33; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); }
+    pre code { display: block; padding: 18px; color: #e2e8f0; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; }
+
+    .alert-box { border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
+    .alert-info { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #a7f3d0; }
+    .alert-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; }
+
+    /* Quiz */
+    .quiz-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(20, 30, 50, 0.7)); border: 1px solid var(--border-glow); border-radius: 16px; padding: 30px; }
+    .quiz-question { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .quiz-q-title { font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-light); padding: 10px 16px; border-radius: 8px;
+      cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255, 255, 255, 0.08); }
+    .quiz-option.selected { border-color: var(--color-primary); background: rgba(16, 185, 129, 0.15); }
+    .quiz-option.correct { border-color: var(--color-success); background: rgba(16, 185, 129, 0.2); }
+    .quiz-option.incorrect { border-color: var(--color-danger); background: rgba(239, 68, 68, 0.2); }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; border: none;
+      padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.92rem;
+    }
+    .quiz-feedback { padding: 12px 18px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; display: none; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · V&V de Software</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">V&V de Software</div>
+      <h2>Semana 5.0</h2>
+      <p>Inspección Formal & Consolidación</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Visión General</a></li>
+      <li><a href="#fagan">🔬 2. El Proceso Fagan (IBM)</a></li>
+      <li><a href="#checklists">📋 3. Diseño de Listas de Chequeo</a></li>
+      <li><a href="#eficiencia">📈 4. Métricas DDE y DRE</a></li>
+      <li><a href="#consolidacion">🧩 5. Consolidación RA1, RA2, RA3</a></li>
+      <li><a href="#quiz">🧪 6. Cuestionario de Preparación</a></li>
+      <li><a href="Semana 5.1 - Taller de Inspección Formal y Auditoría de Artefactos.html">📝 Taller Práctico 5.1 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Período 2026</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">RA3</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Unidad 2: Verificación y Validación</span>
+        <span class="hero-badge badge-rda">Resultado de Aprendizaje: RA3</span>
+      </div>
+      <h1 class="hero-title">Inspección Formal de Software (Fagan), Checklists y Consolidación</h1>
+      <p class="hero-desc">
+        En esta sesión profundizamos en la técnica estática más poderosa de la ingeniería de software: la Inspección Formal de Michael Fagan (IEEE 1028). Diseñamos listas de chequeo estructuradas para requisitos, arquitectura y código fuente, analizamos la métrica de Eficiencia en Remoción de Defectos (DRE) y consolidamos de forma integral los conocimientos de las Unidades 1 y 2 (RA1, RA2 y RA3) como preparación decisiva para el Examen Parcial I.
+      </p>
+    </header>
+
+    <!-- Sección 2: El Proceso Fagan -->
+    <section class="content-section" id="fagan">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> La Metodología de Inspección Formal de Michael Fagan</h2>
+        <p class="section-subtitle">Pionera en IBM (1976), reduce hasta un 80% de los defectos antes de ejecutar la primera prueba dinámica.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Las 6 Fases Rigurosas de la Inspección de Fagan</div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Fase</th>
+              <th>Nombre</th>
+              <th>Actividades Clave y Entregables</th>
+              <th>Responsable Principal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Fase 1</strong></td>
+              <td><strong>Planificación (Planning)</strong></td>
+              <td>El moderador verifica los <em>criterios de entrada</em> (artefacto limpio, compilable, linter aprobado), asigna roles específicos a los inspectores y define fecha/lugar.</td>
+              <td>Moderador</td>
+            </tr>
+            <tr>
+              <td><strong>Fase 2</strong></td>
+              <td><strong>Introducción (Overview)</strong></td>
+              <td>Reunión breve opcional donde el autor explica el contexto global de la arquitectura y los objetivos a los inspectores.</td>
+              <td>Autor</td>
+            </tr>
+            <tr>
+              <td><strong>Fase 3</strong></td>
+              <td><strong>Preparación Individual</strong></td>
+              <td>Cada inspector estudia en solitario el artefacto aplicando listas de chequeo (Checklists), registrando anomalías previas a la reunión.</td>
+              <td>Inspectores</td>
+            </tr>
+            <tr>
+              <td><strong>Fase 4</strong></td>
+              <td><strong>Reunión de Inspección</strong></td>
+              <td>Lectura guiada del artefacto. Se descubren y registran anomalías en el <em>Registro de Defectos (Defect Log)</em>. <strong>REGLA DE ORO: Se buscan defectos, NO se diseñan soluciones.</strong></td>
+              <td>Todo el equipo (Guía: Moderador)</td>
+            </tr>
+            <tr>
+              <td><strong>Fase 5</strong></td>
+              <td><strong>Retrabajo (Rework)</strong></td>
+              <td>El autor corrige cada defecto registrado en el Defect Log en el código fuente o especificación.</td>
+              <td>Autor</td>
+            </tr>
+            <tr>
+              <td><strong>Fase 6</strong></td>
+              <td><strong>Seguimiento (Follow-up)</strong></td>
+              <td>El moderador audita el 100% de las correcciones del autor. Si supera el umbral de calidad, aprueba el <em>Criterio de Salida</em>; de lo contrario, ordena re-inspección.</td>
+              <td>Moderador</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert-box alert-warning">
+          <div>
+            ⚠️ <strong>Reglas de Oro de Fagan:</strong>
+            <br>1. <strong>Tasa de Inspección Recomendada:</strong> No superar 200 a 400 líneas de código (o 2 a 3 páginas de requisitos) por hora de reunión.
+            <br>2. <strong>Duración Máxima:</strong> Nunca exceder 2 horas consecutivas por sesión para evitar fatiga cognitiva y pérdida de efectividad.
+            <br>3. <strong>Ego-less Programming:</strong> Se evalúa el producto, jamás la inteligencia o valía del desarrollador.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 3: Listas de Chequeo -->
+    <section class="content-section" id="checklists">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Diseño y Aplicación de Listas de Chequeo (Checklists)</h2>
+        <p class="section-subtitle">La herramienta cognitiva que orienta el ojo crítico del inspector sobre los puntos vulnerables.</p>
+      </div>
+
+      <div class="grid-3">
+        
+        <div class="card">
+          <div class="card-title">📋 Checklist de Requisitos</div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li>[ ] <strong>Completitud:</strong> ¿Se definen todos los flujos alternos y excepciones?</li>
+            <li>[ ] <strong>Verificabilidad:</strong> ¿Cada requisito no funcional tiene métricas medibles?</li>
+            <li>[ ] <strong>Ambigüedad:</strong> ¿Se eliminaron palabras subjetivas ("rápido", "intuitivo")?</li>
+            <li>[ ] <strong>Consistencia:</strong> ¿No hay conflictos entre historias de usuario?</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🏛️ Checklist de Arquitectura</div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li>[ ] <strong>Acoplamiento:</strong> ¿Los módulos dependen de interfaces y no de clases concretas (DIP)?</li>
+            <li>[ ] <strong>Single Point of Failure:</strong> ¿Existen réplicas para bases de datos y gateways?</li>
+            <li>[ ] <strong>Seguridad:</strong> ¿Se aplica el principio de mínimo privilegio en APIs?</li>
+            <li>[ ] <strong>Persistencia:</strong> ¿Se contemplan transacciones atómicas (ACID)?</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">💻 Checklist de Código Fuente</div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li>[ ] <strong>Nulos y Fronteras:</strong> ¿Se valida <code>null</code> / <code>undefined</code> y límites de bucles?</li>
+            <li>[ ] <strong>Inyecciones:</strong> ¿Se usan consultas preparadas (PreparedStatement) contra SQLi?</li>
+            <li>[ ] <strong>Recursos:</strong> ¿Se cierran streams, sockets y conexiones en bloques <code>finally</code>?</li>
+            <li>[ ] <strong>Excepciones:</strong> ¿Se capturan excepciones específicas en vez de <code>catch (Exception e)</code> vacío?</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección 4: DRE y DDE -->
+    <section class="content-section" id="eficiencia">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> Eficiencia en Remoción de Defectos (DRE)</h2>
+        <p class="section-subtitle">Cómo cuantificar la eficacia de los filtros de calidad a lo largo del pipeline.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Fórmula Matemática de DRE (Defect Removal Efficiency)</div>
+        <div class="code-container">
+          <pre><code>DRE = [ E / (E + D) ] * 100
+
+Donde:
+E = Número de defectos detectados internamente ANTES de la liberación (inspecciones + pruebas)
+D = Número de defectos reportados por el usuario final DESPUÉS del despliegue en producción</code></pre>
+        </div>
+        <p class="card-text">
+          Una organización con alta madurez de ingeniería mantiene un <strong>DRE ≥ 90%</strong>. Si el DRE cae por debajo del 80%, significa que los filtros estáticos de inspección y las pruebas de regresión están dejando escapar demasiados defectos a producción, elevando drásticamente el costo de mantenimiento (Curva de Boehm).
+        </p>
+      </div>
+    </section>
+
+    <!-- Sección 5: Consolidación -->
+    <section class="content-section" id="consolidacion">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Mapa de Consolidación Integral: Unidades 1 y 2 (RA1, RA2, RA3)</h2>
+        <p class="section-subtitle">Visión sinérgica de los contenidos evaluados en el Primer Parcial.</p>
+      </div>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Resultado de Aprendizaje</th>
+            <th>Eje Temático Principal</th>
+            <th>Herramientas y Estándares</th>
+            <th>Aplicación Práctica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RA1 (Semanas 1 y 2)</strong></td>
+            <td>Fundamentos de Calidad y Dimensiones del Producto</td>
+            <td>ISO/IEC 25010 (SQuaRE), CMMI v2.0, ISO 9001, GQM.</td>
+            <td>Diferenciación de Error/Defecto/Falla y formulación de Matriz de Métricas de Calidad de Producto.</td>
+          </tr>
+          <tr>
+            <td><strong>RA2 (Semana 3)</strong></td>
+            <td>Herramientas Estadísticas de Calidad y Gestión de Configuración</td>
+            <td>7 Herramientas Básicas (Ishikawa, Pareto 80/20), IEEE 828, Git.</td>
+            <td>Análisis causa-raíz de caídas de servicio, priorización de módulos críticos y congelación de Baselines.</td>
+          </tr>
+          <tr>
+            <td><strong>RA3 (Semanas 4 y 5)</strong></td>
+            <td>V&V Estática e Inspección Formal de Software</td>
+            <td>ISO/IEC/IEEE 29119, ISTQB CTFL 4.0, Inspección de Fagan, IEEE 1028.</td>
+            <td>Construcción de Matriz RTM, ejecución de Walkthroughs y auditoría de artefactos con Checklists.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Sección 6: Cuestionario -->
+    <section class="content-section" id="quiz">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> Cuestionario Formativo de Consolidación</h2>
+        <p class="section-subtitle">Preguntas analíticas integradoras para medir tu preparación hacia el examen.</p>
+      </div>
+
+      <div class="quiz-card">
+        
+        <div class="quiz-question" data-q="1">
+          <div class="quiz-q-title">1. En una Inspección Formal de Fagan, durante la reunión de inspección, un desarrollador y el autor comienzan a discutir durante 20 minutos sobre cuál es el mejor algoritmo para reescribir una función defectuosa. ¿Qué acción debe tomar el Moderador?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Permitir el debate para resolver el problema de raíz en la misma reunión.</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Intervenir de inmediato y recordar que la reunión es exclusivamente para REGISTRAR defectos, no para diseñar soluciones; la corrección corresponde a la fase de Retrabajo.</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Cancelar la inspección definitivamente y enviar el código a producción.</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Sancionar disciplinariamente al autor ante Recursos Humanos.</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="2">
+          <div class="quiz-q-title">2. Un equipo descubrió 180 defectos durante las fases de inspección estática y pruebas internas. Posteriormente, en producción los usuarios reportaron 20 defectos durante los primeros 3 meses. ¿Cuál es el DRE del proceso?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) 90.0%  [180 / (180 + 20) * 100]</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) 11.1%  [20 / 180 * 100]</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) 80.0%  [(180 - 20) / 200 * 100]</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) 100%</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="3">
+          <div class="quiz-q-title">3. ¿Qué diferencia principal existe entre un Walkthrough y una Inspección Formal de Fagan?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) El Walkthrough está liderado por el autor con foco en transferir conocimiento; la Inspección está liderada por un Moderador neutral con roles formales, métricas y checklists.</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) El Walkthrough requiere ejecutar código en Docker; la Inspección solo revisa documentos impresos.</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) La Inspección de Fagan es informal y no genera actas.</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Ninguna, son términos exactamente idénticos en ISO 29119.</div>
+          </div>
+        </div>
+
+        <div class="quiz-action-bar">
+          <button class="btn-submit" onclick="gradeQuiz()">Calificar Respuestas</button>
+          <div id="quizResult" class="quiz-feedback"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    function selectOption(el) {
+      el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function gradeQuiz() {
+      const answers = { 1: 'b', 2: 'a', 3: 'a' };
+      let score = 0;
+      const total = 3;
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        const qNum = q.getAttribute('data-q');
+        const selected = q.querySelector('.quiz-option.selected');
+        q.querySelectorAll('.quiz-option').forEach(opt => {
+          opt.classList.remove('correct', 'incorrect');
+          if (opt.getAttribute('data-val') === answers[qNum]) opt.classList.add('correct');
+        });
+        if (selected) {
+          if (selected.getAttribute('data-val') === answers[qNum]) score++;
+          else selected.classList.add('incorrect');
+        }
+      });
+      const res = document.getElementById('quizResult');
+      res.style.display = 'block';
+      if (score === total) {
+        res.className = 'quiz-feedback alert-success';
+        res.innerHTML = `🎉 ¡Puntaje Perfecto! ${score}/${total} (100%). Estás en un excelente nivel para el Examen Parcial I.`;
+      } else {
+        res.className = 'quiz-feedback alert-warning';
+        res.innerHTML = `⚠️ Obtuviste ${score}/${total}. Revisa las opciones marcadas en verde para afianzar los conceptos clave.`;
+      }
+    }
+  </script>
+
+</body>
+</html>

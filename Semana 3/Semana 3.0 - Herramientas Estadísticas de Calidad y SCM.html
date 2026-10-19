@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 3.0: Siete Herramientas Básicas de Calidad aplicadas al Software y Fundamentos de Gestión de Configuración (SCM) (RA2) | UNIBE.">
+  <title>Semana 3.0: Herramientas Estadísticas de Calidad y SCM | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(139, 92, 246, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #8b5cf6;
+      --color-secondary: #3b82f6;
+      --color-accent: #a78bfa;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)); transition: width 0.1s ease; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(139, 92, 246, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(139, 92, 246, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 45px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 45px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-rda { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .hero-title {
+      font-size: 2.3rem; font-weight: 800; letter-spacing: -1px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 850px; }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; }
+    .section-title { font-size: 1.75rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px; }
+    .section-title span.number {
+      display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(139, 92, 246, 0.2); color: var(--color-primary); font-size: 0.95rem; font-weight: 700;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; transition: all 0.2s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); transform: translateY(-2px); }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-container {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); margin: 14px 0;
+    }
+    .code-header {
+      background: #131d33; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);
+    }
+    pre code { display: block; padding: 18px; color: #e2e8f0; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; }
+
+    .alert-box { border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
+    .alert-info { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.25); color: #ddd6fe; }
+    .alert-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; }
+
+    /* Quiz */
+    .quiz-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(20, 30, 50, 0.7)); border: 1px solid var(--border-glow); border-radius: 16px; padding: 30px; }
+    .quiz-question { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .quiz-q-title { font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-light); padding: 10px 16px; border-radius: 8px;
+      cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255, 255, 255, 0.08); }
+    .quiz-option.selected { border-color: var(--color-primary); background: rgba(139, 92, 246, 0.15); }
+    .quiz-option.correct { border-color: var(--color-success); background: rgba(16, 185, 129, 0.2); }
+    .quiz-option.incorrect { border-color: var(--color-danger); background: rgba(239, 68, 68, 0.2); }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; border: none;
+      padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.92rem;
+    }
+    .quiz-feedback { padding: 12px 18px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; display: none; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · V&V de Software</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">V&V de Software</div>
+      <h2>Semana 3.0</h2>
+      <p>Herramientas Estadísticas & SCM</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Visión General</a></li>
+      <li><a href="#herramientas">📊 2. Las 7 Herramientas Básicas</a></li>
+      <li><a href="#ishikawa">🐟 3. Ishikawa Adaptado a Software</a></li>
+      <li><a href="#pareto">📉 4. Diagrama de Pareto (80/20)</a></li>
+      <li><a href="#scm">🛡️ 5. Fundamentos de SCM</a></li>
+      <li><a href="#git">🌿 6. Git, Baselines y Cambios</a></li>
+      <li><a href="#quiz">🧪 7. Cuestionario de Evaluación</a></li>
+      <li><a href="Semana 3.1 - Taller Práctico de Ishikawa Pareto y SCM.html">📝 Taller Práctico 3.1 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Período 2026</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">RA2</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Unidad 1: Fundamentos de Calidad</span>
+        <span class="hero-badge badge-rda">Resultado de Aprendizaje: RA2</span>
+      </div>
+      <h1 class="hero-title">Herramientas Estadísticas de Calidad y Gestión de Configuración (SCM)</h1>
+      <p class="hero-desc">
+        En esta sesión dominaremos las 7 herramientas estadísticas clásicas de Kaoru Ishikawa adaptadas a la ingeniería de software moderna, profundizando en el Diagrama de Causa-Efecto (Espina de Pescado) y el Análisis de Pareto (80/20). Paralelamente, establecemos los cimientos de la Gestión de Configuración de Software (SCM): identificación de ítems de configuración (SCI), establecimiento de líneas base (baselines), ramificación profesional en Git y comités de control de cambios (CCB).
+      </p>
+    </header>
+
+    <!-- Sección 2: 7 Herramientas -->
+    <section class="content-section" id="herramientas">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> Las 7 Herramientas Básicas de Calidad en Software</h2>
+        <p class="section-subtitle">Cómo el control estadístico de procesos resuelve el 95% de los problemas de calidad en equipos ágiles.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Diagrama Causa-Efecto</div>
+          <p class="card-text">Identifica y clasifica de forma gráfica todas las posibles causas raíces que originan un defecto crítico de software.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Diagrama de Pareto</div>
+          <p class="card-text">Principio del 80/20: el 80% de las fallas del sistema se concentran en el 20% de los módulos o causas identificadas.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Diagramas de Flujo</div>
+          <p class="card-text">Modelan visualmente el proceso de desarrollo, revisión y despliegue (CI/CD) para detectar cuellos de botella y pasos sin valor.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">4. Listas de Chequeo</div>
+          <p class="card-text">Checklists sistemáticas para recopilar datos de inspección de artefactos o verificar criterios de aceptación (Definition of Done).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">5. Histogramas</div>
+          <p class="card-text">Visualizan la distribución de frecuencias de variables continuas: tiempo de resolución de bugs, cobertura de pruebas o tamaño de PRs.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">6. Gráficos de Control (SPC)</div>
+          <p class="card-text">Monitorean si el proceso es predecible en el tiempo calculando límites de control superior (UCL) e inferior (LCL) en métricas de sprints.</p>
+        </div>
+        <div class="card" style="grid-column: span 1;">
+          <div class="card-title">7. Diagramas de Dispersión</div>
+          <p class="card-text">Miden la correlación matemática entre dos variables de software (ej. Complejidad Ciclomática vs Densidad de Defectos).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 3: Ishikawa -->
+    <section class="content-section" id="ishikawa">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Diagrama de Ishikawa Adaptado a la Ingeniería de Software</h2>
+        <p class="section-subtitle">Las 6M tradicionales adaptadas a los pilares del desarrollo de software contemporáneo.</p>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Estructura de Espina de Pescado (Software Ishikawa)</span>
+          <span>Diagrama Conceptual</span>
+        </div>
+        <pre><code>PERSONAS (Roles/Skills)        PROCESOS (Metodología)         ENTORNO / HERRAMIENTAS
+         \                              \                              \
+          \                              \                              \
+           ───────────────┬──────────────────────────────┬───────────────
+                          │                              │
+                          │                              │            =====================
+                          │                              │           || EFECTO / DEFECTO   ||
+                          │                              │    -----> || CRÍTICO OBSERVADO ||
+                          │                              │            =====================
+           ───────────────┴──────────────────────────────┴───────────────
+          /                              /                              /
+         /                              /                              /
+REQUISITOS / DATOS             CÓDIGO / ARQUITECTURA          PRUEBAS / VALIDACIÓN</code></pre>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Categorías Adaptadas a Software</div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--text-muted);">
+            <li>🔹 <strong>Personas:</strong> Fatiga del equipo, falta de capacitación en el framework, rotación de desarrolladores, sesgos cognitivos.</li>
+            <li>🔹 <strong>Procesos:</strong> Ausencia de code reviews obligatorios, criterios de aceptación mal definidos, despliegues manuales los viernes.</li>
+            <li>🔹 <strong>Entorno y Herramientas:</strong> Dependencias desactualizadas, diferencias entre Docker local y Cloud, fallas de conectividad CI/CD.</li>
+            <li>🔹 <strong>Requisitos:</strong> Historias de usuario ambiguas, cambios tardíos de alcance, criterios Gherkin ausentes.</li>
+            <li>🔹 <strong>Código y Arquitectura:</strong> Alto acoplamiento, deuda técnica acumulada, falta de manejo defensivo de excepciones.</li>
+            <li>🔹 <strong>Pruebas:</strong> Cobertura insuficiente en casos límite, datos de prueba obsoletos, ausencia de pruebas de integración.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Caso Real: Falla en Pasarela de Pagos</div>
+          <p class="card-text" style="margin-bottom: 10px;">
+            Durante un evento de Black Friday, el 40% de los pagos con tarjeta fueron rechazados erróneamente:
+          </p>
+          <div class="alert-box alert-warning">
+            <div>
+              <strong>Causas identificadas con Ishikawa:</strong>
+              <br>1. <em>Código:</em> Timeout estático configurado en 2 segundos (la API bancaria demoraba 3.5s por sobrecarga).
+              <br>2. <em>Pruebas:</em> Solo se ejecutaron tests unitarios con mocks; nunca se probaron escenarios con latencia simulada.
+              <br>3. <em>Procesos:</em> No se realizó un Load Test previo al evento.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 4: Pareto -->
+    <section class="content-section" id="pareto">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> Diagrama de Pareto (Regla del 80/20) en Testing</h2>
+        <p class="section-subtitle">Focalización estratégica: priorizar los pocos vitales sobre los muchos triviales.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Distribución Acumulada de Defectos por Módulo</div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Módulo del Sistema</th>
+              <th>Defectos Encontrados</th>
+              <th>% Individual</th>
+              <th>% Acumulado</th>
+              <th>Clasificación de Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background: rgba(239, 68, 68, 0.08);">
+              <td><strong>Módulo de Pagos y Facturación</strong></td>
+              <td>112</td>
+              <td>49.8%</td>
+              <td>49.8%</td>
+              <td><span style="color: #ef4444; font-weight:700;">Vital (Zona Pareto 80%)</span></td>
+            </tr>
+            <tr style="background: rgba(239, 68, 68, 0.08);">
+              <td><strong>Autenticación y Sesiones JWT</strong></td>
+              <td>68</td>
+              <td>30.2%</td>
+              <td>80.0%</td>
+              <td><span style="color: #ef4444; font-weight:700;">Vital (Zona Pareto 80%)</span></td>
+            </tr>
+            <tr>
+              <td>Catálogo de Productos y Filtros</td>
+              <td>24</td>
+              <td>10.7%</td>
+              <td>90.7%</td>
+              <td>Trivial (Zona 20%)</td>
+            </tr>
+            <tr>
+              <td>Notificaciones por Email / SMS</td>
+              <td>14</td>
+              <td>6.2%</td>
+              <td>96.9%</td>
+              <td>Trivial (Zona 20%)</td>
+            </tr>
+            <tr>
+              <td>Perfil y Preferencias de Usuario</td>
+              <td>7</td>
+              <td>3.1%</td>
+              <td>100.0%</td>
+              <td>Trivial (Zona 20%)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert-box alert-info">
+          <div>
+            💡 <strong>Conclusión Técnica:</strong> Focalizando el esfuerzo de refactorización y pruebas automatizadas en tan solo <strong>2 módulos (Pagos y Autenticación)</strong>, el equipo erradica el <strong>80% de los defectos</strong> totales del sistema.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 5: Fundamentos de SCM -->
+    <section class="content-section" id="scm">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Fundamentos de Gestión de Configuración de Software (SCM)</h2>
+        <p class="section-subtitle">El arte y la ciencia de controlar la evolución de los artefactos de software.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">¿Qué es SCM? (IEEE 828)</div>
+          <p class="card-text">
+            Disciplina que aplica dirección y vigilancia técnica y administrativa para: identificar y documentar las características funcionales y físicas de los <strong>ítems de configuración</strong>, controlar los cambios en ellos, registrar e informar el estado del cambio y verificar el cumplimiento de los requisitos.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Ítem de Configuración (SCI)</div>
+          <p class="card-text">
+            Cualquier artefacto de software creado o utilizado durante el ciclo de vida que se pone formalmente bajo control de configuración:
+            <br>• Código fuente y scripts SQL
+            <br>• Modelos y especificación de requisitos
+            <br>• Casos de prueba y suites automatizadas
+            <br>• Dockerfiles y pipelines YAML
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Líneas Base (Baselines)</div>
+          <p class="card-text">
+            Una especificación o producto que ha sido formalmente revisado y acordado, que sirve de base para un desarrollo posterior y que <strong>solo puede cambiarse mediante procedimientos formales de control de cambios</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Tipos de Líneas Base -->
+      <div class="card">
+        <div class="card-title">Jerarquía de Líneas Base en el Ciclo de Vida</div>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Línea Base (Baseline)</th>
+              <th>Momento del Ciclo de Vida</th>
+              <th>Artefactos Aprobados y Congelados</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Functional Baseline (Línea Base Funcional)</strong></td>
+              <td>Fin de la fase de Requisitos</td>
+              <td>Documento de Requisitos de Software (SRS / User Stories aprobadas).</td>
+            </tr>
+            <tr>
+              <td><strong>Design / Allocated Baseline</strong></td>
+              <td>Fin del Diseño Arquitectónico</td>
+              <td>Diagramas C4, esquemas de bases de datos, contratos de API (OpenAPI/Swagger).</td>
+            </tr>
+            <tr>
+              <td><strong>Development Baseline</strong></td>
+              <td>Durante la Construcción continua</td>
+              <td>Versiones taggeadas de código y pruebas unitarias que pasan en CI.</td>
+            </tr>
+            <tr>
+              <td><strong>Product / Release Baseline</strong></td>
+              <td>Entrega a Producción (Release)</td>
+              <td>Binarios compilados, imágenes Docker selladas, informes finales de prueba y manuales.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sección 6: Git, Branching y CCB -->
+    <section class="content-section" id="git">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> Control de Versiones con Git y Gestión de Cambios (CCB)</h2>
+        <p class="section-subtitle">Reglas de ramificación, branch protection y el Comité de Control de Cambios.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Estrategia de Ramificación y Branch Protection</div>
+          <p class="card-text" style="margin-bottom: 12px;">
+            En proyectos profesionales con V&V rigurosa, la rama <code>main</code> está protegida con las siguientes reglas inviolables:
+          </p>
+          <div class="code-container">
+            <div class="code-header"><span>Reglas Obligatorias en GitHub / GitLab</span></div>
+            <pre><code>1. Bloqueo de Push directo a 'main'
+2. Requerir Pull Request con al menos 1 Peer Review aprobado
+3. Requerir que el pipeline de CI pase al 100% (Build + Tests)
+4. Sin commits directos: Merge mediante 'Squash and Merge'
+5. Versionamiento Semántico con Git Tags: v1.0.0, v1.1.0</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">El Comité de Control de Cambios (CCB)</div>
+          <p class="card-text">
+            Grupo formal de interesados (Project Manager, Líder Técnico, Líder de QA y Cliente) responsable de evaluar, aprobar o rechazar <strong>Solicitudes de Cambio (Change Requests - CR)</strong> sobre una línea base congelada.
+            <br><br>
+            <strong>Flujo del Cambio:</strong>
+            <br>1. Solicitud formal de cambio con justificación.
+            <br>2. Análisis de impacto (técnico, financiero y cronograma).
+            <br>3. Decisión del CCB (Aprobado / Rechazado / Pospuesto).
+            <br>4. Implementación en rama feature + Pruebas de Regresión.
+            <br>5. Creación de una nueva Línea Base.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 7: Cuestionario -->
+    <section class="content-section" id="quiz">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">7</span> Cuestionario Interactivo de Evaluación</h2>
+        <p class="section-subtitle">Comprueba tu dominio de las 7 herramientas estadísticas y la gestión de configuración.</p>
+      </div>
+
+      <div class="quiz-card">
+        
+        <div class="quiz-question" data-q="1">
+          <div class="quiz-q-title">1. Si el equipo descubre que el 80% de los bugs de seguridad provienen exclusivamente de módulos que manejan autenticación y deserialización, ¿qué principio de calidad se evidencia?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Principio de Pareto (Agrupamiento de defectos / Defect clustering)</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Regla de Shewhart de límites de control</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Paradoja del Pesticida</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Principio de no repudio de ISO 25010</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="2">
+          <div class="quiz-q-title">2. ¿Qué es formalmente una 'Línea Base' (Baseline) en SCM?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) El primer commit vacío de un repositorio git.</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Un artefacto o conjunto de artefactos formalmente revisado y acordado, que solo puede alterarse mediante un procedimiento formal de cambio.</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) La cantidad mínima de memoria RAM para ejecutar el servidor.</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Un documento de Word sin control de versiones.</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="3">
+          <div class="quiz-q-title">3. En un Diagrama de Ishikawa de software, ¿dónde ubicarías la causa: "Falta de pruebas con latencia de red simulada en el pipeline"?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) En la espina de Pruebas / Validación</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) En la espina de Requisitos de Hardware</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) En la cabeza del pescado (Efecto final)</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) En la espina de Facturación Comercial</div>
+          </div>
+        </div>
+
+        <div class="quiz-action-bar">
+          <button class="btn-submit" onclick="gradeQuiz()">Calificar Respuestas</button>
+          <div id="quizResult" class="quiz-feedback"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    function selectOption(el) {
+      el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function gradeQuiz() {
+      const answers = { 1: 'a', 2: 'b', 3: 'a' };
+      let score = 0;
+      const total = 3;
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        const qNum = q.getAttribute('data-q');
+        const selected = q.querySelector('.quiz-option.selected');
+        q.querySelectorAll('.quiz-option').forEach(opt => {
+          opt.classList.remove('correct', 'incorrect');
+          if (opt.getAttribute('data-val') === answers[qNum]) opt.classList.add('correct');
+        });
+        if (selected) {
+          if (selected.getAttribute('data-val') === answers[qNum]) score++;
+          else selected.classList.add('incorrect');
+        }
+      });
+      const res = document.getElementById('quizResult');
+      res.style.display = 'block';
+      if (score === total) {
+        res.className = 'quiz-feedback alert-success';
+        res.innerHTML = `🎉 ¡Puntaje Perfecto! ${score}/${total} (100%). Comprendes con exactitud las herramientas estadísticas y la gestión de configuración.`;
+      } else {
+        res.className = 'quiz-feedback alert-warning';
+        res.innerHTML = `⚠️ Obtuviste ${score}/${total}. Revisa las opciones marcadas en verde para retroalimentación.`;
+      }
+    }
+  </script>
+
+</body>
+</html>

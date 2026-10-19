@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 1.1: Taller Práctico Experimental de Diferenciación Estructurada entre Calidad, Error, Defecto, Falla y Métricas de Software (APE - RA1) | UNIBE.">
+  <title>Semana 1.1: Taller Práctico de Error, Defecto, Falla y Métricas | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(16, 185, 129, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #10b981;
+      --color-primary-rgb: 16, 185, 129;
+      --color-secondary: #3b82f6;
+      --color-accent: #34d399;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(16, 185, 129, 0.12); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(16, 185, 129, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; display: flex; flex-direction: column; gap: 40px; min-width: 0;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 40px;
+    }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .hero-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .alert-box { border-radius: 12px; padding: 16px 20px; display: flex; gap: 12px; margin: 12px 0; font-size: 0.9rem; }
+    .alert-info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); color: #bfdbfe; }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #a7f3d0; }
+
+    .code-box {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; font-family: var(--font-mono); font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 12px 0;
+    }
+
+    .scenario-box {
+      background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid var(--color-primary); border-radius: 10px; padding: 20px; margin-bottom: 16px;
+    }
+    .scenario-title { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Taller Práctico APE</div>
+      <h2 style="font-size: 1.15rem; color: #fff;">Semana 1.1</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Clasificación y Métricas</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#objetivos" class="active">🎯 1. Objetivos del Taller</a></li>
+      <li><a href="#actividad1">🧩 2. Actividad 1: Casos de Estudio</a></li>
+      <li><a href="#actividad2">📐 3. Actividad 2: Diseño GQM</a></li>
+      <li><a href="#actividad3">📚 4. Actividad 3: Glosario Técnico</a></li>
+      <li><a href="#rubrica">📊 5. Rúbrica y Entregables</a></li>
+      <li><a href="Semana 1.0 - Fundamentos de Calidad y Conceptos Clave.html">📖 Volver a Teoría 1.0 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · APE 1</span>
+      <a href="#" style="color: var(--color-accent); text-decoration:none;">RA1</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="objetivos">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; margin-bottom: 8px;">
+        Aprendizaje Práctico-Experimental (APE) · 2 Horas
+      </div>
+      <h1 class="hero-title">Taller 1.1: Clasificación de Incidentes y Formulación de Métricas</h1>
+      <p class="hero-desc">
+        Guía práctica de ejercitación en laboratorio. Aplicarás los conceptos de ISTQB e IEEE para realizar una disección técnica de incidentes reales en software bancario, aeroespacial y comercial, identificando la raíz humana (Error), el artefacto dañado (Defecto) y la consecuencia en ejecución (Falla). Asimismo, construirás un árbol de métricas bajo el enfoque GQM.
+      </p>
+    </header>
+
+    <!-- Objetivos -->
+    <section class="card">
+      <div class="card-title">🎯 Resultados de Aprendizaje y Objetivos Específicos</div>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; color: var(--text-muted);">
+        <li>✅ <strong>Diferenciar con precisión:</strong> Distinguir entre error humano, defecto en artefacto y falla en runtime en escenarios ambiguos.</li>
+        <li>✅ <strong>Estructurar métricas:</strong> Diseñar métricas cuantitativas de software mediante el paradigma GQM (Goal-Question-Metric).</li>
+        <li>✅ <strong>Glosario de ingeniería:</strong> Compilar el glosario técnico oficial con definiciones rigurosas y ejemplos contrastados.</li>
+      </ul>
+    </section>
+
+    <!-- Actividad 1: Casos de Estudio -->
+    <section class="card" id="actividad1">
+      <div class="card-title">🧩 Actividad 1: Análisis y Clasificación de Escenarios de Falla</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+        Analiza cada uno de los siguientes tres escenarios de la industria y completa la tabla de descomposición causal indicando con precisión técnica cada elemento.
+      </p>
+
+      <div class="scenario-box">
+        <div class="scenario-title">Caso A: El Carrito de Compras Fantasma</div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">
+          Un analista escribió en la especificación que "los cupones de descuento no expiran". El desarrollador implementó la lógica sin validar fecha de caducidad. Durante el Cyber Monday, un usuario aplicó un cupón del año 2021 y obtuvo un descuento del 90%, provocando pérdidas de \$30,000 a la tienda.
+        </p>
+      </div>
+
+      <div class="scenario-box">
+        <div class="scenario-title">Caso B: El Cajero Automático y el Saldo Negativo</div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">
+          Durante una migración de base de datos a PostgreSQL, el programador omitió la restricción <code>CHECK (balance >= 0)</code>. El sistema permitió retiros simultáneos en dos cajeros mediante hilos asíncronos concurrentes, dejando la cuenta en balance negativo sin generar alerta en el core bancario.
+        </p>
+      </div>
+
+      <div class="scenario-box">
+        <div class="scenario-title">Caso C: El Radar de Navegación Aérea</div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6;">
+          El programador utilizó una variable entera de 16 bits con signo para almacenar la velocidad del viento en nudos. Durante un huracán categoría 5 con rachas extremas, la variable se desbordó (overflow) pasando a un valor negativo (-32,768), lo que provocó que el piloto automático desconectara los controles de altitud.
+        </p>
+      </div>
+
+      <div style="font-weight: 600; font-size: 0.95rem; margin-top: 15px; margin-bottom: 8px;">
+        Plantilla de Respuesta requerida para el informe:
+      </div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Error Humano (Quién y qué equivocación)</th>
+            <th>Defecto en Artefacto (Línea / Documento)</th>
+            <th>Falla Observable (Runtime / Impacto)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Caso A</strong></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+          </tr>
+          <tr>
+            <td><strong>Caso B</strong></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+          </tr>
+          <tr>
+            <td><strong>Caso C</strong></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+            <td><em>[Diligenciar por el estudiante]</em></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Actividad 2: Diseño GQM -->
+    <section class="card" id="actividad2">
+      <div class="card-title">📐 Actividad 2: Formulación de Métricas mediante el Modelo GQM</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+        Para tu Proyecto Integrador de Software, selecciona una meta de calidad de producto (ej. Fiabilidad, Eficiencia o Mantenibilidad) y construye una jerarquía GQM completa con:
+      </p>
+
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">
+        <li>🔹 <strong>1 Meta (Goal):</strong> Redactada siguiendo el formato formal: <em>"Analizar [objeto] con el propósito de [evaluar/mejorar] con respecto a [atributo] desde la perspectiva de [rol] en el contexto de [proyecto]".</em></li>
+        <li>🔹 <strong>2 Preguntas (Questions):</strong> Preguntas analíticas directas cuya respuesta cuantifique el estado de la meta.</li>
+        <li>🔹 <strong>2 Métricas (Metrics) por pregunta:</strong> Nombre de la métrica, fórmula matemática explícita, unidad de medida y umbral de aceptación (ej. ≤ 2%, ≥ 95%).</li>
+      </ul>
+
+      <div class="code-box">
+# Ejemplo de Estructura Formal GQM:
+Meta: Analizar el módulo de facturación con el fin de evaluar su Fiabilidad desde la perspectiva del equipo de QA en el contexto del Proyecto Integrador.
+├── Pregunta 1: ¿Cuál es la densidad de defectos encontrada antes de la entrega a producción?
+│   └── Métrica 1.1: Densidad de Defectos = (Total Defectos Críticos / KLOC) [Umbral: < 1.5 def/KLOC]
+└── Pregunta 2: ¿Qué porcentaje de pruebas automatizadas fallan por regresión en cada build?
+    └── Métrica 2.1: Tasa de Regresión = (Tests fallidos en versión N / Total tests existentes) * 100 [Umbral: <= 0%]
+      </div>
+    </section>
+
+    <!-- Actividad 3: Glosario Técnico -->
+    <section class="card" id="actividad3">
+      <div class="card-title">📚 Actividad 3: Glosario Técnico Normalizado</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        Elabora en formato Markdown un glosario técnico con los 8 términos fundamentales de la semana, citando la fuente normativa oficial (ISTQB CTFL 4.0 o IEEE 610.12):
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">1. Calidad de Software</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">2. Aseguramiento (QA)</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">3. Control de Calidad (QC)</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">4. Error (Mistake)</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">5. Defecto (Bug)</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">6. Falla (Failure)</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">7. Medida vs Métrica</span>
+        <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight:600;">8. Curva de Boehm</span>
+      </div>
+    </section>
+
+    <!-- Rúbrica de Evaluación -->
+    <section class="card" id="rubrica">
+      <div class="card-title">📊 Rúbrica de Evaluación (Puntaje Total: 10.0 Puntos)</div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>Excelente (100%)</th>
+            <th>Aceptable (70%)</th>
+            <th>Deficiente (0-40%)</th>
+            <th>Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Clasificación de Incidentes</strong></td>
+            <td>Distingue inequívocamente error humano, defecto estático y falla observable en los 3 casos.</td>
+            <td>Confunde error y defecto en al menos un caso o describe la falla de manera imprecisa.</td>
+            <td>No identifica la cadena causal o confunde los conceptos de forma generalizada.</td>
+            <td><strong>4.0 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Diseño Jerárquico GQM</strong></td>
+            <td>Meta estructurada, preguntas analíticas coherentes y fórmulas cuantitativas bien formuladas con umbrales.</td>
+            <td>Plantea métricas sin fórmulas matemáticas claras o sin umbrales de aceptación.</td>
+            <td>No respeta la jerarquía GQM o propone métricas subjetivas no medibles.</td>
+            <td><strong>3.5 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Glosario y Rigor Técnico</strong></td>
+            <td>Glosario completo con citas normativas ISTQB/IEEE, redacción impecable y formato Markdown en GitHub.</td>
+            <td>Definiciones textuales de internet sin referenciar estándares formales.</td>
+            <td>Incompleto o redactado sin rigor de ingeniería.</td>
+            <td><strong>2.5 pts</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+</body>
+</html>

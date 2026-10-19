@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 6.1: Simulador Oficial y Examen Parcial I Teórico-Práctico de Verificación y Validación de Software (RA1, RA2, RA3) con temporizador interactivo y laboratorio | UNIBE.">
+  <title>Semana 6.1: Simulador y Examen Parcial I | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(245, 158, 11, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #f59e0b;
+      --color-secondary: #3b82f6;
+      --color-accent: #fbbf24;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(245, 158, 11, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; display: flex; flex-direction: column; gap: 40px; min-width: 0;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 40px; position: relative;
+    }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .hero-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* Sticky Timer Bar */
+    .timer-bar {
+      position: sticky; top: 15px; z-index: 90;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(15px);
+      border: 1px solid var(--border-glow); border-radius: 12px; padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    .timer-display { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--color-accent); }
+    .timer-btn {
+      background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-light); color: #fff;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+    }
+    .timer-btn:hover { background: var(--color-primary); }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-box {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; font-family: var(--font-mono); font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 12px 0;
+    }
+
+    /* Quiz Question Styles */
+    .quiz-question { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .quiz-q-title { font-size: 1rem; font-weight: 600; color: var(--text-bright); margin-bottom: 10px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-light); padding: 10px 14px; border-radius: 8px;
+      cursor: pointer; font-size: 0.88rem; transition: all 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255, 255, 255, 0.08); }
+    .quiz-option.selected { border-color: var(--color-primary); background: rgba(245, 158, 11, 0.15); }
+    .quiz-option.correct { border-color: var(--color-success); background: rgba(16, 185, 129, 0.2); }
+    .quiz-option.incorrect { border-color: var(--color-danger); background: rgba(239, 68, 68, 0.2); }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--color-primary), #d97706); color: #fff; border: none;
+      padding: 12px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.95rem;
+    }
+    .btn-submit:hover { transform: scale(1.02); }
+    .quiz-feedback { padding: 16px 20px; border-radius: 10px; font-size: 1rem; font-weight: 600; display: none; margin-top: 15px; }
+
+    .alert-success { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #a7f3d0; }
+    .alert-warning { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fde68a; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Examen Parcial I</div>
+      <h2 style="font-size: 1.15rem; color: #fff;">Semana 6.1</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Simulador & Laboratorio</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Instrucciones del Examen</a></li>
+      <li><a href="#teoria">📝 2. Parte I: Cuestionario (4.0 pts)</a></li>
+      <li><a href="#practica">🧪 3. Parte II: Laboratorio (6.0 pts)</a></li>
+      <li><a href="#rubrica">📊 4. Rúbrica Analítica de Cierre</a></li>
+      <li><a href="Semana 6.0 - Guía de Estudio y Repaso Integral Primer Parcial.html">📖 Volver a Guía 6.0 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Período 2026</span>
+      <a href="#" style="color: var(--color-accent); text-decoration:none;">10.0 pts</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <!-- Sticky Timer Bar -->
+    <div class="timer-bar">
+      <div>
+        <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Tiempo Restante:</span>
+        <div class="timer-display" id="timeDisplay">45:00</div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="timer-btn" onclick="startTimer()">Iniciar</button>
+        <button class="timer-btn" onclick="pauseTimer()">Pausar</button>
+        <button class="timer-btn" onclick="resetTimer()">Reiniciar</button>
+      </div>
+    </div>
+
+    <header class="hero-section" id="intro">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; margin-bottom: 8px;">
+        Evaluación Sumativa Primer Aporte · Duración: 90 Minutos
+      </div>
+      <h1 class="hero-title">Examen Parcial I: Verificación y Validación de Software</h1>
+      <p class="hero-desc">
+        Evaluación formal de los Resultados de Aprendizaje RA1, RA2 y RA3 correspondientes a las Unidades 1 y 2. Consta de dos secciones ponderadas: <strong>Parte I Teórico-Analítica (40% / 4.0 puntos)</strong> mediante reactivos automatizados tipo certificación con límite de tiempo, y <strong>Parte II Laboratorio Práctico de V&V (60% / 6.0 puntos)</strong> sobre un caso de estudio crítico.
+      </p>
+    </header>
+
+    <!-- PARTE I: Cuestionario -->
+    <section class="card" id="teoria">
+      <div class="card-title">📝 Parte I: Cuestionario Teórico-Analítico (Ponderación: 4.0 Puntos)</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+        Responde los siguientes 10 reactivos analíticos. Cada reactivo tiene un valor de <strong>0.40 puntos</strong>. Al finalizar, presiona "Calificar Examen Teórico" para obtener tu puntaje inmediato y desglose de retroalimentación.
+      </p>
+
+      <!-- Reactivo 1 -->
+      <div class="quiz-question" data-q="1">
+        <div class="quiz-q-title">1. (RA1) Un desarrollador introduce accidentalmente una condición de carrera (race condition) al no sincronizar dos hilos que acceden a una variable global. En la taxonomía formal de ISTQB, la equivocación mental del desarrollador se denomina:</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Defecto</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Error (Mistake)</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Falla (Failure)</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Excepción no controlada</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 2 -->
+      <div class="quiz-question" data-q="2">
+        <div class="quiz-q-title">2. (RA1) ¿Cuál de las siguientes actividades corresponde estrictamente al Aseguramiento de Calidad (QA) y NO al Control de Calidad (QC)?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Ejecución de una suite de pruebas de regresión en Jenkins.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Inspección de código fuente para contar null pointers.</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Definición y auditoría de los estándares de codificación y procesos de la organización.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Registro de bugs en la herramienta de seguimiento Jira.</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 3 -->
+      <div class="quiz-question" data-q="3">
+        <div class="quiz-q-title">3. (RA1) La capacidad de un sistema para restaurar su servicio y recuperar los datos directamente afectados tras un corte abrupto de energía se clasifica en ISO/IEC 25010 bajo:</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Fiabilidad (subcaracterística Recuperabilidad)</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Mantenibilidad (subcaracterística Modificabilidad)</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Portabilidad (subcaracterística Adaptabilidad)</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Eficiencia (subcaracterística Comportamiento temporal)</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 4 -->
+      <div class="quiz-question" data-q="4">
+        <div class="quiz-q-title">4. (RA1) ¿Cuál es la característica distintiva de una organización evaluada en el Nivel 4 (Gestionado Cuantitativamente) de CMMI v2.0?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) No tiene procesos documentados y depende de programadores estrella.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Los procesos se controlan mediante técnicas estadísticas de calidad y modelos predictivos.</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Solo utiliza metodologías ágiles como Scrum o Kanban.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Ha eliminado completamente la fase de pruebas dinámicas.</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 5 -->
+      <div class="quiz-question" data-q="5">
+        <div class="quiz-q-title">5. (RA2) Al tabular 200 defectos de software, se observa que el módulo de pasarela de pagos acumula 120 defectos (60%) y el módulo de autenticación acumula 45 defectos (22.5%). Aplicando la regla de Pareto, ¿qué decisión debe tomar el Líder de QA?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Repartir equitativamente el tiempo de pruebas entre todos los módulos del sistema.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Concentrar prioritariamente el esfuerzo de refactorización y pruebas exhaustivas en Pagos y Autenticación, pues suman el 82.5% de los defectos (zona vital).</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Ignorar ambos módulos y probar únicamente la interfaz estética.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Despedir a los desarrolladores de los demás módulos.</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 6 -->
+      <div class="quiz-question" data-q="6">
+        <div class="quiz-q-title">6. (RA2) En Gestión de Configuración de Software (SCM), ¿por qué es mandatorio congelar una 'Línea Base' (Baseline) antes de iniciar las pruebas de integración?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Para evitar que los desarrolladores continúen modificando el código sin control mientras el equipo de QA está validando la versión.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Para eliminar el historial de git y reducir el tamaño del repositorio.</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Porque GitHub prohíbe crear ramas sin un tag de baseline.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Para convertir el código fuente a código abierto (Open Source).</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 7 -->
+      <div class="quiz-question" data-q="7">
+        <div class="quiz-q-title">7. (RA3) ¿Cuál de las siguientes afirmaciones describe con precisión la diferencia epistemológica entre Verificación y Validación (Boehm)?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Verificación comprueba el cumplimiento de especificaciones técnicas; Validación comprueba la satisfacción de las necesidades reales del usuario final.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Verificación solo se hace en producción; Validación solo se hace en local.</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Son sinónimos intercambiables según ISO 29119.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Verificación la ejecuta el cliente; Validación la ejecuta el compilador.</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 8 -->
+      <div class="quiz-question" data-q="8">
+        <div class="quiz-q-title">8. (RA3) En una Inspección Formal de Michael Fagan, ¿cuál de los siguientes enunciados representa una REGLA DE ORO inviolable durante la Reunión de Inspección?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) El equipo debe reescribir inmediatamente las funciones de código defectuosas en la misma sesión.</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) La reunión se enfoca exclusivamente en IDENTIFICAR Y REGISTRAR defectos, prohibiendo debatir soluciones de diseño.</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) La sesión debe durar mínimo 5 horas consecutivas para ser exhaustiva.</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) El autor del código debe actuar obligatoriamente como el Moderador.</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 9 -->
+      <div class="quiz-question" data-q="9">
+        <div class="quiz-q-title">9. (RA3) Un sistema médico es sometido a inspección y pruebas internas, detectándose 90 defectos. Una vez en operación en los hospitales, los usuarios reportan 10 defectos adicionales en 6 meses. ¿Cuál es el DRE (Defect Removal Efficiency) del proceso?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) 90.0%  [90 / (90 + 10) * 100]</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) 10.0%</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) 80.0%</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) 100%</div>
+        </div>
+      </div>
+
+      <!-- Reactivo 10 -->
+      <div class="quiz-question" data-q="10">
+        <div class="quiz-q-title">10. (RA3) ¿Qué documento técnico garantiza la vinculación bidireccional entre una historia de usuario, los componentes de software construidos y los casos de prueba diseñados?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Diagrama de Ishikawa</div>
+          <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Matriz de Trazabilidad de Requisitos (RTM)</div>
+          <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Carta Gantt de cronograma</div>
+          <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Archivo README.md</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn-submit" onclick="gradeExam()">Calificar Examen Teórico</button>
+        <div id="examResult" class="quiz-feedback"></div>
+      </div>
+
+    </section>
+
+    <!-- PARTE II: Caso Práctico -->
+    <section class="card" id="practica">
+      <div class="card-title">🧪 Parte II: Laboratorio Práctico de V&V de Software (Ponderación: 6.0 Puntos)</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+        <strong>Instrucciones:</strong> Lee el siguiente caso de estudio y desarrolla en tu repositorio / informe técnico de examen los 3 requerimientos solicitados con rigor de ingeniería.
+      </p>
+
+      <div class="code-box">
+CASO DE ESTUDIO: "MEDIC-DISPATCH" (Sistema Crítico de Telemedicina y Despacho de Ambulancias)
+Empresa: SaludTech Ecuador / Hospital Metropolitano
+Arquitectura: Backend en Spring Boot, base de datos PostgreSQL y clientes móviles para paramédicos.
+
+El sistema recibe llamadas de emergencia, geolocaliza ambulancias y asigna la unidad más cercana.
+En la última actualización, ocurrieron tres incidentes críticos:
+1. Las ambulancias fueron despachadas a coordenadas erróneas (latitud y longitud invertidas en el JSON).
+2. Durante un pico de 80 llamadas simultáneas, el servidor de despacho colapsó arrojando HTTP 504.
+3. El parámetro de búsqueda del paciente se construyó concatenando la cédula en la consulta SQL sin sanitizar.
+      </div>
+
+      <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 16px;">
+        
+        <div style="background: rgba(30, 41, 59, 0.5); padding: 18px; border-radius: 10px; border-left: 3px solid var(--color-primary);">
+          <strong style="color:#fff; font-size: 0.95rem;">Requerimiento 1: Análisis Causa-Raíz Ishikawa (2.0 Puntos)</strong>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5;">
+            Construye el Diagrama de Ishikawa de software para el problema central: <em>"Colapso del servidor de despacho y despacho a coordenadas erróneas bajo concurrencia"</em>, identificando al menos 2 causas secundarias plausibles en cada una de las 6 categorías de software (Personas, Procesos, Entorno, Requisitos, Código y Pruebas).
+          </p>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.5); padding: 18px; border-radius: 10px; border-left: 3px solid var(--color-secondary);">
+          <strong style="color:#fff; font-size: 0.95rem;">Requerimiento 2: Reespecificación ISO 25010 y Métricas Planguage (2.0 Puntos)</strong>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5;">
+            El requisito actual dice: <em>"El sistema debe ser muy rápido y soportar muchas llamadas sin caerse"</em>. Reespecifícalo bajo el estándar Planguage para la característica <strong>Eficiencia de Desempeño</strong> y <strong>Fiabilidad</strong>, definiendo escala, métrica ISO 25023, meta cuantitativa, peor caso aceptable y método de verificación en JMeter.
+          </p>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.5); padding: 18px; border-radius: 10px; border-left: 3px solid var(--color-success);">
+          <strong style="color:#fff; font-size: 0.95rem;">Requerimiento 3: Matriz de Trazabilidad RTM y Quality Gates (2.0 Puntos)</strong>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5;">
+            Diseña la Matriz de Trazabilidad RTM para los 3 incidentes (despacho por geolocalización, concurrencia de llamadas e inyección SQL), asociando: ID Requisito, Componente de Código, Tipo de Prueba de Verificación (Caja Negra, Caja Blanca, SAST con SonarQube) y Criterio Booleano de Aceptación para la línea base de producción.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Rúbrica -->
+    <section class="card" id="rubrica">
+      <div class="card-title">📊 Rúbrica Analítica de Calificación Institucional (Total: 10.0 Puntos)</div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Componente del Examen</th>
+            <th>Ponderación</th>
+            <th>Criterio de Evaluación Excelente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Parte I: Cuestionario Automatizado</strong></td>
+            <td><strong>4.0 Puntos (40%)</strong></td>
+            <td>10 reactivos de opción múltiple calificados de forma objetiva (0.40 pts c/u).</td>
+          </tr>
+          <tr>
+            <td><strong>Parte II: Ishikawa Causa-Raíz</strong></td>
+            <td><strong>2.0 Puntos (20%)</strong></td>
+            <td>Diagrama con 6 ramas completas, causas plausibles y técnica de los 5 Porqués.</td>
+          </tr>
+          <tr>
+            <td><strong>Parte II: Reespecificación Planguage</strong></td>
+            <td><strong>2.0 Puntos (20%)</strong></td>
+            <td>Formulación cuantitativa de latencia y SLA con métricas de ISO 25023.</td>
+          </tr>
+          <tr>
+            <td><strong>Parte II: Matriz RTM y V&V</strong></td>
+            <td><strong>2.0 Puntos (20%)</strong></td>
+            <td>Trazabilidad unívoca entre incidentes, componentes y pruebas con compuertas de calidad.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <script>
+    // Timer functionality
+    let timeRemaining = 45 * 60; // 45 minutes
+    let timerInterval = null;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          if (timeRemaining > 0) {
+            timeRemaining--;
+            document.getElementById('timeDisplay').innerText = formatTime(timeRemaining);
+            if (timeRemaining === 300) {
+              alert("⚠️ ¡Atención! Quedan solo 5 minutos para el cierre del examen.");
+            }
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            alert("⏰ El tiempo del examen ha finalizado. Calificando automáticamente...");
+            gradeExam();
+          }
+        }, 1000);
+      }
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timeRemaining = 45 * 60;
+      document.getElementById('timeDisplay').innerText = formatTime(timeRemaining);
+    }
+
+    // Quiz options selection
+    function selectOption(el) {
+      el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    // Grade Exam
+    function gradeExam() {
+      const answers = {
+        1: 'b',
+        2: 'c',
+        3: 'a',
+        4: 'b',
+        5: 'b',
+        6: 'a',
+        7: 'a',
+        8: 'b',
+        9: 'a',
+        10: 'b'
+      };
+
+      let correctCount = 0;
+      const totalQuestions = 10;
+      const questions = document.querySelectorAll('.quiz-question');
+
+      questions.forEach(q => {
+        const qNum = q.getAttribute('data-q');
+        const selected = q.querySelector('.quiz-option.selected');
+        const options = q.querySelectorAll('.quiz-option');
+
+        options.forEach(opt => {
+          opt.classList.remove('correct', 'incorrect');
+          if (opt.getAttribute('data-val') === answers[qNum]) {
+            opt.classList.add('correct');
+          }
+        });
+
+        if (selected) {
+          if (selected.getAttribute('data-val') === answers[qNum]) {
+            correctCount++;
+          } else {
+            selected.classList.add('incorrect');
+          }
+        }
+      });
+
+      const scoreOn4 = (correctCount * 0.40).toFixed(2);
+      const scoreOn10 = ((correctCount / totalQuestions) * 10).toFixed(1);
+      const res = document.getElementById('examResult');
+      res.style.display = 'block';
+
+      if (correctCount >= 7) {
+        res.className = 'quiz-feedback alert-success';
+        res.innerHTML = `🎉 <strong>¡Excelente Rendimiento!</strong> Obtuviste ${correctCount} de ${totalQuestions} aciertos.<br>Calificación Parte I: <strong>${scoreOn4} / 4.00 Puntos</strong> (${scoreOn10} / 10.0 equiv.).`;
+      } else {
+        res.className = 'quiz-feedback alert-warning';
+        res.innerHTML = `⚠️ <strong>Resultado Formativo:</strong> Obtuviste ${correctCount} de ${totalQuestions} aciertos.<br>Calificación Parte I: <strong>${scoreOn4} / 4.00 Puntos</strong> (${scoreOn10} / 10.0 equiv.). Revisa las opciones en verde para retroalimentación.`;
+      }
+    }
+  </script>
+
+</body>
+</html>

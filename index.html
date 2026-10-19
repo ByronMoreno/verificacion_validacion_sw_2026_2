@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portal Académico del Curso: Verificación y Validación de Software - UNIBE (Período 2026). Contenido estructurado de las Semanas 1 a 6: Fundamentos de Calidad, ISO 25010, Herramientas Estadísticas, SCM, V&V Estática, Inspecciones Formales y Examen Parcial I.">
+  <title>Verificación y Validación de Software | UNIBE - Portal Académico</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(59, 130, 246, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #3b82f6;
+      --color-secondary: #8b5cf6;
+      --color-accent: #06b6d4;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Glows */
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 45px;
+      width: 100%;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5));
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 50px 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .uni-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+    .hero-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      border-top: 1px solid var(--border-light);
+      padding-top: 20px;
+      font-size: 0.88rem;
+    }
+    .hero-info-item strong { color: var(--text-bright); display: block; margin-bottom: 2px; }
+    .hero-info-item span { color: var(--text-muted); }
+
+    /* Learning Outcomes (RA) */
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .section-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .rda-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .rda-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      border-left: 4px solid var(--color-primary);
+      transition: all 0.2s ease;
+    }
+    .rda-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+      border-color: var(--border-glow);
+    }
+    .rda-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .rda-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .rda-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Weeks Navigation Grid */
+    .weeks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+    }
+    .week-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .week-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .week-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+    .week-card:hover::before { opacity: 1; }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .week-number {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--color-accent);
+      background: rgba(6, 182, 212, 0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .week-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+    }
+    .week-badge.exam {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .week-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .week-topics {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .week-topics li {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .week-topics li span.bullet {
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    .week-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid var(--border-light);
+      padding-top: 18px;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-theory {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+    .btn-theory:hover {
+      background: var(--color-primary);
+      color: #fff;
+    }
+    .btn-practice {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+    .btn-practice:hover {
+      background: var(--color-success);
+      color: #fff;
+    }
+    .btn-exam {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+    }
+    .btn-exam:hover {
+      background: var(--color-warning);
+      color: #1e1b4b;
+    }
+
+    /* Evaluation Matrix */
+    .eval-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 30px;
+    }
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .custom-table th {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-bright);
+      padding: 14px 18px;
+      font-weight: 600;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .custom-table td {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+    .custom-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-light);
+      padding: 30px 24px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2rem; }
+      .hero-banner { padding: 30px 20px; }
+      .container { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="container">
+    
+    <!-- Hero Banner -->
+    <header class="hero-banner">
+      <div class="uni-badge">Universidad Iberoamericana del Ecuador · UNIBE</div>
+      <h1 class="hero-title">Verificación y Validación de Software</h1>
+      <p class="hero-desc">
+        Portal académico integral de la asignatura. Explora los fundamentos conceptuales de la calidad de software, estándares internacionales (ISO/IEC 25010, ISO/IEC/IEEE 29119, ISTQB CTFL 4.0), herramientas estadísticas de calidad, gestión de configuración (SCM) y técnicas de revisión e inspección estática hasta la evaluación del Primer Aporte.
+      </p>
+      
+      <div class="hero-info-grid">
+        <div class="hero-info-item">
+          <strong>Docente Titular</strong>
+          <span>Ing. Byron Rodrigo Moreno Moreno</span>
+        </div>
+        <div class="hero-info-item">
+          <strong>Nivel y Paralelo</strong>
+          <span>5to Nivel · Paralelo A</span>
+        </div>
+        <div class="hero-info-item">
+          <strong>Carga Horaria</strong>
+          <span>144 Horas (96h ACD / 48h APE)</span>
+        </div>
+        <div class="hero-info-item">
+          <strong>Período Académico</strong>
+          <span>2026 · Primer Aporte (Semanas 1 a 6)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Resultados de Aprendizaje Evaluados en Aporte 1 -->
+    <section>
+      <h2 class="section-title">🎯 Resultados de Aprendizaje (Aporte 1)</h2>
+      <p class="section-subtitle">Competencias específicas a desarrollar y evaluar durante las primeras seis semanas de formación.</p>
+      
+      <div class="rda-grid">
+        <div class="rda-card">
+          <span class="rda-tag">Resultado de Aprendizaje 1</span>
+          <h3 class="rda-title">Fundamentos y Estándares de Calidad</h3>
+          <p class="rda-desc">
+            Comprende los fundamentos, dimensiones y evolución de la calidad de software, diferenciando aseguramiento (QA), control (QC), error, defecto y falla, y aplicando modelos y estándares de calidad como ISO/IEC 25010 y CMMI.
+          </p>
+        </div>
+
+        <div class="rda-card" style="border-left-color: var(--color-secondary);">
+          <span class="rda-tag" style="color: #a78bfa;">Resultado de Aprendizaje 2</span>
+          <h3 class="rda-title">Herramientas de Calidad y SCM</h3>
+          <p class="rda-desc">
+            Aplica herramientas estadísticas básicas de calidad (Ishikawa, Pareto, checklists) y principios de gestión de configuración de software (SCM) para el control de ítems (SCI), líneas base y versiones en proyectos de desarrollo.
+          </p>
+        </div>
+
+        <div class="rda-card" style="border-left-color: var(--color-accent);">
+          <span class="rda-tag" style="color: var(--color-accent);">Resultado de Aprendizaje 3</span>
+          <h3 class="rda-title">V&V Estática e Inspección Formal</h3>
+          <p class="rda-desc">
+            Diseña y ejecuta procesos de Verificación y Validación (V&V) estática mediante inspecciones formales de Fagan, revisiones técnicas y listas de chequeo alineadas a los estándares ISO/IEC/IEEE 29119 e ISTQB CTFL 4.0.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mapa de Semanas 1 a 6 -->
+    <section>
+      <h2 class="section-title">📚 Plan Semanal de Clases y Talleres (Semanas 1 a 6)</h2>
+      <p class="section-subtitle">Accede a las guías de estudio teóricas interactivas y a los talleres prácticos experimentales.</p>
+
+      <div class="weeks-grid">
+        
+        <!-- Semana 1 -->
+        <article class="week-card">
+          <div>
+            <div class="week-header">
+              <span class="week-number">Semana 1</span>
+              <span class="week-badge">RA1 · Unidad 1</span>
+            </div>
+            <h3 class="week-title">Fundamentos de Calidad, QA/QC y Taxonomía del Error</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> Origen, historia y dimensiones de la calidad de software.</li>
+              <li><span class="bullet">▹</span> Gestión de Calidad vs Aseguramiento (QA) vs Control (QC).</li>
+              <li><span class="bullet">▹</span> Cadena causal: Error (Humano) → Defecto (Bug) → Falla (Runtime).</li>
+              <li><span class="bullet">▹</span> Medida, Medición y Métrica (Modelo GQM). Casos históricos reales.</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 1/Semana 1.0 - Fundamentos de Calidad y Conceptos Clave.html" class="action-btn btn-theory">
+              <span>📖 Clase 1.0: Teoría y Conceptos Clave</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 1/Semana 1.1 - Taller Práctico de Error Defecto Falla y Métricas.html" class="action-btn btn-practice">
+              <span>🧪 Taller 1.1: Práctica y Clasificación de Fallas</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Semana 2 -->
+        <article class="week-card">
+          <div>
+            <div class="week-header">
+              <span class="week-number">Semana 2</span>
+              <span class="week-badge">RA1 · Unidad 1</span>
+            </div>
+            <h3 class="week-title">Modelos y Estándares de Calidad: ISO 25010 y CMMI</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> Familia ISO/IEC 25000 (SQuaRE) y calidad del producto.</li>
+              <li><span class="bullet">▹</span> 8 Características y subcaracterísticas ISO 25010 en profundidad.</li>
+              <li><span class="bullet">▹</span> Modelos de madurez CMMI e ISO 9001:2015 aplicados al software.</li>
+              <li><span class="bullet">▹</span> Formulación de métricas de calidad y criterios de aceptación.</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 2/Semana 2.0 - Modelos y Estándares de Calidad ISO 25010 y CMMI.html" class="action-btn btn-theory">
+              <span>📖 Clase 2.0: ISO 25010 y Modelos de Madurez</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 2/Semana 2.1 - Taller de Matriz de Métricas y Requisitos de Calidad.html" class="action-btn btn-practice">
+              <span>🧪 Taller 2.1: Matriz de Requisitos y Métricas</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Semana 3 -->
+        <article class="week-card">
+          <div>
+            <div class="week-header">
+              <span class="week-number">Semana 3</span>
+              <span class="week-badge">RA2 · Unidad 1</span>
+            </div>
+            <h3 class="week-title">Herramientas Estadísticas de Calidad y Gestión de Configuración (SCM)</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> 7 Herramientas Básicas: Ishikawa, Pareto 80/20, Histogramas y Gráficos de Control.</li>
+              <li><span class="bullet">▹</span> Fundamentos de SCM: Elementos de Configuración (SCI) y Líneas Base (Baselines).</li>
+              <li><span class="bullet">▹</span> Control de versiones moderno (Git workflows, branch protection y tagging).</li>
+              <li><span class="bullet">▹</span> Gestión y control de cambios (Change Control Board y trazabilidad).</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 3/Semana 3.0 - Herramientas Estadísticas de Calidad y SCM.html" class="action-btn btn-theory">
+              <span>📖 Clase 3.0: Ishikawa, Pareto y SCM</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 3/Semana 3.1 - Taller Práctico de Ishikawa Pareto y SCM.html" class="action-btn btn-practice">
+              <span>🧪 Taller 3.1: Laboratorio de Ishikawa y SCM</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Semana 4 -->
+        <article class="week-card">
+          <div>
+            <div class="week-header">
+              <span class="week-number">Semana 4</span>
+              <span class="week-badge">RA3 · Unidad 2</span>
+            </div>
+            <h3 class="week-title">Proceso de V&V, ISO 29119, ISTQB y Revisiones Estáticas</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> Verificación vs Validación: diferencias ontológicas y objetivos.</li>
+              <li><span class="bullet">▹</span> Estándares globales: ISO/IEC/IEEE 29119 y principios ISTQB CTFL 4.0.</li>
+              <li><span class="bullet">▹</span> Taxonomía de revisiones: Walkthroughs, Revisiones Técnicas y Peer Reviews.</li>
+              <li><span class="bullet">▹</span> Matriz de Trazabilidad de Requisitos (RTM bidireccional).</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 4/Semana 4.0 - Fundamentos de V&V Estática e ISO 29119 e ISTQB.html" class="action-btn btn-theory">
+              <span>📖 Clase 4.0: V&V Estática e ISO 29119</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 4/Semana 4.1 - Taller de Modelado del Proceso de V&V y Matriz de Trazabilidad.html" class="action-btn btn-practice">
+              <span>🧪 Taller 4.1: Modelado de V&V y Matriz RTM</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Semana 5 -->
+        <article class="week-card">
+          <div>
+            <div class="week-header">
+              <span class="week-number">Semana 5</span>
+              <span class="week-badge">RA3 · Unidad 2</span>
+            </div>
+            <h3 class="week-title">Inspección Formal de Software (Fagan) y Listas de Chequeo</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> Metodología formal de Michael Fagan: 6 fases rigurosas de inspección.</li>
+              <li><span class="bullet">▹</span> Roles de inspección: Moderador, Autor, Inspector y Escribiente.</li>
+              <li><span class="bullet">▹</span> Diseño de Checklists para requisitos, arquitectura y código.</li>
+              <li><span class="bullet">▹</span> Integración de aprendizajes RA1, RA2 y RA3 para el cierre de Aporte 1.</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 5/Semana 5.0 - Inspección Formal Checklists y Consolidación de V&V.html" class="action-btn btn-theory">
+              <span>📖 Clase 5.0: Inspección de Fagan y Checklists</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 5/Semana 5.1 - Taller de Inspección Formal y Auditoría de Artefactos.html" class="action-btn btn-practice">
+              <span>🧪 Taller 5.1: Auditoría de Artefactos de Software</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Semana 6 -->
+        <article class="week-card" style="border-color: rgba(245, 158, 11, 0.3);">
+          <div>
+            <div class="week-header">
+              <span class="week-number" style="color: #fbbf24; background: rgba(245, 158, 11, 0.15);">Semana 6</span>
+              <span class="week-badge exam">Evaluación Parcial I</span>
+            </div>
+            <h3 class="week-title">Consolidación, Guía de Repaso y Examen Primer Aporte</h3>
+            <ul class="week-topics">
+              <li><span class="bullet">▹</span> Repaso integral y mapas conceptuales de las Unidades 1 y 2.</li>
+              <li><span class="bullet">▹</span> Banco de 30 preguntas analíticas tipo certificación ISTQB / UNIBE.</li>
+              <li><span class="bullet">▹</span> Simulador interactivo cronometrado con evaluación inmediata.</li>
+              <li><span class="bullet">▹</span> Enunciado oficial y rúbrica del Laboratorio Práctico de Examen.</li>
+            </ul>
+          </div>
+          <div class="week-actions">
+            <a href="Semana 6/Semana 6.0 - Guía de Estudio y Repaso Integral Primer Parcial.html" class="action-btn btn-theory">
+              <span>📖 Guía 6.0: Resumen y Banco de Estudio</span>
+              <span>→</span>
+            </a>
+            <a href="Semana 6/Semana 6.1 - Simulador y Examen Parcial I Teórico-Práctico.html" class="action-btn btn-exam">
+              <span>⚡ Simulador 6.1: Examen Parcial I en Vivo</span>
+              <span>→</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Sistema de Evaluación Institucional -->
+    <section class="eval-card">
+      <h2 class="section-title">📊 Sistema de Evaluación - Primer Aporte</h2>
+      <p class="section-subtitle">Ponderación académica de conformidad con el Reglamento de Estudiantes de la UNIBE.</p>
+      
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Componente Evaluativo</th>
+            <th>Tipo de Aprendizaje</th>
+            <th>Descripción de Actividades</th>
+            <th>Ponderación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Evaluación Sistemática Continua</strong></td>
+            <td>APE (Práctico / Experimental) + Autónomo</td>
+            <td>Talleres semanales (1.1, 2.1, 3.1, 4.1, 5.1), informes de laboratorio, glosarios y tareas en repositorio Git.</td>
+            <td><strong style="color: var(--color-success);">60% (6.0 pts)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Examen Parcial I</strong></td>
+            <td>ACD (Contacto Docente / Evaluación Formal)</td>
+            <td>Examen escrito teórico-práctico de las Unidades 1 y 2 (Reactivos analíticos y resolución de caso de V&V).</td>
+            <td><strong style="color: var(--color-warning);">40% (4.0 pts)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Calificación Total Aporte 1</strong></td>
+            <td>Total Consolidado</td>
+            <td>Promedio ponderado del primer corte académico. Requisito de aprobación continua: ≥ 7.0 / 10.0.</td>
+            <td><strong style="color: var(--color-accent);">100% (10.0 pts)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Bibliografía y Referencias -->
+    <section class="eval-card">
+      <h2 class="section-title">📖 Bibliografía y Estándares de Referencia</h2>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);">
+        <li>🔹 <strong>ISTQB:</strong> International Software Testing Qualifications Board (2023). <em>Certified Tester Foundation Level (CTFL) Syllabus v4.0</em>.</li>
+        <li>🔹 <strong>ISO/IEC:</strong> International Organization for Standardization (2011/2023). <em>ISO/IEC 25010: Systems and software engineering — Systems and software Quality Requirements and Evaluation (SQuaRE)</em>.</li>
+        <li>🔹 <strong>ISO/IEC/IEEE:</strong> IEEE Computer Society (2021). <em>ISO/IEC/IEEE 29119: Software and systems engineering — Software testing (Parts 1 to 5)</em>.</li>
+        <li>🔹 <strong>Pressman, R. S. & Maxim, B. R.</strong> (2020). <em>Ingeniería del Software: Un enfoque práctico</em> (9na ed.). McGraw-Hill Education.</li>
+        <li>🔹 <strong>Sommerville, I.</strong> (2016). <em>Ingeniería de Software</em> (10ma ed.). Pearson Educación.</li>
+        <li>🔹 <strong>Fagan, M. E.</strong> (1976/1986). <em>Design and Code Inspections to Reduce Errors in Program Development</em>. IBM Systems Journal.</li>
+      </ul>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Universidad Iberoamericana del Ecuador · UNIBE | Escuela de Software</p>
+    <p style="margin-top: 4px; font-size: 0.78rem;">Asignatura: Verificación y Validación de Software · Docente: Byron Rodrigo Moreno Moreno</p>
+  </footer>
+
+</body>
+</html>

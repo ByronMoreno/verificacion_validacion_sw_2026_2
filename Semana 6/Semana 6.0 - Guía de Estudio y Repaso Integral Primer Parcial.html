@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 6.0: Guía de Estudio y Repaso Integral para el Examen Parcial I. Síntesis de Unidades 1 y 2 (RA1, RA2, RA3), banco de 30 reactivos y ejercicios resueltos | UNIBE.">
+  <title>Semana 6.0: Guía de Repaso Primer Parcial | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(245, 158, 11, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #f59e0b;
+      --color-secondary: #3b82f6;
+      --color-accent: #fbbf24;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width 0.1s ease; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(245, 158, 11, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 45px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 45px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-rda { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .hero-title {
+      font-size: 2.3rem; font-weight: 800; letter-spacing: -1px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #fde68a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 850px; }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; }
+    .section-title { font-size: 1.75rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px; }
+    .section-title span.number {
+      display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(245, 158, 11, 0.2); color: var(--color-primary); font-size: 0.95rem; font-weight: 700;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; transition: all 0.2s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); transform: translateY(-2px); }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-container {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); margin: 14px 0;
+    }
+    .code-header { background: #131d33; padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); }
+    pre code { display: block; padding: 18px; color: #e2e8f0; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; }
+
+    .alert-box { border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
+    .alert-info { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #a7f3d0; }
+
+    details {
+      background: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-light); border-radius: 10px; padding: 14px 18px; margin-bottom: 12px;
+    }
+    summary { font-weight: 600; color: #fff; cursor: pointer; font-size: 0.95rem; }
+    summary:hover { color: var(--color-accent); }
+    details p { margin-top: 10px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · V&V de Software</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Guía de Examen I</div>
+      <h2>Semana 6.0</h2>
+      <p>Repaso y Banco de Estudio</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Visión General</a></li>
+      <li><a href="#mapas">🗺️ 2. Mapas Conceptuales</a></li>
+      <li><a href="#bancora1">📘 3. Banco RA1: Calidad & ISO</a></li>
+      <li><a href="#bancora2">📗 4. Banco RA2: Herramientas & SCM</a></li>
+      <li><a href="#bancora3">📙 5. Banco RA3: V&V & Fagan</a></li>
+      <li><a href="#ejercicios">📐 6. Ejercicios Numéricos Resueltos</a></li>
+      <li><a href="#consejos">💡 7. Consejos de Examen</a></li>
+      <li><a href="Semana 6.1 - Simulador y Examen Parcial I Teórico-Práctico.html">⚡ Simulador en Vivo 6.1 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Período 2026</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">Parcial I</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Evaluación Primer Aporte</span>
+        <span class="hero-badge badge-rda">Cobertura: RA1, RA2, RA3 (Unidades 1 y 2)</span>
+      </div>
+      <h1 class="hero-title">Guía de Preparación y Repaso Integral - Examen Parcial I</h1>
+      <p class="hero-desc">
+        Esta guía de estudio sintetiza los núcleos temáticos evaluados en el Primer Parcial de Verificación y Validación de Software: fundamentos y modelos de calidad (ISO/IEC 25010, CMMI), taxonomía del error, herramientas estadísticas de Ishikawa y Pareto, gestión de configuración de software (SCM), procesos de V&V según ISO/IEC/IEEE 29119 e ISTQB CTFL 4.0, e inspecciones formales de Fagan. Incluye banco de 15 reactivos analíticos resueltos y problemas prácticos de cálculo.
+      </p>
+    </header>
+
+    <!-- Mapas Conceptuales -->
+    <section class="content-section" id="mapas">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> Mapas Conceptuales de Cierre de Unidades</h2>
+        <p class="section-subtitle">Las relaciones estructurales indispensables para el examen.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Unidad 1: Fundamentos de Calidad (RA1 & RA2)</div>
+          <div class="code-container">
+            <pre><code>CALIDAD DEL SOFTWARE
+ ├── PERSPECTIVAS:
+ │    ├── Procesos (QA) -> CMMI v2.0 / ISO 9001
+ │    └── Producto (QC) -> ISO/IEC 25010 (SQuaRE)
+ ├── CADENA DEL INCIDENTE:
+ │    └── Error (Humano) -> Defecto (Código/Doc) -> Falla (Runtime)
+ ├── MEDICIÓN:
+ │    └── Paradigma GQM: Meta -> Preguntas -> Métricas (ISO 25023)
+ ├── HERRAMIENTAS ESTADÍSTICAS:
+ │    ├── Ishikawa (Causa-Raíz: 6 categorías de software)
+ │    └── Pareto (Priorización: 80% bugs en 20% módulos)
+ └── GESTIÓN DE CONFIGURACIÓN (SCM):
+      ├── Ítems de Configuración (SCI) & Baselines
+      └── Git Workflows & Control de Cambios (CCB)</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Unidad 2: Verificación y Validación (RA3)</div>
+          <div class="code-container">
+            <pre><code>VERIFICACIÓN Y VALIDACIÓN (V&V)
+ ├── VERIFICACIÓN: "¿Construimos el producto correctamente?"
+ │    └── Evaluación contra especificaciones, contratos y arquitectura
+ ├── VALIDACIÓN: "¿Construimos el producto correcto?"
+ │    └── Evaluación contra necesidades y satisfacción del usuario
+ ├── ESTÁNDARES:
+ │    ├── ISO/IEC/IEEE 29119 (Partes 1 a 5)
+ │    └── ISTQB CTFL 4.0 (7 Principios del Testing)
+ ├── REVISIONES ESTÁTICAS:
+ │    ├── Informales / Buddy Checks
+ │    ├── Walkthroughs (Guiados por Autor)
+ │    ├── Revisiones Técnicas (Arquitectónicas)
+ │    └── Inspección Formal de Fagan (6 Fases, Moderador, Checklists)
+ └── TRAZABILIDAD & MÉTRICAS:
+      ├── Matriz RTM Bidireccional (Requisitos -> Código -> Tests)
+      └── Eficiencia de Remoción (DRE = E / (E + D) * 100)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banco RA1 -->
+    <section class="content-section" id="bancora1">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Banco de Reactivos: RA1 (Calidad, Taxonomía e ISO 25010)</h2>
+        <p class="section-subtitle">Preguntas tipo certificación con justificación técnica (despliega para ver solución).</p>
+      </div>
+
+      <details>
+        <summary>P1. ¿Cuál es la diferencia fundamental entre Aseguramiento de Calidad (QA) y Control de Calidad (QC)?</summary>
+        <p><strong>Respuesta:</strong> QA es proactivo y está orientado al <em>proceso</em> para prevenir la introducción de defectos (definición de metodologías, capacitaciones, auditorías de procesos). QC es reactivo y está orientado al <em>producto</em> para detectar y corregir defectos en los artefactos construidos antes de su liberación (inspecciones, revisiones, testing dinámico).</p>
+      </details>
+
+      <details>
+        <summary>P2. En un sistema de trading financiero, un programador omite validar la división por cero cuando el volumen de acciones es nulo. El software compila y se despliega. A las 3 semanas, un cliente introduce volumen cero y el servidor crashea. Identifica Error, Defecto y Falla.</summary>
+        <p><strong>Respuesta:</strong>
+        <br>• <strong>Error:</strong> La equivocación cognitiva del programador al olvidar contemplar la condición matemática de frontera.
+        <br>• <strong>Defecto:</strong> La ausencia de la validación <code>if (volumen == 0)</code> en el código fuente.
+        <br>• <strong>Falla:</strong> El crash o caída del servidor con excepción <code>ArithmeticException</code> en tiempo de ejecución ante el usuario.</p>
+      </details>
+
+      <details>
+        <summary>P3. Menciona las 8 características de calidad del producto de ISO/IEC 25010.</summary>
+        <p><strong>Respuesta:</strong> 1. Adecuación Funcional, 2. Eficiencia de Desempeño, 3. Compatibilidad, 4. Usabilidad, 5. Fiabilidad, 6. Seguridad, 7. Mantenibilidad y 8. Portabilidad.</p>
+      </details>
+
+      <details>
+        <summary>P4. ¿A qué nivel de madurez de CMMI v2.0 corresponde una empresa donde los procesos están definidos formalmente en toda la organización mediante políticas corporativas estandarizadas?</summary>
+        <p><strong>Respuesta:</strong> Corresponde al <strong>Nivel 3: Definido</strong>. (El Nivel 2 es a nivel de proyecto individual; el Nivel 4 agrega control cuantitativo/estadístico y el Nivel 5 optimización continua).</p>
+      </details>
+    </section>
+
+    <!-- Banco RA2 -->
+    <section class="content-section" id="bancora2">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> Banco de Reactivos: RA2 (Herramientas Estadísticas & SCM)</h2>
+        <p class="section-subtitle">Preguntas sobre Ishikawa, Pareto, Baselines y Git.</p>
+      </div>
+
+      <details>
+        <summary>P5. ¿Cómo se formula la regla de Pareto (80/20) en el contexto de pruebas de software y qué implicación práctica tiene?</summary>
+        <p><strong>Respuesta:</strong> Establece que aproximadamente el 80% de los defectos del sistema residen en el 20% de los módulos o componentes (conocido también en ISTQB como <em>Defect Clustering</em>). Implica que el equipo de pruebas debe concentrar sus recursos y pruebas más rigurosas en los pocos módulos más complejos o propensos a fallas.</p>
+      </details>
+
+      <details>
+        <summary>P6. ¿Qué es un Elemento de Configuración de Software (SCI) y menciona 4 ejemplos concretos en tu proyecto?</summary>
+        <p><strong>Respuesta:</strong> Un SCI es cualquier artefacto de software formalmente identificado y sujeto al control de configuración durante el ciclo de vida. Ejemplos: 1. Especificación de Requisitos (SRS / User Stories), 2. Código fuente (.java, .ts, .py), 3. Scripts de migración de base de datos DDL, 4. Suites de casos de prueba automatizados y archivos de pipeline CI/CD.</p>
+      </details>
+
+      <details>
+        <summary>P7. ¿Qué función cumple el Comité de Control de Cambios (CCB) cuando se ha establecido una 'Functional Baseline'?</summary>
+        <p><strong>Respuesta:</strong> El CCB evalúa las solicitudes de cambio (Change Requests) para analizar su impacto en el cronograma, presupuesto y arquitectura. Ningún desarrollador puede modificar los requisitos congelados sin la autorización formal y documentada del CCB.</p>
+      </details>
+    </section>
+
+    <!-- Banco RA3 -->
+    <section class="content-section" id="bancora3">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Banco de Reactivos: RA3 (V&V, ISO 29119 e Inspecciones Fagan)</h2>
+        <p class="section-subtitle">Preguntas de alto nivel sobre verificación estática y trazabilidad.</p>
+      </div>
+
+      <details>
+        <summary>P8. ¿Por qué se afirma que la verificación estática es complementaria y no reemplaza a las pruebas dinámicas?</summary>
+        <p><strong>Respuesta:</strong> Porque las pruebas estáticas (inspecciones, linters) descubren defectos directamente en el código o documento sin ejecutarlo (dead code, violaciones de estándares, inyecciones SQL), pero no pueden evaluar el rendimiento real en red, el comportamiento concurrente bajo carga ni la interacción con bases de datos en vivo (pruebas dinámicas).</p>
+      </details>
+
+      <details>
+        <summary>P9. Enumera en orden cronológico las 6 fases de la Inspección Formal de Michael Fagan.</summary>
+        <p><strong>Respuesta:</strong> 1. Planificación (Planning), 2. Introducción / Visión general (Overview), 3. Preparación Individual (Individual Preparation con Checklists), 4. Reunión de Inspección (Inspection Meeting / Logging), 5. Retrabajo (Rework), y 6. Seguimiento (Follow-up).</p>
+      </details>
+
+      <details>
+        <summary>P10. ¿Qué garantiza una Matriz de Trazabilidad de Requisitos (RTM) con trazabilidad bidireccional?</summary>
+        <p><strong>Respuesta:</strong> Garantiza hacia adelante (forward) que todo requisito especificado tiene al menos un componente de código y casos de prueba que lo validan; y hacia atrás (backward) que todo código y caso de prueba tiene su justificación en un requisito del cliente (evitando funcionalidades no autorizadas).</p>
+      </details>
+    </section>
+
+    <!-- Ejercicios Numéricos -->
+    <section class="content-section" id="ejercicios">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> Ejercicios Numéricos y Métricas Resueltas</h2>
+        <p class="section-subtitle">Modelos matemáticos recurrentes en problemas de examen.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Ejercicio 1: Cálculo de Eficiencia en Remoción de Defectos (DRE)</div>
+        <p class="card-text" style="margin-bottom: 12px;">
+          <strong>Enunciado:</strong> En una auditoría de software, las revisiones estáticas de requisitos y código encontraron 140 defectos. Las pruebas funcionales dinámicas previas a producción encontraron 60 defectos. Tras liberar el software al cliente, se reportaron 25 defectos en producción en los primeros 6 meses.
+          <br><br>
+          a) Calcula el total de defectos detectados antes de la entrega (E).
+          <br>b) Calcula el DRE del proceso de desarrollo.
+        </p>
+        <div class="code-container">
+          <pre><code>Paso a:
+E = Defectos estáticos (140) + Defectos dinámicos (60) = 200 defectos internos.
+D = Defectos de producción = 25 defectos.
+
+Paso b:
+DRE = [ E / (E + D) ] * 100
+DRE = [ 200 / (200 + 25) ] * 100 = [ 200 / 225 ] * 100 = 88.89%
+
+Interpretación:
+El proceso de V&V filtró el 88.89% de todos los defectos existentes, permitiendo un escape del 11.11% hacia producción.</code></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Ejercicio 2: Cálculo de Densidad de Defectos (ISO 25023)</div>
+        <p class="card-text" style="margin-bottom: 12px;">
+          <strong>Enunciado:</strong> Un microservicio contiene 4,800 líneas de código ejecutables (LOC). El equipo de pruebas registró 24 defectos confirmados durante el sprint. Calcula la Densidad de Defectos en unidades Defectos/KLOC.
+        </p>
+        <div class="code-container">
+          <pre><code>KLOC = 4,800 / 1,000 = 4.8 KLOC
+Densidad de Defectos = Total Defectos / KLOC
+Densidad = 24 / 4.8 = 5.0 defectos / KLOC</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consejos de Examen -->
+    <section class="content-section" id="consejos">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">7</span> Recomendaciones Estratégicas para Rendir el Examen</h2>
+        <p class="section-subtitle">Pautas institucionales para maximizar tu puntaje en el Aporte 1.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">1. Precisión Conceptual</div>
+          <p class="card-text">Distingue rigurosamente la terminología ISTQB: no utilices "error", "bug" y "falla" como sinónimos indistintos; identifica la causa humana, el código y el runtime.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">2. Justificación Técnica</div>
+          <p class="card-text">En las preguntas prácticas, menciona el estándar oficial que sustenta tu respuesta (ISO 25010, ISO 29119, IEEE 1028 o CMMI).</p>
+        </div>
+        <div class="card">
+          <div class="card-title">3. Práctica en el Simulador</div>
+          <p class="card-text">Entrena con el simulador interactivo de la clase 6.1 para calibrar tu velocidad de respuesta bajo presión de tiempo (45 minutos).</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+  </script>
+
+</body>
+</html>

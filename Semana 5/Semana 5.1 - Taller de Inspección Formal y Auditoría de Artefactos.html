@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 5.1: Taller Práctico Experimental de Inspección Formal de Software (Fagan) y Auditoría con Listas de Chequeo (APE - RA3) | UNIBE.">
+  <title>Semana 5.1: Taller de Inspección Formal y Auditoría | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(16, 185, 129, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #10b981;
+      --color-secondary: #3b82f6;
+      --color-accent: #34d399;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); min-height: 100vh; display: flex; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(16, 185, 129, 0.12); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(16, 185, 129, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; display: flex; flex-direction: column; gap: 40px; min-width: 0;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 40px;
+    }
+    .hero-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .hero-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .code-box {
+      background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 16px; font-family: var(--font-mono); font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 12px 0;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Taller Práctico APE</div>
+      <h2 style="font-size: 1.15rem; color: #fff;">Semana 5.1</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">Inspección y Auditoría</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#objetivos" class="active">🎯 1. Objetivos del Taller</a></li>
+      <li><a href="#roles">👥 2. Asignación de Roles</a></li>
+      <li><a href="#artefacto">📜 3. Artefacto a Inspeccionar</a></li>
+      <li><a href="#defectlog">📝 4. Registro de Defectos</a></li>
+      <li><a href="#rubrica">📊 5. Rúbrica de Evaluación</a></li>
+      <li><a href="Semana 5.0 - Inspección Formal Checklists y Consolidación de V&V.html">📖 Volver a Teoría 5.0 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · APE 5</span>
+      <a href="#" style="color: var(--color-accent); text-decoration:none;">RA3</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="objetivos">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; margin-bottom: 8px;">
+        Aprendizaje Práctico-Experimental (APE) · 2 Horas
+      </div>
+      <h1 class="hero-title">Taller 5.1: Inspección Formal de Software (Fagan) y Defect Logging</h1>
+      <p class="hero-desc">
+        En este laboratorio los equipos ejecutarán una sesión real de Inspección Formal siguiendo el método de Michael Fagan. Cada integrante asumirá un rol específico (Moderador, Autor, Inspector o Escribiente) para auditar un artefacto crítico con defectos reales inyectados, diligenciar el Registro Oficial de Defectos (Defect Log) y emitir el veredicto formal de cierre.
+      </p>
+    </header>
+
+    <!-- Objetivos -->
+    <section class="card">
+      <div class="card-title">🎯 Competencias a Demostrar</div>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; color: var(--text-muted);">
+        <li>✅ <strong>Ejecución del protocolo de Fagan:</strong> Aplicar las fases de preparación individual, reunión con límite de tiempo y registro sin entrar en debate de solución.</li>
+        <li>✅ <strong>Detección estática mediante Checklists:</strong> Identificar ambigüedades, omisiones lógicas, vulnerabilidades de seguridad y fallas de acoplamiento.</li>
+        <li>✅ <strong>Diligenciamiento del Defect Log:</strong> Documentar de forma irrefutable cada anomalía con su tipo, severidad y localización exacta.</li>
+      </ul>
+    </section>
+
+    <!-- Roles -->
+    <section class="card" id="roles">
+      <div class="card-title">👥 Dinámica de Equipo y Asignación de Roles</div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Rol Asignado</th>
+            <th>Estudiante</th>
+            <th>Responsabilidad Específica en la Sesión</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Moderador (Neutral)</strong></td>
+            <td><em>[Estudiante A]</em></td>
+            <td>Controla el tiempo (máx. 40 min), modera intervenciones, impide debates de rediseño y valida criterios de salida.</td>
+          </tr>
+          <tr>
+            <td><strong>Autor del Artefacto</strong></td>
+            <td><em>[Estudiante B]</em></td>
+            <td>Responde preguntas puntuales de intención del diseño y se compromete a realizar el retrabajo de corrección.</td>
+          </tr>
+          <tr>
+            <td><strong>Inspector 1 (Requisitos & Lógica)</strong></td>
+            <td><em>[Estudiante C]</em></td>
+            <td>Aplica la checklist de requisitos buscando flujos no contemplados, ambigüedades y casos de borde.</td>
+          </tr>
+          <tr>
+            <td><strong>Inspector 2 / Escribiente</strong></td>
+            <td><em>[Estudiante D]</em></td>
+            <td>Aplica la checklist de seguridad y arquitectura, y registra en tiempo real cada defecto en el Defect Log.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Artefacto -->
+    <section class="card" id="artefacto">
+      <div class="card-title">📜 Artefacto bajo Inspección: Especificación del Módulo de Transferencias Bancarias</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        <em>Instrucciones: Lee atentamente la siguiente especificación del módulo bancario. Contiene al menos 5 defectos severos inyectados intencionalmente que deben ser descubiertos por el equipo de inspección.</em>
+      </p>
+
+      <div class="code-box">
+MÓDULO: Transferencia Bancaria Interbancaria (SPEI / SPI)
+CÓDIGO DE REQUISITO: RF-SPI-09
+AUTOR: Equipo de Desarrollo Core Bancario v0.9
+
+1. DESCRIPCIÓN:
+El usuario ingresa el número de cuenta de destino, el monto y presiona "Transferir".
+El sistema transferirá el dinero de forma inmediata y muy rápida.
+
+2. REGLAS DE NEGOCIO:
+RN-01: El monto mínimo de transferencia es $1.00. No existe límite máximo para comodidad del cliente.
+RN-02: Si la cuenta de origen no tiene saldo suficiente, la base de datos restará el valor y el banco enviará un correo solicitando un depósito dentro de las 24 horas siguientes.
+RN-03: Para ejecutar la transferencia, el backend concatena el valor en la consulta SQL:
+       SELECT transferir_fondos(cuenta_origen, '" + cuenta_destino + "', " + monto + ");
+RN-04: En caso de que el banco receptor no responda, el sistema continuará reintentando en un bucle infinito cada 500 ms hasta recibir confirmación HTTP 200.
+RN-05: Se asume que el usuario nunca cerrará el navegador durante la operación.
+      </div>
+    </section>
+
+    <!-- Defect Log -->
+    <section class="card" id="defectlog">
+      <div class="card-title">📝 Registro Oficial de Defectos de Inspección (Fagan Defect Log)</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+        Completa el reporte de auditoría formal documentando los hallazgos:
+      </p>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>ID Defecto</th>
+            <th>Ubicación / Regla</th>
+            <th>Tipo de Defecto</th>
+            <th>Severidad</th>
+            <th>Descripción Técnica de la Discrepancia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DEF-01</strong></td>
+            <td>Sección 1 (Descripción)</td>
+            <td>Ambigüedad</td>
+            <td>Media</td>
+            <td>Uso de término subjetivo no verificable: "muy rápida" sin definir latencia máxima o SLA.</td>
+          </tr>
+          <tr>
+            <td><strong>DEF-02</strong></td>
+            <td>RN-01</td>
+            <td>Omisión / Seguridad</td>
+            <td>Crítica</td>
+            <td>Falta de límite máximo de transferencia diaria permite fuga masiva de capitales y fraude.</td>
+          </tr>
+          <tr>
+            <td><strong>DEF-03</strong></td>
+            <td>RN-02</td>
+            <td>Lógica de Negocio</td>
+            <td>Bloqueante</td>
+            <td>Permitir saldo negativo sin autorización previa de sobregiro viola la regulación bancaria.</td>
+          </tr>
+          <tr>
+            <td><strong>DEF-04</strong></td>
+            <td>RN-03</td>
+            <td>Vulnerabilidad / Seguridad</td>
+            <td>Crítica</td>
+            <td>Concatenación directa de parámetros en consulta SQL genera vulnerabilidad grave de Inyección SQL (SQLi).</td>
+          </tr>
+          <tr>
+            <td><strong>DEF-05</strong></td>
+            <td>RN-04 y RN-05</td>
+            <td>Arquitectura / Resiliencia</td>
+            <td>Crítica</td>
+            <td>Bucle infinito de reintentos provoca agotamiento de recursos (DDoS interno) y bloqueo de conexiones.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Rúbrica -->
+    <section class="card" id="rubrica">
+      <div class="card-title">📊 Rúbrica de Evaluación (10.0 Puntos)</div>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>Excelente (100%)</th>
+            <th>Aceptable (70%)</th>
+            <th>Deficiente (0-40%)</th>
+            <th>Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Identificación de Defectos</strong></td>
+            <td>Descubre los 5 defectos inyectados con justificación técnica rigurosa basada en estándares.</td>
+            <td>Detecta entre 3 y 4 defectos pero omite la vulnerabilidad de inyección o el bucle infinito.</td>
+            <td>Detecta menos de 2 defectos o plantea quejas subjetivas sin valor técnico.</td>
+            <td><strong>4.0 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Diligenciamiento Defect Log</strong></td>
+            <td>Clasificación impecable de tipo (Ambigüedad, Seguridad, Lógica) y severidad según ISO 29119.</td>
+            <td>Registro con descripciones incompletas o sin severidad definida.</td>
+            <td>Tabla desordenada o sin formato formal.</td>
+            <td><strong>3.5 pts</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Dinámica de Roles y Cierre</strong></td>
+            <td>Roles respetados a cabalidad, moderación profesional y acta de acuerdos de retrabajo firmada.</td>
+            <td>Discusión de rediseño no controlada por el moderador durante la sesión.</td>
+            <td>Falta de roles o sin acta de seguimiento.</td>
+            <td><strong>2.5 pts</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+</body>
+</html>

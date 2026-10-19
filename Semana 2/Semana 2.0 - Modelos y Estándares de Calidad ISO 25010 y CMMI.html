@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 2.0: Modelos y Estándares Internacionales de Calidad de Software: ISO/IEC 25010 (SQuaRE), CMMI e ISO 9001, y Métricas de Calidad de Producto (RA1) | UNIBE.">
+  <title>Semana 2.0: Modelos y Estándares de Calidad ISO 25010 y CMMI | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(59, 130, 246, 0.2);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #3b82f6;
+      --color-secondary: #8b5cf6;
+      --color-accent: #06b6d4;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 280px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary)); transition: width 0.1s ease; }
+
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.94); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(6, 182, 212, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.88rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(59, 130, 246, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 45px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 45px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-rda { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .hero-title {
+      font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 850px; }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; }
+    .section-title { font-size: 1.75rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px; }
+    .section-title span.number {
+      display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(139, 92, 246, 0.2); color: var(--color-secondary); font-size: 0.95rem; font-weight: 700;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px;
+      transition: all 0.2s ease;
+    }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); transform: translateY(-2px); }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    .subcharacteristic-badge {
+      display: inline-block; background: rgba(255,255,255,0.06); border: 1px solid var(--border-light);
+      padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; color: #cbd5e1; margin: 3px 2px;
+    }
+
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .alert-box { border-radius: 12px; padding: 18px 22px; display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
+    .alert-info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); color: #bfdbfe; }
+    .alert-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; }
+
+    .tab-header { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-light); color: var(--text-muted);
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: 0.85rem;
+    }
+    .tab-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Quiz */
+    .quiz-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(20, 30, 50, 0.7)); border: 1px solid var(--border-glow); border-radius: 16px; padding: 30px; }
+    .quiz-question { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .quiz-q-title { font-size: 1.05rem; font-weight: 600; color: var(--text-bright); margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-light); padding: 10px 16px; border-radius: 8px;
+      cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255, 255, 255, 0.08); }
+    .quiz-option.selected { border-color: var(--color-primary); background: rgba(59, 130, 246, 0.15); }
+    .quiz-option.correct { border-color: var(--color-success); background: rgba(16, 185, 129, 0.2); }
+    .quiz-option.incorrect { border-color: var(--color-danger); background: rgba(239, 68, 68, 0.2); }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; border: none;
+      padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.92rem;
+    }
+    .quiz-feedback { padding: 12px 18px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; display: none; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · V&V de Software</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">V&V de Software</div>
+      <h2>Semana 2.0</h2>
+      <p>Estándares ISO 25010 y CMMI</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Visión General</a></li>
+      <li><a href="#square">🏛️ 2. La Familia SQuaRE</a></li>
+      <li><a href="#iso25010">⭐ 3. Las 8 Dimensiones ISO 25010</a></li>
+      <li><a href="#cmmi">📈 4. CMMI e ISO 9001</a></li>
+      <li><a href="#metricas">📐 5. Métricas ISO 25023</a></li>
+      <li><a href="#requisitos">📋 6. Requisitos de Calidad</a></li>
+      <li><a href="#quiz">🧪 7. Cuestionario de Evaluación</a></li>
+      <li><a href="Semana 2.1 - Taller de Matriz de Métricas y Requisitos de Calidad.html">📝 Taller Práctico 2.1 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Período 2026</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">RA1</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Unidad 1: Fundamentos de Calidad</span>
+        <span class="hero-badge badge-rda">Resultado de Aprendizaje: RA1</span>
+      </div>
+      <h1 class="hero-title">Modelos y Estándares de Calidad: ISO/IEC 25010 y CMMI</h1>
+      <p class="hero-desc">
+        En esta sesión exploramos el estándar internacional por excelencia para la evaluación del producto de software: ISO/IEC 25010 (SQuaRE). Desglosamos sus 8 características y 31 subcaracterísticas, lo contrastamos frente a modelos de madurez de procesos como CMMI e ISO 9001, y aprendemos a formular métricas cuantitativas precisas a partir de la norma ISO/IEC 25023 para el Proyecto Integrador.
+      </p>
+    </header>
+
+    <!-- Sección 2: La Familia SQuaRE -->
+    <section class="content-section" id="square">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> La Serie ISO/IEC 25000 (SQuaRE)</h2>
+        <p class="section-subtitle">Systems and software Quality Requirements and Evaluation — El marco de referencia moderno.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Arquitectura Modular de la Familia SQuaRE</div>
+        <p class="card-text" style="margin-bottom: 14px;">
+          La serie ISO/IEC 25000 sustituyó a las históricas normas ISO/IEC 9126 (calidad de software) e ISO/IEC 14598 (evaluación de software). SQuaRE está organizada en cinco divisiones interconectadas:
+        </p>
+        <div class="grid-2">
+          <div style="background: rgba(30, 41, 59, 0.4); padding: 16px; border-radius: 10px; border-left: 3px solid var(--color-primary);">
+            <strong style="color:#fff;">ISO 2500n - Gestión de Calidad:</strong> Define modelos de referencia, términos comunes y coordinación de proyectos de evaluación.
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.4); padding: 16px; border-radius: 10px; border-left: 3px solid var(--color-secondary);">
+            <strong style="color:#fff;">ISO 2501n - Modelos de Calidad:</strong> Incluye <strong>ISO 25010</strong> (modelo de calidad del producto y calidad en uso) e ISO 25012 (calidad de datos).
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.4); padding: 16px; border-radius: 10px; border-left: 3px solid var(--color-accent);">
+            <strong style="color:#fff;">ISO 2502n - Medición de Calidad:</strong> Incluye <strong>ISO 25023</strong>, con el catálogo oficial de fórmulas matemáticas y métricas cuantificables.
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.4); padding: 16px; border-radius: 10px; border-left: 3px solid var(--color-success);">
+            <strong style="color:#fff;">ISO 2503n / 2504n - Requisitos y Evaluación:</strong> Guías metodológicas para especificar requisitos de calidad y ejecutar procesos de auditoría formal.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 3: Las 8 Características ISO 25010 -->
+    <section class="content-section" id="iso25010">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Las 8 Características de Calidad del Producto (ISO/IEC 25010)</h2>
+        <p class="section-subtitle">Taxonomía universal de atributos de calidad y sus 31 subcaracterísticas.</p>
+      </div>
+
+      <div class="grid-4">
+        
+        <!-- 1. Adecuación Funcional -->
+        <div class="card" style="border-top: 3px solid #3b82f6;">
+          <div class="card-title">1. Adecuación Funcional</div>
+          <p class="card-text">Capacidad del software para proveer funciones que satisfacen las necesidades declaradas bajo condiciones específicas.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Completitud funcional</span>
+            <span class="subcharacteristic-badge">Corrección funcional</span>
+            <span class="subcharacteristic-badge">Pertinencia funcional</span>
+          </div>
+        </div>
+
+        <!-- 2. Eficiencia de Desempeño -->
+        <div class="card" style="border-top: 3px solid #06b6d4;">
+          <div class="card-title">2. Eficiencia de Desempeño</div>
+          <p class="card-text">Desempeño relativo a la cantidad de recursos utilizados bajo condiciones declaradas.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Comportamiento temporal (latencia)</span>
+            <span class="subcharacteristic-badge">Utilización de recursos (CPU/RAM)</span>
+            <span class="subcharacteristic-badge">Capacidad (throughput)</span>
+          </div>
+        </div>
+
+        <!-- 3. Compatibilidad -->
+        <div class="card" style="border-top: 3px solid #8b5cf6;">
+          <div class="card-title">3. Compatibilidad</div>
+          <p class="card-text">Grado en el cual el producto intercambia información con otros sistemas o comparte el mismo entorno.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Coexistencia</span>
+            <span class="subcharacteristic-badge">Interoperabilidad</span>
+          </div>
+        </div>
+
+        <!-- 4. Usabilidad -->
+        <div class="card" style="border-top: 3px solid #10b981;">
+          <div class="card-title">4. Usabilidad</div>
+          <p class="card-text">Facilidad con la que los usuarios pueden operar y aprender el software con efectividad y satisfacción.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Reconocibilidad</span>
+            <span class="subcharacteristic-badge">Aprendizaje</span>
+            <span class="subcharacteristic-badge">Operabilidad</span>
+            <span class="subcharacteristic-badge">Protección ante errores</span>
+            <span class="subcharacteristic-badge">Estética UI</span>
+            <span class="subcharacteristic-badge">Accesibilidad (WCAG)</span>
+          </div>
+        </div>
+
+        <!-- 5. Fiabilidad -->
+        <div class="card" style="border-top: 3px solid #f59e0b;">
+          <div class="card-title">5. Fiabilidad (Reliability)</div>
+          <p class="card-text">Capacidad de mantener un nivel especificado de rendimiento durante un período de tiempo.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Madurez</span>
+            <span class="subcharacteristic-badge">Disponibilidad (SLA)</span>
+            <span class="subcharacteristic-badge">Tolerancia a fallos</span>
+            <span class="subcharacteristic-badge">Recuperabilidad (RTO/RPO)</span>
+          </div>
+        </div>
+
+        <!-- 6. Seguridad -->
+        <div class="card" style="border-top: 3px solid #ef4444;">
+          <div class="card-title">6. Seguridad</div>
+          <p class="card-text">Protección de la información y los datos para que personas o sistemas no autorizados no puedan acceder ni alterarlos.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Confidencialidad</span>
+            <span class="subcharacteristic-badge">Integridad</span>
+            <span class="subcharacteristic-badge">No repudio</span>
+            <span class="subcharacteristic-badge">Autenticidad</span>
+            <span class="subcharacteristic-badge">Responsabilidad (Audit)</span>
+          </div>
+        </div>
+
+        <!-- 7. Mantenibilidad -->
+        <div class="card" style="border-top: 3px solid #ec4899;">
+          <div class="card-title">7. Mantenibilidad</div>
+          <p class="card-text">Facilidad y efectividad con la que el producto puede ser modificado por los ingenieros de desarrollo.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Modularidad</span>
+            <span class="subcharacteristic-badge">Reusabilidad</span>
+            <span class="subcharacteristic-badge">Analizabilidad</span>
+            <span class="subcharacteristic-badge">Modificabilidad</span>
+            <span class="subcharacteristic-badge">Comprobabilidad (Testability)</span>
+          </div>
+        </div>
+
+        <!-- 8. Portabilidad -->
+        <div class="card" style="border-top: 3px solid #14b8a6;">
+          <div class="card-title">8. Portabilidad</div>
+          <p class="card-text">Eficacia y eficiencia con la que el software puede ser transferido de un hardware, SO o nube a otro.</p>
+          <div style="margin-top: 12px;">
+            <span class="subcharacteristic-badge">Adaptabilidad</span>
+            <span class="subcharacteristic-badge">Instalabilidad</span>
+            <span class="subcharacteristic-badge">Reemplazabilidad</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección 4: CMMI e ISO 9001 -->
+    <section class="content-section" id="cmmi">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> Modelos de Madurez: CMMI v2.0 e ISO 9001</h2>
+        <p class="section-subtitle">Calidad de Producto (ISO 25010) frente a Calidad y Madurez de Proceso (CMMI e ISO 9001).</p>
+      </div>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Dimensión</th>
+            <th>ISO/IEC 25010 (SQuaRE)</th>
+            <th>CMMI v2.0 (SEI)</th>
+            <th>ISO 9001:2015</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Objeto de Evaluación</strong></td>
+            <td><strong>El Producto de Software</strong> (código, rendimiento, seguridad, UX).</td>
+            <td><strong>La Capacidad del Proceso</strong> de la organización de ingeniería.</td>
+            <td><strong>El Sistema de Gestión de Calidad</strong> global de la empresa.</td>
+          </tr>
+          <tr>
+            <td><strong>Estructura</strong></td>
+            <td>8 Características y 31 subcaracterísticas técnicas.</td>
+            <td>5 Niveles de Madurez evolutivos (1: Inicial a 5: Optimización continua).</td>
+            <td>Ciclo PHVA (Planificar-Hacer-Verificar-Actuar) y enfoque en riesgos.</td>
+          </tr>
+          <tr>
+            <td><strong>Objetivo Primordial</strong></td>
+            <td>Asegurar que el software no falle y cumpla las expectativas técnicas del cliente.</td>
+            <td>Garantizar predictibilidad, repetibilidad y reducción de varianza en proyectos.</td>
+            <td>Satisfacción del cliente mediante procesos organizacionales estandarizados.</td>
+          </tr>
+          <tr>
+            <td><strong>Complementariedad</strong></td>
+            <td colspan="3" style="text-align: center; color: #60a5fa;">
+              <em>Una organización en CMMI Nivel 5 utiliza las métricas de ISO 25010 para gobernar la calidad de sus entregables bajo un sistema ISO 9001.</em>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Niveles de CMMI en tabs -->
+      <div class="card">
+        <div class="card-title">Los 5 Niveles de Madurez de CMMI v2.0</div>
+        <div class="tab-header">
+          <button class="tab-btn active" onclick="switchTab(event, 'cmmi-1')">Nivel 1: Inicial</button>
+          <button class="tab-btn" onclick="switchTab(event, 'cmmi-2')">Nivel 2: Gestionado</button>
+          <button class="tab-btn" onclick="switchTab(event, 'cmmi-3')">Nivel 3: Definido</button>
+          <button class="tab-btn" onclick="switchTab(event, 'cmmi-4')">Nivel 4: Cuantitativo</button>
+          <button class="tab-btn" onclick="switchTab(event, 'cmmi-5')">Nivel 5: Optimizado</button>
+        </div>
+
+        <div id="cmmi-1" class="tab-pane active">
+          <p class="card-text"><strong>Nivel 1 (Inicial):</strong> Proceso impredecible, reactivo y poco controlado. El éxito depende exclusivamente del heroísmo individual de los programadores. Sobrecostos y retrasos crónicos.</p>
+        </div>
+        <div id="cmmi-2" class="tab-pane">
+          <p class="card-text"><strong>Nivel 2 (Gestionado):</strong> Los proyectos se planifican, miden y controlan a nivel básico. Se gestionan los requisitos, la configuración (SCM) y las pruebas mínimas, pero los procesos varían entre equipos.</p>
+        </div>
+        <div id="cmmi-3" class="tab-pane">
+          <p class="card-text"><strong>Nivel 3 (Definido):</strong> La organización cuenta con procesos estándar documentados y compartidos por toda la empresa. Existen lineamientos formales de verificación, validación y revisión técnica.</p>
+        </div>
+        <div id="cmmi-4" class="tab-pane">
+          <p class="card-text"><strong>Nivel 4 (Gestionado Cuantitativamente):</strong> Los procesos se controlan mediante técnicas estadísticas de calidad. La gerencia puede predecir matemáticamente la densidad de defectos antes de liberar el producto.</p>
+        </div>
+        <div id="cmmi-5" class="tab-pane">
+          <p class="card-text"><strong>Nivel 5 (En Optimización):</strong> Mejora continua continua e innovación ágil. Se identifican causas raíz de defectos sistemáticos y se automatizan procesos para prevenir desviaciones futuras.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 5: Métricas ISO 25023 -->
+    <section class="content-section" id="metricas">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Catálogo de Métricas de Calidad de Producto (ISO/IEC 25023)</h2>
+        <p class="section-subtitle">Operacionalización matemática de los atributos de calidad para el software.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-text" style="margin-bottom: 15px;">
+          La norma ISO/IEC 25023 provee fórmulas específicas para cuantificar el grado de cumplimiento de las características de ISO 25010:
+        </p>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Atributo ISO 25010</th>
+              <th>Nombre de la Métrica</th>
+              <th>Fórmula Matemática</th>
+              <th>Interpretación y Meta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Adecuación Funcional</strong></td>
+              <td>Cobertura de Implementación de Requisitos</td>
+              <td><code>X = (Requisitos Funcionales Verificados / Requisitos Especificados) * 100</code></td>
+              <td>Meta: 100%. Mide qué fracción de los casos de uso especificados funcionan con éxito.</td>
+            </tr>
+            <tr>
+              <td><strong>Eficiencia de Desempeño</strong></td>
+              <td>Tiempo Medio de Respuesta (Latency)</td>
+              <td><code>X = Sum(Tiempo_Respuesta_Petición_i) / Total_Peticiones</code></td>
+              <td>Meta: &lt; 200 ms en endpoints REST en percentil 95 (P95).</td>
+            </tr>
+            <tr>
+              <td><strong>Fiabilidad</strong></td>
+              <td>Disponibilidad Operativa (Availability SLA)</td>
+              <td><code>X = (MTBF / (MTBF + MTTR)) * 100</code></td>
+              <td>Meta: &gt; 99.9% ("Tres nueves" = menos de 8.76 horas de caída al año).</td>
+            </tr>
+            <tr>
+              <td><strong>Seguridad</strong></td>
+              <td>Densidad de Vulnerabilidades Críticas</td>
+              <td><code>X = Total Vulnerabilidades OWASP Críticas / KLOC</code></td>
+              <td>Meta: 0.0 vulnerabilidades críticas toleradas en producción.</td>
+            </tr>
+            <tr>
+              <td><strong>Mantenibilidad</strong></td>
+              <td>Comprobabilidad (Test Coverage)</td>
+              <td><code>X = (Líneas de Código Ejecutadas por Pruebas / Total Líneas Ejecutables) * 100</code></td>
+              <td>Meta: &gt; 80% de cobertura de código (Line/Branch Coverage).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sección 6: Requisitos y Criterios de Aceptación -->
+    <section class="content-section" id="requisitos">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> Requisitos y Criterios de Aceptación en el Proyecto</h2>
+        <p class="section-subtitle">Cómo traducir atributos no funcionales a criterios verificables e irrefutables.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="border-left: 4px solid var(--color-danger);">
+          <div class="card-title" style="color: #fca5a5;">❌ Requisito Ambiguo (No Verificable)</div>
+          <p class="card-text">
+            <em>"El sistema debe ser muy rápido, completamente seguro y fácil de usar por cualquier estudiante."</em>
+            <br><br>
+            <strong>Problema:</strong> Es subjetivo. Un tester no puede diseñar una prueba objetiva que determine si el sistema "pasa" o "falla".
+          </p>
+        </div>
+
+        <div class="card" style="border-left: 4px solid var(--color-success);">
+          <div class="card-title" style="color: #86efac;">✅ Requisito ISO 25010 Verificable</div>
+          <p class="card-text">
+            <em>"Bajo una carga concurrente de 500 usuarios simultáneos, el tiempo de respuesta del login debe ser ≤ 1.5 segundos en el 95% de las peticiones (P95), con una tasa de error HTTP 5xx menor al 0.01%."</em>
+            <br><br>
+            <strong>Ventaja:</strong> Permite construir una prueba de rendimiento en JMeter con aserciones booleanas indiscutibles.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 7: Cuestionario Interactivo -->
+    <section class="content-section" id="quiz">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">7</span> Cuestionario de Afianzamiento</h2>
+        <p class="section-subtitle">Demuestra tu comprensión de la norma ISO/IEC 25010 y los modelos de madurez.</p>
+      </div>
+
+      <div class="quiz-card">
+        
+        <div class="quiz-question" data-q="1">
+          <div class="quiz-q-title">1. ¿Bajo cuál característica de calidad del producto de ISO/IEC 25010 se clasifica la 'Accesibilidad Web' (WCAG)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Portabilidad</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Usabilidad</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Eficiencia de Desempeño</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Adecuación Funcional</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="2">
+          <div class="quiz-q-title">2. ¿Qué diferencia conceptual primordial existe entre la norma ISO/IEC 25010 y el modelo CMMI?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) ISO 25010 evalúa las características del producto de software; CMMI evalúa la madurez y capacidad de los procesos organizacionales.</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) ISO 25010 es exclusivo para hardware; CMMI es exclusivo para código fuente.</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) CMMI fue derogado por IEEE en 2011; ISO 25010 solo aplica en Europa.</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) No existe diferencia, ambos miden únicamente las horas invertidas por el desarrollador.</div>
+          </div>
+        </div>
+
+        <div class="quiz-question" data-q="3">
+          <div class="quiz-q-title">3. Un sistema bancario procesa pagos en línea. Si falla el servidor principal, el sistema conmuta automáticamente a un réplica secundaria en menos de 3 segundos sin pérdida de transacciones. Esto es una evidencia directa de:</div>
+          <div class="quiz-options">
+            <div class="quiz-option" data-val="a" onclick="selectOption(this)">A) Tolerancia a fallos y Recuperabilidad (Fiabilidad)</div>
+            <div class="quiz-option" data-val="b" onclick="selectOption(this)">B) Reusabilidad y Modularidad (Mantenibilidad)</div>
+            <div class="quiz-option" data-val="c" onclick="selectOption(this)">C) Coexistencia (Compatibilidad)</div>
+            <div class="quiz-option" data-val="d" onclick="selectOption(this)">D) Reemplazabilidad (Portabilidad)</div>
+          </div>
+        </div>
+
+        <div class="quiz-action-bar">
+          <button class="btn-submit" onclick="gradeQuiz()">Calificar Respuestas</button>
+          <div id="quizResult" class="quiz-feedback"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    function switchTab(evt, tabId) {
+      const container = evt.currentTarget.parentElement.parentElement;
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      evt.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function selectOption(el) {
+      el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function gradeQuiz() {
+      const answers = { 1: 'b', 2: 'a', 3: 'a' };
+      let score = 0;
+      const total = 3;
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        const qNum = q.getAttribute('data-q');
+        const selected = q.querySelector('.quiz-option.selected');
+        q.querySelectorAll('.quiz-option').forEach(opt => {
+          opt.classList.remove('correct', 'incorrect');
+          if (opt.getAttribute('data-val') === answers[qNum]) opt.classList.add('correct');
+        });
+        if (selected) {
+          if (selected.getAttribute('data-val') === answers[qNum]) score++;
+          else selected.classList.add('incorrect');
+        }
+      });
+      const res = document.getElementById('quizResult');
+      res.style.display = 'block';
+      if (score === total) {
+        res.className = 'quiz-feedback alert-success';
+        res.innerHTML = `🎉 ¡Puntaje Perfecto! ${score}/${total} (100%). Identificas con claridad la taxonomía ISO 25010 y CMMI.`;
+      } else {
+        res.className = 'quiz-feedback alert-warning';
+        res.innerHTML = `⚠️ Obtuviste ${score}/${total}. Revisa los conceptos marcados en verde para reforzar tu aprendizaje.`;
+      }
+    }
+  </script>
+
+</body>
+</html>
