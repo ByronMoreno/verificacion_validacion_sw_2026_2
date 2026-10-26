@@ -117,15 +117,21 @@
       </div>
       <h1 class="hero-title">Taller 2.1: Especificación y Matriz de Métricas de Calidad ISO 25010</h1>
       <p class="hero-desc">
-        En este taller estructurarás el documento de especificación formal de requisitos de software y diseñarás la matriz de métricas de calidad que gobernará el Proyecto Integrador, asegurando que cada atributo de calidad (ISO 25010) cuente con una fórmula de cálculo matemática objetiva (ISO 25023), un umbral de aceptación verificable y una técnica de prueba asociada.
+        En este taller estructurarás el documento de especificación formal de requisitos de software y diseñarás la matriz de métricas de calidad que gobernará el Proyecto Integrador, asegurando que cada atributo de calidad (bajo el modelo clásico de 8 características de ISO 25010:2011 o el modelo actualizado de 9 características de ISO 25010:2023) cuente con una fórmula matemática objetiva (ISO 25023), un umbral de aceptación verificable y una técnica de prueba asociada.
       </p>
     </header>
+
+    <!-- Alerta Informativa sobre Ediciones 2011 y 2023 -->
+    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; border-radius: 12px; padding: 16px 20px; font-size: 0.9rem; line-height: 1.6;">
+      💡 <strong>Flexibilidad de Estándares en el Proyecto Integrador:</strong>
+      <br>Puedes estructurar tu matriz utilizando el <strong>modelo clásico ISO/IEC 25010:2011</strong> (8 características del sílabo) o incorporar las innovaciones de la <strong>revisión ISO/IEC 25010:2023</strong> (9 características, destacando <em>Seguridad Operacional / Safety</em> para proyectos con impacto en personas/bienes, <em>Capacidad de Interacción</em> y <em>Flexibilidad</em>). Ambos enfoques son válidos y reconocidos.
+    </div>
 
     <!-- Objetivos -->
     <section class="card">
       <div class="card-title">🎯 Competencias a Desarrollar</div>
       <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; color: var(--text-muted);">
-        <li>✅ <strong>Especificar requisitos no funcionales:</strong> Redactar requisitos de calidad sin ambigüedades, asociándolos a las 8 características de ISO 25010.</li>
+        <li>✅ <strong>Especificar requisitos no funcionales:</strong> Redactar requisitos de calidad sin ambigüedades, asociándolos a las características de ISO 25010 (versión 2011 u 2023).</li>
         <li>✅ <strong>Construir la Matriz de Métricas:</strong> Definir indicadores cuantitativos formales (ISO 25023) con umbrales booleanos (pasa / no pasa).</li>
         <li>✅ <strong>Alinear criterios de aceptación:</strong> Establecer los criterios de parada y aceptación contractual del Proyecto Integrador.</li>
       </ul>
@@ -139,6 +145,7 @@
       </p>
 
       <div class="code-box">
+# Ejemplo 1: Seguridad de la Información (Security - ISO 25010:2011/2023)
 Etiqueta: RNF-SEG-01 (Seguridad - Autenticación)
 Descripción: El sistema debe proteger las sesiones de usuario frente a ataques de fuerza bruta.
 Escala: Número de intentos fallidos consecutivos permitidos por dirección IP y por cuenta.
@@ -146,6 +153,15 @@ Métrica: Intentos_Fallidos_Consecutivos
 Meta: Bloquear temporalmente la IP tras 5 intentos fallidos en una ventana de 15 minutos.
 Peor caso aceptable: Bloquear tras 7 intentos.
 Método de Medición: Simulación de ataque mediante script automatizado de pruebas de penetración (DAST).
+
+# Ejemplo 2: Seguridad Operacional / Inocuidad (Safety - Novedad ISO 25010:2023)
+Etiqueta: RNF-SAF-01 (Seguridad Operacional - Fail-Safe)
+Descripción: En caso de desbordamiento en la telemetría del sensor médico, el actuador de infusión debe entrar en modo de parada segura sin suministrar dosis erróneas.
+Escala: Tiempo de detección y transición al estado seguro tras la anomalía.
+Métrica: Latencia_Transicion_FailSafe (ms)
+Meta: &lt; 50 ms hacia estado bloqueado sin sobredosis.
+Peor caso aceptable: &lt; 100 ms.
+Método de Medición: Inyección intencional de fallos de hardware/software en banco de pruebas (Fault Injection Testing).
       </div>
     </section>
 
@@ -178,7 +194,7 @@ Método de Medición: Simulación de ataque mediante script automatizado de prue
           </tr>
           <tr>
             <td><strong>M-02</strong></td>
-            <td>Seguridad</td>
+            <td>Seguridad (Security)</td>
             <td>Vulnerabilidades Críticas OWASP</td>
             <td><code>Count(CVEs con CVSS ≥ 7.0)</code></td>
             <td>0 vulnerabilidades en branch main</td>
@@ -186,6 +202,14 @@ Método de Medición: Simulación de ataque mediante script automatizado de prue
           </tr>
           <tr>
             <td><strong>M-03</strong></td>
+            <td>Seguridad Operacional (Safety - 2023)</td>
+            <td>Tiempo de Entrada en Estado Seguro</td>
+            <td><code>Tiempo_Detección + Tiempo_Rollback</code></td>
+            <td>≤ 200 ms ante fallo crítico de hardware/API</td>
+            <td>Pruebas de Inyección de Fallas (Chaos Engineering)</td>
+          </tr>
+          <tr>
+            <td><strong>M-04</strong></td>
             <td>Mantenibilidad</td>
             <td>Cobertura de Código (Coverage)</td>
             <td><code>(Líneas Ejecutadas / Líneas Totales) * 100</code></td>
@@ -193,7 +217,7 @@ Método de Medición: Simulación de ataque mediante script automatizado de prue
             <td>Pruebas Unitarias automatizadas (JUnit/pytest)</td>
           </tr>
           <tr>
-            <td><strong>M-04</strong></td>
+            <td><strong>M-05</strong></td>
             <td>Fiabilidad</td>
             <td>Tasa de Falla en Transacciones</td>
             <td><code>(Peticiones HTTP 5xx / Total Peticiones) * 100</code></td>
@@ -201,8 +225,8 @@ Método de Medición: Simulación de ataque mediante script automatizado de prue
             <td>Monitoreo de logs y métricas APM</td>
           </tr>
           <tr>
-            <td><strong>M-05</strong></td>
-            <td>Usabilidad</td>
+            <td><strong>M-06</strong></td>
+            <td>Usabilidad / Capacidad de Interacción</td>
             <td>Eficacia de Accesibilidad Web</td>
             <td><code>Violaciones WCAG 2.1 Nivel AA</code></td>
             <td>0 violaciones críticas de contraste o ARIA</td>

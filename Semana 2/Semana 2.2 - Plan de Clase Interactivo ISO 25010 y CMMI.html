@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 2.2: Plan de Clase Dinámico e Interactivo de 2 Horas sobre Estándares y Modelos de Calidad (ISO/IEC 25010 y CMMI) - Caso Central: Sistema de Matrículas Universitarias | UNIBE.">
+  <title>Semana 2.2: Plan de Clase de 2 Horas - ISO 25010 y CMMI | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(59, 130, 246, 0.25);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #3b82f6;
+      --color-secondary: #8b5cf6;
+      --color-accent: #06b6d4;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 290px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -20%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(59, 130, 246, 0.09) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(6, 182, 212, 0.09) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width 0.1s ease; }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+      transition: transform var(--transition-speed) ease;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(6, 182, 212, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.86rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(59, 130, 246, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 40px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.5));
+      border: 1px solid var(--border-light); border-radius: 20px; padding: 40px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-time { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .hero-title {
+      font-size: 2.3rem; font-weight: 800; letter-spacing: -1px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 14px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 860px; }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; }
+    .section-title { font-size: 1.6rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px; }
+    .section-title span.number {
+      display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(59, 130, 246, 0.2); color: var(--color-primary); font-size: 0.95rem; font-weight: 700;
+    }
+    .section-subtitle { font-size: 0.92rem; color: var(--text-muted); margin-top: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 14px; padding: 24px; transition: all 0.2s ease; }
+    .card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); transform: translateY(-2px); }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* Timeline pills */
+    .timeline-strip {
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-top: 10px;
+    }
+    .time-node {
+      background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-light); border-radius: 10px;
+      padding: 10px 14px; min-width: 135px; flex-shrink: 0; text-align: center;
+    }
+    .time-node strong { display: block; font-size: 0.82rem; color: var(--color-accent); font-family: var(--font-mono); }
+    .time-node span { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Detective cards */
+    .incident-card {
+      background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-light); border-radius: 12px;
+      padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+      border-left: 4px solid var(--color-primary);
+    }
+    .incident-number {
+      font-size: 0.75rem; font-weight: 700; color: var(--color-accent); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .incident-desc { font-size: 0.92rem; color: #fff; line-height: 1.5; font-weight: 500; }
+    .btn-reveal {
+      background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #93c5fd;
+      padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600;
+      align-self: flex-start; transition: all 0.2s;
+    }
+    .btn-reveal:hover { background: var(--color-primary); color: #fff; }
+    .incident-answer {
+      display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: #a7f3d0; line-height: 1.5;
+    }
+
+    /* Slider Matrix */
+    .slider-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 14px;
+      background: rgba(30, 41, 59, 0.4); padding: 12px 16px; border-radius: 10px;
+    }
+    .slider-label { flex: 1; font-size: 0.9rem; color: #fff; }
+    .slider-desc { display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .slider-input { flex: 1; max-width: 250px; cursor: pointer; }
+    .slider-val { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--color-accent); width: 50px; text-align: right; }
+
+    /* Tables */
+    .custom-table {
+      width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light);
+    }
+    .custom-table th { background: rgba(30, 41, 59, 0.8); color: var(--text-bright); padding: 12px 16px; font-weight: 600; text-align: left; font-size: 0.88rem; }
+    .custom-table td { padding: 12px 16px; border-top: 1px solid var(--border-light); color: var(--text-muted); font-size: 0.88rem; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: var(--text-main); }
+
+    .alert-box { border-radius: 12px; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start; margin: 10px 0; }
+    .alert-info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); color: #bfdbfe; }
+    .alert-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #fde68a; }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #a7f3d0; }
+
+    /* Level Selector Buttons */
+    .level-btn-group { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .lvl-btn {
+      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-light); color: var(--text-muted);
+      padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
+    }
+    .lvl-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+    .lvl-btn.selected { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .lvl-btn.correct { background: rgba(16, 185, 129, 0.3); border-color: var(--color-success); color: #a7f3d0; }
+    .lvl-btn.incorrect { background: rgba(239, 68, 68, 0.3); border-color: var(--color-danger); color: #fca5a5; }
+
+    .btn-action {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color: #fff; border: none;
+      padding: 10px 22px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem;
+    }
+
+    textarea.ticket-input {
+      width: 100%; height: 90px; background: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px; color: #fff; padding: 12px; font-family: var(--font-sans); font-size: 0.9rem; resize: vertical; margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+      .hero-title { font-size: 1.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · Plan de Clase de 2h</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">Guía Docente & Dinámica</div>
+      <h2 style="font-size:1.15rem; color:#fff;">Semana 2.2</h2>
+      <p style="font-size:0.8rem; color:var(--text-muted);">Clase Activa de 2 Horas</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Visión y Metodología</a></li>
+      <li><a href="#distribucion">⏱️ 2. Agenda de los 120 Minutos</a></li>
+      <li><a href="#problema-inicial">💥 3. Actividad Inicial: Caso Matrículas</a></li>
+      <li><a href="#actividad1">🕵️ 4. Actividad 1: Detectives de Calidad</a></li>
+      <li><a href="#evolucion">📜 5. Breve Explicación Teórica</a></li>
+      <li><a href="#actividad2">⚖️ 6. Actividad 2: Comité de Calidad</a></li>
+      <li><a href="#cmmi">📈 7. CMMI: Madurez del Equipo</a></li>
+      <li><a href="#actividad3">🚀 8. Actividad 3: Rescate del Proyecto</a></li>
+      <li><a href="#ticket">🎟️ 9. Ticket de Salida</a></li>
+      <li><a href="#recomendaciones">💡 10. Consejos para el Docente</a></li>
+      <li><a href="Semana 2.0 - Modelos y Estándares de Calidad ISO 25010 y CMMI.html">📖 Teoría Semana 2.0 ↗</a></li>
+      <li><a href="Semana 2.1 - Taller de Matriz de Métricas y Requisitos de Calidad.html">🧪 Taller Práctico 2.1 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · 120 Minutos</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">RA1</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <!-- Hero Header -->
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Plan de Sesión Activa · ACD + APE</span>
+        <span class="hero-badge badge-time">Duración Exacta: 120 Minutos (2 Horas)</span>
+      </div>
+      <h1 class="hero-title">Plan de Clase: Estándares y Modelos de Calidad (ISO 25010 y CMMI)</h1>
+      <p class="hero-desc">
+        Para que una clase de dos horas sobre ISO/IEC 25010 y CMMI no sea aburrida, trabajamos con un caso que los estudiantes reconocen de inmediato: <strong>el Sistema de Matrículas Universitarias</strong>. Los estudiantes asumen el rol de un equipo de ingeniería que toma decisiones reales de presupuesto y calidad, introduciendo cada concepto justo en el momento en que lo necesitan.
+      </p>
+    </header>
+
+    <!-- Sección 1: Distribución de 120 Minutos -->
+    <section class="content-section" id="distribucion">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">1</span> Distribución de los 120 Minutos</h2>
+        <p class="section-subtitle">Estructura ágil: bloques cortos que alternan debate, toma de decisiones y retroalimentación.</p>
+      </div>
+
+      <div class="timeline-strip">
+        <div class="time-node">
+          <strong>00 – 10 min</strong>
+          <span>El problema inicial</span>
+        </div>
+        <div class="time-node">
+          <strong>10 – 25 min</strong>
+          <span>Evolución de modelos</span>
+        </div>
+        <div class="time-node" style="border-color: var(--color-primary);">
+          <strong style="color:var(--color-primary);">25 – 50 min</strong>
+          <span>Actividad 1: Detectives</span>
+        </div>
+        <div class="time-node">
+          <strong>50 – 70 min</strong>
+          <span>ISO 25010 y métricas</span>
+        </div>
+        <div class="time-node" style="border-color: var(--color-warning);">
+          <strong style="color:var(--color-warning);">70 – 95 min</strong>
+          <span>Actividad 2: El comité</span>
+        </div>
+        <div class="time-node">
+          <strong>95 – 108 min</strong>
+          <span>CMMI: madurez</span>
+        </div>
+        <div class="time-node" style="border-color: var(--color-success);">
+          <strong style="color:var(--color-success);">108 – 118 min</strong>
+          <span>Actividad 3: Rescate</span>
+        </div>
+        <div class="time-node">
+          <strong>118 – 120 min</strong>
+          <span>Ticket de salida</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 2: Actividad Inicial -->
+    <section class="content-section" id="problema-inicial">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> Actividad Inicial: ¿Qué tan malo es este sistema? (10 minutos)</h2>
+        <p class="section-subtitle">Proyecta esta situación en pantalla sin explicar todavía ni ISO ni CMMI.</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid var(--color-danger);">
+        <div class="card-title" style="color: #fca5a5;">🔥 Situación de Apertura en Vivo</div>
+        <p class="card-text" style="font-size: 1.05rem; color: #fff; margin-bottom: 12px;">
+          <em>"Es lunes a las 08:00. Se habilitan las matrículas de la universidad. Entran 1.500 estudiantes al mismo tiempo. La página tarda 40 segundos en cargar, algunos estudiantes reciben el mensaje 'matrícula exitosa' pero no aparecen registrados en el sistema, y otros no pueden recuperar su contraseña."</em>
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">Pregunta 1</div>
+          <p class="card-text">¿El sistema funciona correctamente? ¿Por qué sí o por qué no?</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Pregunta 2</div>
+          <p class="card-text">¿Qué fallo les parece más grave de los tres y por qué razón?</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Pregunta 3</div>
+          <p class="card-text">Si solo tuvieran presupuesto para solucionar dos problemas hoy, ¿cuáles escogerían?</p>
+        </div>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>
+          💡 <strong>Guía para el docente:</strong> Haz que los estudiantes respondan levantando la mano y pide a dos o tres estudiantes que defiendan sus decisiones antagónicas.
+          <br><br>
+          <strong>Tu conclusión para cerrar la apertura:</strong> <em>La calidad no significa solamente que una aplicación abra o tenga una interfaz bonita. Hay múltiples dimensiones que deben evaluarse de forma estructurada, y algunas son mucho más críticas que otras según el contexto.</em>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 3: Actividad 1: Detectives de Calidad -->
+    <section class="content-section" id="actividad1">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Actividad 1: Detectives de Calidad (25 minutos)</h2>
+        <p class="section-subtitle">Forma grupos de 3 o 4 estudiantes. Dales estas tarjetas de incidentes y pídeles identificar qué característica de calidad está afectada.</p>
+      </div>
+
+      <div class="alert-box alert-warning">
+        <div>
+          🎮 <strong>Dinámica lúdica para el aula:</strong> Asigna 1 punto por clasificación correcta y 1 punto adicional por la solidez de la justificación. Si dos grupos discrepan, se abre un debate relámpago de 1 minuto para defender su argumento con ejemplos de la vida real.
+        </div>
+      </div>
+
+      <div class="grid-2">
+        
+        <!-- Tarjeta 1 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 1</span>
+            <p class="incident-desc">El sistema permite matricular a un estudiante dos veces en la misma asignatura.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Adecuación Funcional (subcaracterística: Corrección funcional).
+              <br><strong>Justificación:</strong> El software no cumple con la regla de negocio que prohíbe inscripciones duplicadas, produciendo un resultado erróneo.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 2</span>
+            <p class="incident-desc">La búsqueda de asignaturas tarda 25 segundos cuando hay muchos usuarios conectados.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Eficiencia de Desempeño (subcaracterística: Comportamiento temporal / latencia).
+              <br><strong>Justificación:</strong> El tiempo de respuesta es inaceptable para la interacción de los usuarios bajo concurrencia.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 3</span>
+            <p class="incident-desc">El sistema pierde la sesión y deja de responder después de una interrupción momentánea del servidor.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Fiabilidad (subcaracterística: Recuperabilidad / Tolerancia a fallos).
+              <br><strong>Justificación:</strong> El sistema no preserva el estado de la transacción ni es capaz de reanudar el servicio limpiamente.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 4</span>
+            <p class="incident-desc">Un usuario puede consultar las calificaciones de otros estudiantes modificando el ID numérico en la URL.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Seguridad (subcaracterística: Confidencialidad / Vulnerabilidad IDOR).
+              <br><strong>Justificación:</strong> Se expone información privada a usuarios sin privilegios ni autorización.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 5 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 5</span>
+            <p class="incident-desc">Cada cambio en el módulo de matrículas obliga a modificar otros diez módulos del sistema.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Mantenibilidad (subcaracterística: Modularidad / Modificabilidad).
+              <br><strong>Justificación:</strong> Alto acoplamiento. Un cambio local genera un efecto dominó en componentes no relacionados.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 6 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 6</span>
+            <p class="incident-desc">La pantalla de matrícula no se puede utilizar correctamente desde un teléfono móvil.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Usabilidad / Capacidad de Interacción (Operabilidad / Accesibilidad) y Portabilidad / Flexibilidad (Adaptabilidad).
+              <br><strong>Justificación:</strong> Afecta la experiencia del usuario en dispositivos móviles y la adaptación a diferentes pantallas.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 7 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 7</span>
+            <p class="incident-desc">El sistema de matrículas no puede intercambiar información con el sistema de pagos de la universidad.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Compatibilidad (subcaracterística: Interoperabilidad).
+              <br><strong>Justificación:</strong> Incapacidad de comunicarse y transferir datos con otros sistemas independientes mediante APIs o mensajes.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 8 -->
+        <div class="incident-card">
+          <div>
+            <span class="incident-number">Incidente 8</span>
+            <p class="incident-desc">La aplicación solo puede instalarse en un sistema operativo específico, aunque debería funcionar en varios.</p>
+          </div>
+          <div>
+            <button class="btn-reveal" onclick="toggleAnswer(this)">Ver respuesta docente</button>
+            <div class="incident-answer">
+              <strong>Característica:</strong> Portabilidad (ISO 25010:2011) / Flexibilidad (ISO 25010:2023) - Instalabilidad y Adaptabilidad.
+              <br><strong>Justificación:</strong> Restricción rígida que impide ejecutar el software en diferentes entornos o plataformas.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección 4: Explicación Breve Teórica -->
+    <section class="content-section" id="evolucion">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> Explicación Breve: Evolución y Modelos de Calidad (10–15 minutos)</h2>
+        <p class="section-subtitle">Línea histórica concisa sin convertir la sesión en una clase de memorización.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">McCall (1977)</div>
+          <p class="card-text">
+            Organiza los factores de calidad desde tres perspectivas prácticas: <strong>Operación</strong> del producto (corrección, fiabilidad), <strong>Revisión</strong> (mantenibilidad, flexibilidad) y <strong>Transición</strong> (portabilidad, reusabilidad).
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Boehm (1978)</div>
+          <p class="card-text">
+            Propone una estructura jerárquica de árbol vinculando características de alto nivel con propiedades cuantitativas concretas, fundamentando la relación costo-beneficio de la calidad.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Familia ISO/IEC 25000 (SQuaRE)</div>
+          <p class="card-text">
+            Evolución de ISO 9126. Proporciona modelos y procesos estandarizados para especificar, medir y evaluar la calidad del producto y del sistema de software.
+          </p>
+        </div>
+      </div>
+
+      <!-- Cuadro comparativo 2011 vs 2023 -->
+      <div class="alert-box alert-warning">
+        <div>
+          📢 <strong>Aclaración Vital para el Estudiante:</strong>
+          <br>Los <strong>ocho atributos</strong> que figuran en el sílabo corresponden a la norma <strong>ISO/IEC 25010:2011</strong> (Adecuación funcional, Eficiencia, Compatibilidad, Usabilidad, Fiabilidad, Seguridad, Mantenibilidad y Portabilidad).
+          <br><br>
+          La reciente edición <strong>ISO/IEC 25010:2023</strong> lo revisó y presenta <strong>nueve características</strong>:
+          <br>• Incorpora formalmente la <strong style="color:#ef4444;">Seguridad Operacional (Safety)</strong> para proteger vidas humanas y bienes frente a fallos del sistema (distinguiéndola de la Seguridad de la Información o <em>Security</em>).
+          <br>• Reemplaza <em>Usabilidad</em> por <strong style="color:#10b981;">Capacidad de Interacción (Interaction Capability)</strong>.
+          <br>• Reemplaza <em>Portabilidad</em> por <strong style="color:#06b6d4;">Flexibilidad (Flexibility)</strong>.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">La Idea Clave que Deben Recordar</div>
+        <p class="card-text" style="font-size: 1rem; color: #fff;">
+          <em>"Los modelos de calidad nos permiten pasar de opiniones subjetivas como 'el sistema es bueno o malo' a criterios de ingeniería objetivos que pueden especificarse, medirse cuantitativamente y evaluarse contractualmente."</em>
+        </p>
+      </div>
+    </section>
+
+    <!-- Sección 5: Actividad 2: El Comité de Calidad -->
+    <section class="content-section" id="actividad2">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Actividad 2: El Comité de Calidad (25 minutos)</h2>
+        <p class="section-subtitle">Actividad central de la clase. Los grupos toman decisiones como responsables de aprobar el presupuesto de calidad.</p>
+      </div>
+
+      <div class="card" style="border-left: 4px solid var(--color-warning);">
+        <div class="card-title">El Escenario de Decisión</div>
+        <p class="card-text" style="font-size: 0.95rem; color: #fff;">
+          La universidad tiene presupuesto para mejorar <strong>únicamente tres aspectos</strong> antes del próximo período de matrículas. Cada equipo debe priorizar los atributos de calidad, asignar 100 puntos y justificar sus decisiones.
+        </p>
+      </div>
+
+      <!-- Simulador Interactivo de Ponderación -->
+      <div class="card">
+        <div class="card-title">🎛️ Simulador Interactivo: Matriz de Ponderación (100 Puntos)</div>
+        <p class="card-text" style="margin-bottom: 15px;">
+          Ajusta los deslizadores de cada atributo según el riesgo y las necesidades del sistema. La suma debe dar exactamente <strong>100 puntos</strong>:
+        </p>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <strong>Adecuación Funcional</strong>
+            <span class="slider-desc">Que las matrículas se registren correctamente y sin duplicados.</span>
+          </div>
+          <input type="range" min="0" max="100" value="35" class="slider-input" id="s_func" oninput="updateMatrix()">
+          <span class="slider-val" id="v_func">35%</span>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <strong>Eficiencia de Desempeño</strong>
+            <span class="slider-desc">Que el sistema responda con rapidez ante 1.500 concurrentes.</span>
+          </div>
+          <input type="range" min="0" max="100" value="20" class="slider-input" id="s_perf" oninput="updateMatrix()">
+          <span class="slider-val" id="v_perf">20%</span>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <strong>Fiabilidad (Reliability)</strong>
+            <span class="slider-desc">Que siga funcionando sin perder sesiones ni datos si el servidor parpadea.</span>
+          </div>
+          <input type="range" min="0" max="100" value="25" class="slider-input" id="s_rel" oninput="updateMatrix()">
+          <span class="slider-val" id="v_rel">25%</span>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <strong>Seguridad (Security)</strong>
+            <span class="slider-desc">Que proteja datos privados y calificaciones contra manipulación en URL.</span>
+          </div>
+          <input type="range" min="0" max="100" value="20" class="slider-input" id="s_sec" oninput="updateMatrix()">
+          <span class="slider-val" id="v_sec">20%</span>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <strong>Usabilidad / Capacidad de Interacción</strong>
+            <span class="slider-desc">Que los estudiantes puedan completar la matrícula fácilmente sin confusión.</span>
+          </div>
+          <input type="range" min="0" max="100" value="10" class="slider-input" id="s_usab" oninput="updateMatrix()">
+          <span class="slider-val" id="v_usab">10%</span>
+        </div>
+
+        <!-- Indicador de Suma Total -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-light);">
+          <div>
+            <span style="font-size:0.85rem; color:var(--text-muted);">Total de Puntos Asignados:</span>
+            <div id="matrixTotal" style="font-size:1.6rem; font-weight:800; font-family:var(--font-mono); color:var(--color-warning);">110 / 100</div>
+          </div>
+          <div id="matrixStatus" class="alert-box alert-warning" style="margin:0; padding:10px 16px;">
+            ⚠️ Ajusta los controles hasta sumar exactamente 100 puntos.
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso 2: Métricas -->
+      <div class="card">
+        <div class="card-title">Paso 2: Conversión a Criterios Medibles (Métricas Propuestas)</div>
+        <p class="card-text" style="margin-bottom: 12px;">
+          Una vez definidas las 3 prioridades, proyecta esta tabla de métricas ilustrativas para que los equipos asocien sus decisiones con metas objetivas:
+        </p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Atributo ISO 25010</th>
+              <th>Métrica Posible</th>
+              <th>Meta Ilustrativa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Adecuación Funcional</strong></td>
+              <td><code>Matrículas registradas correctamente / Matrículas intentadas</code></td>
+              <td>≥ 99.9%</td>
+            </tr>
+            <tr>
+              <td><strong>Eficiencia de Desempeño</strong></td>
+              <td><code>Tiempo de respuesta en percentil 95 (P95)</code></td>
+              <td>≤ 2.0 segundos</td>
+            </tr>
+            <tr>
+              <td><strong>Fiabilidad</strong></td>
+              <td><code>Transacciones completadas sin fallos / Total transacciones</code></td>
+              <td>≥ 99.9%</td>
+            </tr>
+            <tr>
+              <td><strong>Seguridad</strong></td>
+              <td><code>Vulnerabilidades críticas (CVSS ≥ 7.0) sin resolver</code></td>
+              <td>0 al liberar a producción</td>
+            </tr>
+            <tr>
+              <td><strong>Usabilidad</strong></td>
+              <td><code>Porcentaje de usuarios que completan la matrícula sin soporte</code></td>
+              <td>≥ 90.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pregunta de Cierre Actividad 2 -->
+      <div class="card" style="border-left: 4px solid var(--color-success);">
+        <div class="card-title">Pregunta de Cierre del Docente</div>
+        <p class="card-text" style="font-size: 0.95rem; color: #fff; margin-bottom: 8px;">
+          <em>"¿Por qué dos equipos de estudiantes pueden obtener distribuciones de puntos completamente diferentes y aun así ambos haber hecho un trabajo técnicamente válido e impecable?"</em>
+        </p>
+        <p class="card-text">
+          <strong>Respuesta esperada:</strong> Porque las prioridades dependen del apetito de riesgo, del perfil de los usuarios, de la arquitectura tecnológica y de los objetivos estratégicos del proyecto; lo crucial en ingeniería es que <strong>estén justificadas técnicamente y asociadas a criterios medibles verificables</strong>.
+        </p>
+      </div>
+    </section>
+
+    <!-- Sección 6: CMMI -->
+    <section class="content-section" id="cmmi">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> CMMI: ¿Qué tan maduro es nuestro equipo? (13 minutos)</h2>
+        <p class="section-subtitle">Diferenciación crucial: Calidad del Producto (ISO 25010) frente a Madurez de Procesos (CMMI).</p>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>
+          ⚖️ <strong>Diferencia Fundamental:</strong>
+          <br>• <strong>ISO/IEC 25010:</strong> Ayuda a evaluar qué tan bueno es el <strong>producto</strong> de software (código, latencia, seguridad).
+          <br>• <strong>CMMI:</strong> Permite evaluar la madurez de los <strong>procesos</strong> y las prácticas de la organización que construye el software.
+        </div>
+      </div>
+
+      <!-- Historia evolutiva CMMI -->
+      <div class="card">
+        <div class="card-title">Los 5 Niveles CMMI como la Historia Evolutiva de una Empresa</div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
+          
+          <div style="background:rgba(239,68,68,0.1); border-left:4px solid #ef4444; padding:14px; border-radius:8px;">
+            <strong style="color:#fca5a5;">Nivel 1 · Inicial:</strong> Cada proyecto se resuelve improvisando. Se depende del heroísmo de personas concretas. Si el programador estrella se enferma, el proyecto se detiene.
+          </div>
+
+          <div style="background:rgba(245,158,11,0.1); border-left:4px solid #f59e0b; padding:14px; border-radius:8px;">
+            <strong style="color:#fde68a;">Nivel 2 · Gestionado:</strong> Se planifican tareas, fechas, responsables y seguimiento de cada proyecto. Los compromisos se cumplen a nivel de equipo individual.
+          </div>
+
+          <div style="background:rgba(59,130,246,0.1); border-left:4px solid #3b82f6; padding:14px; border-radius:8px;">
+            <strong style="color:#93c5fd;">Nivel 3 · Definido:</strong> La organización establece procesos comunes documentados que los distintos equipos adaptan y aplican sistemáticamente.
+          </div>
+
+          <div style="background:rgba(139,92,246,0.1); border-left:4px solid #8b5cf6; padding:14px; border-radius:8px;">
+            <strong style="color:#c4b5fd;">Nivel 4 · Gestionado Cuantitativamente:</strong> Se utilizan métricas estadísticas y análisis cuantitativo riguroso para controlar y predecir el desempeño del proceso.
+          </div>
+
+          <div style="background:rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:14px; border-radius:8px;">
+            <strong style="color:#a7f3d0;">Nivel 5 · En Optimización:</strong> Se busca la mejora continua y la prevención sistemática de defectos a partir de lecciones aprendidas y análisis de causa raíz.
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 7: Actividad 3: Rescate del Proyecto -->
+    <section class="content-section" id="actividad3">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">7</span> Actividad 3: Rescate del Proyecto (13 minutos)</h2>
+        <p class="section-subtitle">Diagnostica la madurez del equipo según situaciones reales de la industria del software.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-text" style="margin-bottom: 18px;">
+          Selecciona para cada una de las 5 situaciones de desarrollo el nivel de madurez CMMI que mejor la representa. Luego haz clic en <strong>"Comprobar Diagnóstico"</strong> para verificar tus respuestas:
+        </p>
+
+        <!-- Situación A -->
+        <div style="background:rgba(30,41,59,0.4); padding:16px; border-radius:10px; margin-bottom:14px;" data-case="A">
+          <p style="color:#fff; font-size:0.92rem; line-height:1.5;">
+            <strong>A.</strong> Los desarrolladores no estiman tareas ni registran errores. Cada entrega depende de trabajar horas extra y apagar incendios de último momento.
+          </p>
+          <div class="level-btn-group">
+            <button class="lvl-btn" onclick="selectLevel(this, 1)">Nivel 1</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 2)">Nivel 2</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 3)">Nivel 3</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 4)">Nivel 4</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 5)">Nivel 5</button>
+          </div>
+          <div class="case-feedback" style="display:none; font-size:0.85rem; margin-top:8px;"></div>
+        </div>
+
+        <!-- Situación B -->
+        <div style="background:rgba(30,41,59,0.4); padding:16px; border-radius:10px; margin-bottom:14px;" data-case="B">
+          <p style="color:#fff; font-size:0.92rem; line-height:1.5;">
+            <strong>B.</strong> El equipo registra tareas en Jira, asigna responsables, controla fechas de entrega y revisa el avance semanal de cada proyecto.
+          </p>
+          <div class="level-btn-group">
+            <button class="lvl-btn" onclick="selectLevel(this, 1)">Nivel 1</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 2)">Nivel 2</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 3)">Nivel 3</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 4)">Nivel 4</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 5)">Nivel 5</button>
+          </div>
+          <div class="case-feedback" style="display:none; font-size:0.85rem; margin-top:8px;"></div>
+        </div>
+
+        <!-- Situación C -->
+        <div style="background:rgba(30,41,59,0.4); padding:16px; border-radius:10px; margin-bottom:14px;" data-case="C">
+          <p style="color:#fff; font-size:0.92rem; line-height:1.5;">
+            <strong>C.</strong> Todos los proyectos de la empresa aplican un proceso documentado común, adaptado según las necesidades particulares de cada cliente.
+          </p>
+          <div class="level-btn-group">
+            <button class="lvl-btn" onclick="selectLevel(this, 1)">Nivel 1</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 2)">Nivel 2</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 3)">Nivel 3</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 4)">Nivel 4</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 5)">Nivel 5</button>
+          </div>
+          <div class="case-feedback" style="display:none; font-size:0.85rem; margin-top:8px;"></div>
+        </div>
+
+        <!-- Situación D -->
+        <div style="background:rgba(30,41,59,0.4); padding:16px; border-radius:10px; margin-bottom:14px;" data-case="D">
+          <p style="color:#fff; font-size:0.92rem; line-height:1.5;">
+            <strong>D.</strong> La organización utiliza datos históricos y técnicas cuantitativas para predecir y controlar variaciones estadísticas del proceso de desarrollo.
+          </p>
+          <div class="level-btn-group">
+            <button class="lvl-btn" onclick="selectLevel(this, 1)">Nivel 1</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 2)">Nivel 2</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 3)">Nivel 3</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 4)">Nivel 4</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 5)">Nivel 5</button>
+          </div>
+          <div class="case-feedback" style="display:none; font-size:0.85rem; margin-top:8px;"></div>
+        </div>
+
+        <!-- Situación E -->
+        <div style="background:rgba(30,41,59,0.4); padding:16px; border-radius:10px; margin-bottom:14px;" data-case="E">
+          <p style="color:#fff; font-size:0.92rem; line-height:1.5;">
+            <strong>E.</strong> Después de analizar defectos recurrentes en retrospectivas, la empresa cambia sistemáticamente sus prácticas de arquitectura y CI/CD para prevenirlos.
+          </p>
+          <div class="level-btn-group">
+            <button class="lvl-btn" onclick="selectLevel(this, 1)">Nivel 1</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 2)">Nivel 2</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 3)">Nivel 3</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 4)">Nivel 4</button>
+            <button class="lvl-btn" onclick="selectLevel(this, 5)">Nivel 5</button>
+          </div>
+          <div class="case-feedback" style="display:none; font-size:0.85rem; margin-top:8px;"></div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn-action" onclick="checkCmmi()">Comprobar Diagnóstico CMMI</button>
+          <div id="cmmiScore" style="display:none; font-weight:700; font-size:0.95rem;"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección 8: Ticket de Salida -->
+    <section class="content-section" id="ticket">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">8</span> Cierre: Ticket de Salida (2 minutos)</h2>
+        <p class="section-subtitle">Comprobación individual instantánea para verificar que los estudiantes asimilaron los conceptos clave.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-text" style="margin-bottom: 14px;">
+          Pide a cada estudiante que redacte estas 3 respuestas breves en su cuaderno o en el chat del aula virtual:
+        </p>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size:0.88rem; font-weight:600; color:#fff;">1. ¿Cuál es la diferencia fundamental entre ISO/IEC 25010 y CMMI?</label>
+          <textarea class="ticket-input" placeholder="Ej: ISO 25010 evalúa el producto (qué tan bueno es el software); CMMI evalúa los procesos (cómo trabaja y madura la organización)..."></textarea>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size:0.88rem; font-weight:600; color:#fff;">2. Menciona una característica de calidad y una métrica concreta para evaluarla:</label>
+          <textarea class="ticket-input" placeholder="Ej: Eficiencia de desempeño -> Tiempo de respuesta en percentil 95 (P95) <= 2 segundos..."></textarea>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size:0.88rem; font-weight:600; color:#fff;">3. ¿Qué cambiarías primero en el sistema de matrículas y por qué razón?</label>
+          <textarea class="ticket-input" placeholder="Ej: La verificación funcional de la transacción en base de datos para no confirmar matrículas falsas..."></textarea>
+        </div>
+
+        <button class="btn-action" onclick="alert('Ticket registrado con éxito en tu sesión de estudio.')">Guardar Conclusiones de Salida</button>
+      </div>
+    </section>
+
+    <!-- Sección 9: Recomendaciones para el Docente -->
+    <section class="content-section" id="recomendaciones">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">9</span> Recomendaciones Pedagógicas para que la Clase Funcione</h2>
+        <p class="section-subtitle">Buenas prácticas didácticas basadas en el aprendizaje activo y la ingeniería pragmática.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🚫 No leas diapositivas</div>
+          <p class="card-text">Utiliza una diapositiva o pantalla por concepto, anclada en un ejemplo concreto del sistema de matrículas universitarias.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⏱️ Alterna explicación y participación</div>
+          <p class="card-text">Intenta no superar nunca los 10 a 12 minutos seguidos de exposición magistral sin lanzar una pregunta o un reto en equipo.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🧠 Evalúa el razonamiento técnico</div>
+          <p class="card-text">No penalices una prioridad distinta de atributos si el equipo la justifica con solvencia en función de riesgos del proyecto.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔗 Conecta siempre las dos normas</div>
+          <p class="card-text">Un producto de buena calidad puede haber sido construido por un proceso inmaduro (a costo de sufrimiento y horas extras); y un proceso maduro puede producir un software deficiente si los requisitos no se verificaron.</p>
+        </div>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>
+          📚 <strong>Enlaces y Fuentes Oficiales para Preparación:</strong>
+          <br>• Estándar oficial: <a href="https://www.iso.org/standard/78176.html" target="_blank" style="color:var(--color-accent); font-weight:600;">ISO/IEC 25010:2023 en ISO.org ↗</a>
+          <br>• Niveles de madurez: <a href="https://cmmiinstitute.com/learning/appraisals/levels" target="_blank" style="color:var(--color-accent); font-weight:600;">CMMI Levels of Capability and Performance ↗</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    // Toggle Detective Answer
+    function toggleAnswer(btn) {
+      const answer = btn.nextElementSibling;
+      if (answer.style.display === 'block') {
+        answer.style.display = 'none';
+        btn.innerText = 'Ver respuesta docente';
+      } else {
+        answer.style.display = 'block';
+        btn.innerText = 'Ocultar respuesta';
+      }
+    }
+
+    // Slider Matrix Real-time Calculation
+    function updateMatrix() {
+      const func = parseInt(document.getElementById('s_func').value);
+      const perf = parseInt(document.getElementById('s_perf').value);
+      const rel = parseInt(document.getElementById('s_rel').value);
+      const sec = parseInt(document.getElementById('s_sec').value);
+      const usab = parseInt(document.getElementById('s_usab').value);
+
+      document.getElementById('v_func').innerText = func + '%';
+      document.getElementById('v_perf').innerText = perf + '%';
+      document.getElementById('v_rel').innerText = rel + '%';
+      document.getElementById('v_sec').innerText = sec + '%';
+      document.getElementById('v_usab').innerText = usab + '%';
+
+      const total = func + perf + rel + sec + usab;
+      const totalDiv = document.getElementById('matrixTotal');
+      const statusDiv = document.getElementById('matrixStatus');
+
+      totalDiv.innerText = total + ' / 100';
+
+      if (total === 100) {
+        totalDiv.style.color = 'var(--color-success)';
+        statusDiv.className = 'alert-box alert-success';
+        statusDiv.innerHTML = '🎉 <strong>¡Excelente distribución!</strong> Suma exactamente 100 puntos. Listos para defender prioridades ante el comité.';
+      } else if (total > 100) {
+        totalDiv.style.color = 'var(--color-danger)';
+        statusDiv.className = 'alert-box alert-warning';
+        statusDiv.innerHTML = `⚠️ Sobran ${total - 100} puntos. Reduce la asignación de atributos menos críticos hasta 100.`;
+      } else {
+        totalDiv.style.color = 'var(--color-warning)';
+        statusDiv.className = 'alert-box alert-warning';
+        statusDiv.innerHTML = `⚠️ Faltan ${100 - total} puntos por asignar para completar el 100% del presupuesto.`;
+      }
+    }
+
+    // CMMI Situation Selection
+    const userSelections = {};
+    function selectLevel(btn, level) {
+      const parent = btn.parentElement;
+      const caseId = parent.parentElement.getAttribute('data-case');
+      parent.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      userSelections[caseId] = level;
+    }
+
+    function checkCmmi() {
+      const correctAnswers = {
+        'A': 1,
+        'B': 2,
+        'C': 3,
+        'D': 4,
+        'E': 5
+      };
+
+      const explanations = {
+        'A': 'Correcto: Nivel 1 (Inicial) - Sin estimaciones ni registro formal; apagar incendios y heroísmo.',
+        'B': 'Correcto: Nivel 2 (Gestionado) - Planificación a nivel de proyecto con seguimiento y fechas.',
+        'C': 'Correcto: Nivel 3 (Definido) - Proceso estándar común institucional adaptado a cada proyecto.',
+        'D': 'Correcto: Nivel 4 (Gestionado Cuantitativamente) - Control estadístico con métricas y datos históricos.',
+        'E': 'Correcto: Nivel 5 (En Optimización) - Mejora continua y prevención sistemática de defectos.'
+      };
+
+      let hits = 0;
+      Object.keys(correctAnswers).forEach(caseId => {
+        const caseBox = document.querySelector(`[data-case="${caseId}"]`);
+        const feedbackDiv = caseBox.querySelector('.case-feedback');
+        const selectedLevel = userSelections[caseId];
+        const buttons = caseBox.querySelectorAll('.lvl-btn');
+
+        buttons.forEach(btn => {
+          btn.classList.remove('correct', 'incorrect');
+        });
+
+        feedbackDiv.style.display = 'block';
+
+        if (selectedLevel === correctAnswers[caseId]) {
+          hits++;
+          buttons[correctAnswers[caseId] - 1].classList.add('correct');
+          feedbackDiv.style.color = '#34d399';
+          feedbackDiv.innerHTML = `✅ ${explanations[caseId]}`;
+        } else {
+          if (selectedLevel) {
+            buttons[selectedLevel - 1].classList.add('incorrect');
+          }
+          buttons[correctAnswers[caseId] - 1].classList.add('correct');
+          feedbackDiv.style.color = '#fca5a5';
+          feedbackDiv.innerHTML = `❌ Incorrecto. La respuesta correcta es <strong>Nivel ${correctAnswers[caseId]}</strong>: ${explanations[caseId]}`;
+        }
+      });
+
+      const scoreDiv = document.getElementById('cmmiScore');
+      scoreDiv.style.display = 'block';
+      if (hits === 5) {
+        scoreDiv.style.color = 'var(--color-success)';
+        scoreDiv.innerHTML = `🎉 ¡Puntaje Perfecto! ${hits}/5 aciertos (100%). Diagnóstico CMMI exacto.`;
+      } else {
+        scoreDiv.style.color = 'var(--color-warning)';
+        scoreDiv.innerHTML = `⚠️ Diagnóstico completado: ${hits}/5 aciertos. Revisa las justificaciones señaladas en verde.`;
+      }
+    }
+  </script>
+
+</body>
+</html>
