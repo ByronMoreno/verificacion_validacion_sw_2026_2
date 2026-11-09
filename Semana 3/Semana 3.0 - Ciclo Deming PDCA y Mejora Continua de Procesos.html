@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Semana 3.2: El Ciclo Deming (PDCA / PHVA) y Mejora Continua en Ingeniería de Software y V&V. Conceptos, fases, herramientas, bibliografía oficial y test interactivo | UNIBE.">
+  <title>Semana 3.2: Ciclo Deming PDCA y Mejora Continua | UNIBE</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #0e1526;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
+      --border-glow: rgba(139, 92, 246, 0.3);
+      --border-light: rgba(255, 255, 255, 0.08);
+      
+      --color-primary: #8b5cf6;
+      --color-secondary: #3b82f6;
+      --color-accent: #06b6d4;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      
+      --phase-plan: #3b82f6;
+      --phase-do: #f59e0b;
+      --phase-check: #10b981;
+      --phase-act: #8b5cf6;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+      
+      --sidebar-width: 290px;
+      --transition-speed: 0.3s;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .bg-glow-1 { position: fixed; top: -15%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 65%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -15%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 65%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.3); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-accent)); transition: width 0.1s ease; }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width); height: 100vh; position: fixed; left: 0; top: 0;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--border-light);
+      display: flex; flex-direction: column; z-index: 100;
+      transition: transform var(--transition-speed) ease;
+    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border-light); }
+    .course-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--color-accent); background: rgba(6, 182, 212, 0.12); padding: 4px 10px; border-radius: 6px; margin-bottom: 8px;
+    }
+    .sidebar-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.86rem; font-weight: 500; transition: all 0.2s ease;
+    }
+    .sidebar-menu li a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-bright); }
+    .sidebar-menu li a.active { background: rgba(139, 92, 246, 0.15); border-left: 3px solid var(--color-primary); color: var(--color-accent); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border-light); font-size: 0.78rem; color: var(--text-muted); }
+
+    .top-nav {
+      display: none; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(15px); border-bottom: 1px solid var(--border-light); padding: 14px 20px;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+    }
+    .menu-btn { background: none; border: none; color: var(--text-main); cursor: pointer; font-size: 1.4rem; }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; min-width: 0; display: flex; flex-direction: column; gap: 42px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.6));
+      border: 1px solid var(--border-glow); border-radius: 20px; padding: 40px; position: relative; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .hero-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .hero-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; }
+    .badge-unit { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-time { background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .hero-title {
+      font-size: 2.3rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 14px;
+    }
+    .hero-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; max-width: 900px; }
+
+    /* Content Cards and Sections */
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 14px; }
+    .section-title {
+      font-size: 1.6rem; font-weight: 700; color: var(--text-bright); display: flex; align-items: center; gap: 12px;
+    }
+    .section-title .number {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      width: 34px; height: 34px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; font-family: var(--font-mono); font-weight: 700; color: #fff;
+    }
+    .section-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 6px; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 26px;
+      transition: all var(--transition-speed) ease;
+    }
+    .card:hover { border-color: rgba(255, 255, 255, 0.15); background: var(--bg-card-hover); }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .card-text { font-size: 0.95rem; color: var(--text-muted); line-height: 1.65; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+    /* Interactive PDCA Wheel Component */
+    .pdca-interactive-container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 30px;
+      background: rgba(14, 21, 38, 0.8);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 30px;
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .pdca-interactive-container { grid-template-columns: 1fr; }
+    }
+
+    .pdca-wheel-box {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto;
+    }
+    .wheel-quadrant {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 2px solid transparent;
+      user-select: none;
+    }
+    .wheel-quadrant:hover { transform: scale(1.05); filter: brightness(1.2); }
+    .wheel-quadrant.active {
+      transform: scale(1.08);
+      border-color: #ffffff;
+      box-shadow: 0 0 25px currentColor;
+    }
+    .q-plan { top: 0; left: 0; background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+    .q-do { top: 0; right: 0; background: rgba(245, 158, 11, 0.25); color: #fde68a; }
+    .q-check { bottom: 0; right: 0; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; }
+    .q-act { bottom: 0; left: 0; background: rgba(139, 92, 246, 0.25); color: #c4b5fd; }
+
+    .wheel-letter { font-size: 2.2rem; font-weight: 900; font-family: var(--font-mono); }
+    .wheel-name { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+    .wheel-center-core {
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 70px; height: 70px; border-radius: 50%;
+      background: #090d16; border: 2px solid var(--border-light);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      font-size: 0.65rem; font-weight: 800; text-align: center; color: var(--color-accent);
+    }
+
+    .pdca-details-display {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    /* Phase Deep Dive Tabs */
+    .phase-tab-bar {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .phase-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .phase-tab-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .phase-tab-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: var(--color-primary);
+      color: var(--text-bright);
+    }
+
+    /* Comparison Table */
+    .custom-table {
+      width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;
+    }
+    .custom-table th {
+      background: rgba(30, 41, 59, 0.7); color: var(--text-bright); padding: 14px 16px;
+      border-bottom: 2px solid var(--border-glow); font-weight: 700;
+    }
+    .custom-table td {
+      padding: 14px 16px; border-bottom: 1px solid var(--border-light); color: var(--text-muted);
+    }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); color: #fff; }
+
+    /* Alert / Callout Boxes */
+    .alert-box {
+      border-radius: 12px; padding: 18px 22px; display: flex; gap: 14px; align-items: flex-start;
+      border-left: 4px solid; font-size: 0.92rem; line-height: 1.6;
+    }
+    .alert-info { background: rgba(59, 130, 246, 0.08); border-color: var(--color-secondary); color: #bfdbfe; }
+    .alert-warning { background: rgba(245, 158, 11, 0.08); border-color: var(--color-warning); color: #fde68a; }
+    .alert-success { background: rgba(16, 185, 129, 0.08); border-color: var(--color-success); color: #a7f3d0; }
+
+    /* Bibliography & Official Sources Cards */
+    .biblio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .biblio-card {
+      background: linear-gradient(135deg, rgba(17, 27, 49, 0.9), rgba(30, 48, 86, 0.5));
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .biblio-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-accent);
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.15);
+    }
+    .biblio-source {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--color-accent);
+    }
+    .biblio-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.4;
+    }
+    .biblio-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .biblio-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #67e8f9;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .biblio-link-btn:hover {
+      background: var(--color-accent);
+      color: #090d16;
+    }
+
+    /* Fun Interactive Test (PDCA Challenge) */
+    .quiz-container {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(28, 43, 77, 0.7));
+      border: 2px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 34px;
+      position: relative;
+    }
+    .quiz-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 14px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 16px;
+    }
+    .quiz-score-pill {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid var(--color-primary);
+      padding: 6px 16px;
+      border-radius: 20px;
+      color: #c4b5fd;
+    }
+    .quiz-card {
+      background: rgba(14, 21, 38, 0.8);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+    .quiz-q-num {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-accent);
+      margin-bottom: 6px;
+    }
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.45;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quiz-opt-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .quiz-opt-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--color-primary);
+    }
+    .quiz-opt-btn.correct {
+      background: rgba(16, 185, 129, 0.2) !important;
+      border-color: var(--color-success) !important;
+      color: #34d399 !important;
+    }
+    .quiz-opt-btn.incorrect {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: var(--color-danger) !important;
+      color: #fca5a5 !important;
+    }
+    .quiz-feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .quiz-result-banner {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid var(--color-success);
+      border-radius: 18px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 24px 16px; margin-top: 55px; }
+      .top-nav { display: flex; }
+      .progress-bar-container { left: 0; }
+      .hero-title { font-size: 1.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="top-nav">
+    <div style="font-weight:700; font-size:0.95rem;">UNIBE · Ciclo Deming PDCA</div>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">☰</button>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="course-badge">UNIBE · Semana 3.0</div>
+      <h2 style="font-size:1.15rem; color:#fff;">Ciclo PDCA</h2>
+      <p style="font-size:0.8rem; color:var(--text-muted);">Filosofía de Calidad Continua</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#intro" class="active">📌 1. Introducción y Origen</a></li>
+      <li><a href="#rueda-pdca">🔄 2. Rueda Interactiva PDCA</a></li>
+      <li><a href="#fases-detalle">🔍 3. Detalle de las 4 Fases</a></li>
+      <li><a href="#software-synergy">💻 4. PDCA en Software & V&V</a></li>
+      <li><a href="#errores-comunes">⚠️ 5. Antipopatrones del Ciclo</a></li>
+      <li><a href="#bibliografia">📚 6. Lecturas y Bibliografía</a></li>
+      <li><a href="#test-divertido">🎮 7. Kaizen Quiz Divertido</a></li>
+      <li><a href="Semana 3.1 - Herramientas Estadísticas de Calidad y SCM.html">📖 Clase 3.1: Ishikawa & SCM ↗</a></li>
+      <li><a href="Semana 3.3 - Análisis de Incidencias Post-Mortem y Técnica de los 5 Porqués.html" style="color:#67e8f9;">🔬 Clase 3.3: Post-Mortem & 5 Porqués ↗</a></li>
+      <li><a href="Semana 3.4 - Taller Práctico de Ishikawa Pareto y SCM.html">🧪 Taller Práctico 3.4 ↗</a></li>
+      <li><a href="../index.html">🏠 Volver al Portal General</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>UNIBE · Ingeniería de Software</span>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">RA2</a>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    
+    <!-- Hero Header -->
+    <header class="hero-section" id="intro">
+      <div class="hero-meta">
+        <span class="hero-badge badge-unit">Unidad 1 · Semana 3</span>
+        <span class="hero-badge badge-time">Mejora Continua Kaizen</span>
+      </div>
+      <h1 class="hero-title">El Ciclo Deming (PDCA / PHVA) y la Mejora Continua</h1>
+      <p class="hero-desc">
+        Aprende a transformar el caos y la improvisación de un equipo de desarrollo en un proceso disciplinado, medible y auto-correctivo. Conoce las 4 etapas del ciclo de <strong>Walter A. Shewhart</strong> y <strong>W. Edwards Deming</strong> aplicadas a la Verificación y Validación de software, la gestión de cambios y la ingeniería ágil.
+      </p>
+    </header>
+
+    <!-- Sección 1: Origen e Historia -->
+    <section class="content-section">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">1</span> Origen, Filosofía y Evolución</h2>
+        <p class="section-subtitle">De los laboratorios Bell Telephone en los años 30 al milagro industrial japonés y la cultura DevOps moderna.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🔬 Walter A. Shewhart (1939)</div>
+          <p class="card-text">
+            Físico y estadístico estadounidense en <em>Bell Telephone Laboratories</em>. Shewhart concibió la idea de que la producción de calidad no es una línea recta con principio y fin, sino un proceso científico iterativo de tres pasos: <strong>Especificación → Producción → Inspección</strong>. Demostró que la variabilidad en los procesos puede controlarse estadísticamente.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🇯🇵 W. Edwards Deming (1950)</div>
+          <p class="card-text">
+            Deming llevó las ideas de Shewhart a Japón durante la reconstrucción de posguerra. Enseñó a los líderes de la industria japonesa que la mejora constante en diseño, manufactura y pruebas reducía los costos y ganaba mercados globales. En Japón el modelo se adoptó como el <strong>Ciclo Deming</strong> y se integró con la filosofía <em>Kaizen</em> (改善, mejora continua paso a paso).
+          </p>
+        </div>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>
+          💡 <strong>Principio Clave del Ciclo PDCA:</strong> No es un evento puntual ni una tarea de una sola vez. Es una <em>espiral ascendente</em>: cada vez que se completa un ciclo Actuar (Act), se consolida un nuevo estándar de calidad o línea base (Baseline), y se inicia una nueva iteración más exigente.
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 2: Rueda Interactiva PDCA -->
+    <section class="content-section" id="rueda-pdca">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">2</span> Explorador Interactivo de la Rueda PDCA</h2>
+        <p class="section-subtitle">Haz clic en cada cuadrante de la rueda para analizar su propósito, entradas, actividades y salidas técnicas.</p>
+      </div>
+
+      <div class="pdca-interactive-container">
+        
+        <!-- Interactive Wheel Graphic -->
+        <div class="pdca-wheel-box">
+          <div class="wheel-quadrant q-plan active" id="btnPlan" onclick="selectPhase('plan')">
+            <span class="wheel-letter">P</span>
+            <span class="wheel-name">Plan</span>
+          </div>
+          <div class="wheel-quadrant q-do" id="btnDo" onclick="selectPhase('do')">
+            <span class="wheel-letter">D</span>
+            <span class="wheel-name">Do</span>
+          </div>
+          <div class="wheel-quadrant q-check" id="btnCheck" onclick="selectPhase('check')">
+            <span class="wheel-letter">C</span>
+            <span class="wheel-name">Check</span>
+          </div>
+          <div class="wheel-quadrant q-act" id="btnAct" onclick="selectPhase('act')">
+            <span class="wheel-letter">A</span>
+            <span class="wheel-name">Act</span>
+          </div>
+
+          <div class="wheel-center-core">
+            <span>KAIZEN</span>
+            <span>SPIRAL</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Phase Content Panel -->
+        <div class="pdca-details-display" id="phaseDisplay">
+          <!-- Populated by JavaScript -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección 3: Detalle de las 4 Fases -->
+    <section class="content-section" id="fases-detalle">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">3</span> Anatomía Profunda de las 4 Fases</h2>
+        <p class="section-subtitle">Entradas, actividades clave, herramientas estadísticas y entregables de cada etapa.</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- PLAN -->
+        <div class="card" style="border-left: 4px solid var(--phase-plan);">
+          <div class="card-title" style="color:#93c5fd;">
+            <span>1. PLANIFICAR (Plan)</span>
+          </div>
+          <p class="card-text" style="margin-bottom:12px;">
+            <strong>Propósito:</strong> Diagnosticar el problema actual con datos reales, encontrar su causa raíz y trazar una estrategia con metas medibles.
+          </p>
+          <ul style="color:var(--text-muted); font-size:0.9rem; padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+            <li><strong>Entrada:</strong> Reportes de fallas, logs de error, quejas de usuarios, métricas de rendimiento.</li>
+            <li><strong>Herramientas:</strong> Diagrama de Ishikawa (Causa-Efecto), Diagrama de Pareto 80/20, 5 Porqués, GQM.</li>
+            <li><strong>Salida:</strong> Plan de pruebas (Test Plan), hipótesis de solución, KPIs esperados (ej. reducir latencia p95 a &lt; 2s).</li>
+          </ul>
+        </div>
+
+        <!-- DO -->
+        <div class="card" style="border-left: 4px solid var(--phase-do);">
+          <div class="card-title" style="color:#fde68a;">
+            <span>2. HACER (Do)</span>
+          </div>
+          <p class="card-text" style="margin-bottom:12px;">
+            <strong>Propósito:</strong> Implementar la solución planificada en un entorno controlado (piloto o rama de prueba), recopilando métricas rigurosas.
+          </p>
+          <ul style="color:var(--text-muted); font-size:0.9rem; padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+            <li><strong>Entrada:</strong> Plan de acción, especificaciones técnicas, ramas de feature en Git.</li>
+            <li><strong>Herramientas:</strong> Feature branches, suites de pruebas automatizadas (unitarias/integración), logs de ejecución.</li>
+            <li><strong>Salida:</strong> Código refactorizado, datos crudos de telemetría, registro de incidentes de prueba.</li>
+          </ul>
+        </div>
+
+        <!-- CHECK -->
+        <div class="card" style="border-left: 4px solid var(--phase-check);">
+          <div class="card-title" style="color:#a7f3d0;">
+            <span>3. VERIFICAR (Check)</span>
+          </div>
+          <p class="card-text" style="margin-bottom:12px;">
+            <strong>Propósito:</strong> Comparar los resultados obtenidos en el piloto frente a los objetivos y métricas planteados en la fase Plan.
+          </p>
+          <ul style="color:var(--text-muted); font-size:0.9rem; padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+            <li><strong>Entrada:</strong> Métricas previas vs métricas del piloto, reportes de ejecución de pruebas.</li>
+            <li><strong>Herramientas:</strong> Gráficos de control estadístico, histogramas, matrices de trazabilidad (RTM), DRE.</li>
+            <li><strong>Salida:</strong> Informe de evaluación de efectividad: ¿Se resolvió el problema? ¿Hubo efectos secundarios?</li>
+          </ul>
+        </div>
+
+        <!-- ACT -->
+        <div class="card" style="border-left: 4px solid var(--phase-act);">
+          <div class="card-title" style="color:#c4b5fd;">
+            <span>4. ACTUAR / AJUSTAR (Act)</span>
+          </div>
+          <p class="card-text" style="margin-bottom:12px;">
+            <strong>Propósito:</strong> Si la solución fue exitosa, estandarizarla como nueva línea base. Si falló, aprender y alimentar el siguiente ciclo.
+          </p>
+          <ul style="color:var(--text-muted); font-size:0.9rem; padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+            <li><strong>Entrada:</strong> Informe de verificación y lecciones aprendidas.</li>
+            <li><strong>Herramientas:</strong> Actualización de checklists, pipelines de CI/CD, etiquetado de versión Git (Tag/Release).</li>
+            <li><strong>Salida:</strong> Nuevo estándar de calidad organizacional, proceso institucionalizado, cierre de ciclo.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 4: PDCA en Ingeniería de Software y V&V -->
+    <section class="content-section" id="software-synergy">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">4</span> El Ciclo PDCA en el Ecosistema de Software y V&V</h2>
+        <p class="section-subtitle">Cómo el ciclo se mapea exactamente en metodologías ágiles, pruebas continuas y DevOps.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Mapeo del PDCA en el Ciclo de Vida del Software</div>
+        <div class="table-container" style="overflow-x:auto;">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Fase PDCA</th>
+                <th>Enfoque Tradicional / V&V</th>
+                <th>Enfoque Ágil (Scrum Sprint)</th>
+                <th>Enfoque DevOps / CI-CD</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:var(--phase-plan);">Plan (Planificar)</strong></td>
+                <td>Diseño del Plan de Pruebas (ISO 29119), especificación de requisitos y casos de prueba.</td>
+                <td>Sprint Planning, refinamiento de historias de usuario, criterios de aceptación.</td>
+                <td>Definición de pipelines de CI, infraestructura como código (IaC), Quality Gates.</td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--phase-do);">Do (Hacer)</strong></td>
+                <td>Codificación del módulo y ejecución de pruebas en ambiente de testing controlado.</td>
+                <td>Desarrollo diario, TDD (Test-Driven Development), Pair Programming.</td>
+                <td>Compilación automática, despliegue en staging, ejecución de tests en paralelo.</td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--phase-check);">Check (Verificar)</strong></td>
+                <td>Análisis de cobertura de pruebas, cálculo de densidad de defectos, auditoría de métricas.</td>
+                <td>Sprint Review con el Product Owner, verificación de la Definition of Done (DoD).</td>
+                <td>Monitoreo en tiempo real, alertas de rendimiento, pruebas de carga (K6, JMeter).</td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--phase-act);">Act (Ajustar)</strong></td>
+                <td>Aprobación de línea base (SCM Baseline), actualización de políticas de inspección.</td>
+                <td>Sprint Retrospective: identificación de impedimentos y mejoras para el próximo sprint.</td>
+                <td>Post-mortem sin culpas (Blameless RCA), actualización de dashboards y auto-escalado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 5: Antipatrones Comunes -->
+    <section class="content-section" id="errores-comunes">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">5</span> Antipatrones y Errores Habituales del Ciclo</h2>
+        <p class="section-subtitle">Lo que ocurre cuando los equipos de ingeniería mutilan o descuidan fases del ciclo.</p>
+      </div>
+
+      <div class="grid-3" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+        <div class="card" style="border-top:4px solid var(--color-danger);">
+          <div class="card-title" style="color:#fca5a5;">❌ El Síndrome "Do-Do-Do"</div>
+          <p class="card-text">
+            El equipo salta directamente a programar sin planificar ni entender la causa raíz del error, y nunca verifica los resultados con datos. Es el clásico <em>"apagar incendios"</em> que conduce al agotamiento y al Nivel 1 de CMMI.
+          </p>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--color-warning);">
+          <div class="card-title" style="color:#fde68a;">⚠️ Parálisis por Análisis ("Plan-Plan")</div>
+          <p class="card-text">
+            Semanas debatiendo arquitecturas y redactando documentos sin ejecutar pilotos a pequeña escala. Se acumulan supuestos teóricos sin validar en código real.
+          </p>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--color-accent);">
+          <div class="card-title" style="color:#67e8f9;">🚫 Olvidar la Fase "Act"</div>
+          <p class="card-text">
+            El equipo detecta fallas y las mide con éxito en la fase Check, pero <em>nadie documenta la solución ni actualiza los estándares</em>. Al año siguiente, el mismo error vuelve a ocurrir con otro desarrollador.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección 6: Lecturas y Bibliografía Oficial -->
+    <section class="content-section" id="bibliografia">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">6</span> Lecturas Especializadas y Bibliografía Recomendada</h2>
+        <p class="section-subtitle">Accede a los artículos y recursos oficiales de referencia para profundizar en el ciclo PDCA.</p>
+      </div>
+
+      <div class="biblio-grid">
+        
+        <!-- Recurso 1: Leansis Productividad -->
+        <article class="biblio-card">
+          <div>
+            <span class="biblio-source">Lean Manufacturing & Procesos</span>
+            <h3 class="biblio-title">¿Qué es el Ciclo PDCA y cómo aplicarlo a la productividad?</h3>
+            <p class="biblio-desc">
+              Explicación rigurosa de la metodología Lean y la filosofía Kaizen de mejora continua aplicada a la reducción sistemática de desperdicios (muda) y optimización de flujos de trabajo.
+            </p>
+          </div>
+          <a href="https://leansisproductividad.com/insights/que-es-pdca/" target="_blank" rel="noopener noreferrer" class="biblio-link-btn">
+            <span>Explorar en Leansis Productividad</span>
+            <span>↗</span>
+          </a>
+        </article>
+
+        <!-- Recurso 2: Dropbox Resources -->
+        <article class="biblio-card">
+          <div>
+            <span class="biblio-source">Dropbox Workspace & Colaboración</span>
+            <h3 class="biblio-title">Ciclo PDCA: Qué es y cómo implementarlo en equipos ágiles</h3>
+            <p class="biblio-desc">
+              Guía práctica orientada a la colaboración en equipos modernos, gestión de proyectos iterativos y cómo documentar cada fase del ciclo para mantener sincronizado a todo el equipo.
+            </p>
+          </div>
+          <a href="https://www.dropbox.com/es/resources/pdca" target="_blank" rel="noopener noreferrer" class="biblio-link-btn">
+            <span>Explorar en Dropbox Resources</span>
+            <span>↗</span>
+          </a>
+        </article>
+
+        <!-- Recurso 3: Eurofins Environment -->
+        <article class="biblio-card">
+          <div>
+            <span class="biblio-source">Gestión de Calidad & Procesos</span>
+            <h3 class="biblio-title">El Ciclo Deming: En qué consiste y cómo ayuda a la gestión</h3>
+            <p class="biblio-desc">
+              Análisis formal de la estructura de procesos bajo normas internacionales (ISO 9001 / ISO 14001), trazabilidad de evidencias y aseguramiento de la conformidad técnica.
+            </p>
+          </div>
+          <a href="https://www.eurofins-environment.es/es/el-ciclo-deming-que-consiste-y-como-ayuda-gestion-procesos/" target="_blank" rel="noopener noreferrer" class="biblio-link-btn">
+            <span>Explorar en Eurofins Environment</span>
+            <span>↗</span>
+          </a>
+        </article>
+
+        <!-- Recurso 4: Asana Resources -->
+        <article class="biblio-card">
+          <div>
+            <span class="biblio-source">Gestión Ágil de Proyectos</span>
+            <h3 class="biblio-title">El Ciclo PDCA: 4 pasos para la mejora continua de proyectos</h3>
+            <p class="biblio-desc">
+              Manual enfocado en la gestión visual de proyectos tecnológicos, asignación de tareas iterativas, métricas de cumplimiento y retroalimentación constante en sprints.
+            </p>
+          </div>
+          <a href="https://asana.com/es/resources/pdca-cycle" target="_blank" rel="noopener noreferrer" class="biblio-link-btn">
+            <span>Explorar en Asana Resources</span>
+            <span>↗</span>
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Sección 7: Test Divertido (PDCA Kaizen Challenge) -->
+    <section class="content-section" id="test-divertido">
+      <div class="section-header">
+        <h2 class="section-title"><span class="number">7</span> 🎮 El Desafío Kaizen: Test Divertido de PDCA</h2>
+        <p class="section-subtitle">Demuestra que no eres una víctima del "apagar incendios". Pon a prueba tus reflejos de calidad en software.</p>
+      </div>
+
+      <div class="quiz-container">
+        
+        <div class="quiz-top-bar">
+          <div>
+            <strong style="color:#fff; font-size:1.15rem;">Simulador de Decisión de Calidad</strong>
+            <p style="color:var(--text-muted); font-size:0.85rem;">Responde a los 5 dilemas de la vida real en ingeniería de software:</p>
+          </div>
+          <div class="quiz-score-pill">
+            Puntaje: <span id="quizScore">0</span> / 5
+          </div>
+        </div>
+
+        <!-- Pregunta 1 -->
+        <div class="quiz-card" data-q="1">
+          <div class="quiz-q-num">Dilema #1 · Viernes en la tarde</div>
+          <p class="quiz-question">
+            Un desarrollador encuentra un bug en el módulo de autenticación un viernes a las 17:50. En lugar de investigar con logs o pruebas, hace un cambio directo en la base de datos de producción y se va a su casa. ¿Qué fase del ciclo PDCA violó principalmente?
+          </p>
+          <div class="quiz-options">
+            <button class="quiz-opt-btn" onclick="checkAnswer(1, this, false)">A) Violó la fase "Do", porque no subió el código a GitHub.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(1, this, true)">B) Violó la fase "Plan" (no analizó la causa raíz) y "Check" (no verificó el impacto en un ambiente controlado antes de liberar).</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(1, this, false)">C) No violó nada, fue muy proactivo y ágil al parcharlo de inmediato.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(1, this, false)">D) Solo violó CMMI Nivel 5 porque no usó inteligencia artificial.</button>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Pregunta 2 -->
+        <div class="quiz-card" data-q="2">
+          <div class="quiz-q-num">Dilema #2 · La Retrospectiva Mágica</div>
+          <p class="quiz-question">
+            En un equipo Scrum, la reunión de "Sprint Retrospective" donde se discute qué salió mal en las pruebas, por qué falló el despliegue y cómo evitarlo en el siguiente sprint, ¿a qué fase del ciclo PDCA corresponde?
+          </p>
+          <div class="quiz-options">
+            <button class="quiz-opt-btn" onclick="checkAnswer(2, this, false)">A) A la fase Plan, porque se planifican nuevas funciones para los clientes.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(2, this, false)">B) A la fase Do, porque los desarrolladores están trabajando en código.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(2, this, true)">C) A la fase Act (Ajustar), porque se analizan lecciones aprendidas para actualizar la forma de trabajo del equipo.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(2, this, false)">D) A la fase Check únicamente, porque se miran métricas pasadas sin tomar acciones.</button>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Pregunta 3 -->
+        <div class="quiz-card" data-q="3">
+          <div class="quiz-q-num">Dilema #3 · El Experimento Piloto</div>
+          <p class="quiz-question">
+            ¿Por qué en la fase "Do" (Hacer) del ciclo PDCA original de Shewhart y Deming se recomienda ejecutar la solución a PEQUEÑA ESCALA o mediante una prueba piloto en lugar de un despliegue masivo?
+          </p>
+          <div class="quiz-options">
+            <button class="quiz-opt-btn" onclick="checkAnswer(3, this, true)">A) Para limitar el radio de impacto y verificar con datos si la solución realmente funciona sin arriesgar todo el sistema.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(3, this, false)">B) Porque a Deming no le gustaba trabajar con servidores grandes.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(3, this, false)">C) Porque hacer pruebas a escala real es ilegal según la norma ISO 9001.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(3, this, false)">D) Para que los desarrolladores juniors tengan algo que hacer mientras los seniors descansan.</button>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Pregunta 4 -->
+        <div class="quiz-card" data-q="4">
+          <div class="quiz-q-num">Dilema #4 · La Amnesia del Equipo</div>
+          <p class="quiz-question">
+            Tu equipo logró resolver una caída grave de memoria en el servidor tras 2 semanas de investigación. Sin embargo, nadie documentó la solución, no se actualizó el checklist de code review ni se añadió un test automatizado. Dos meses después, otro programador reintroduce el mismo fallo. ¿Qué fase falló estrepitosamente?
+          </p>
+          <div class="quiz-options">
+            <button class="quiz-opt-btn" onclick="checkAnswer(4, this, false)">A) La fase Plan, porque nunca debieron contratar a ese programador.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(4, this, false)">B) La fase Do, porque el compilador debió adivinar el error.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(4, this, true)">C) La fase Act (Estandarización), porque no se consolidó el aprendizaje en una nueva línea base o regla institucional.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(4, this, false)">D) Ninguna, es parte inevitable del ciclo de vida del software.</button>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Pregunta 5 -->
+        <div class="quiz-card" data-q="5">
+          <div class="quiz-q-num">Dilema #5 · La Espiral Kaizen</div>
+          <p class="quiz-question">
+            ¿Por qué se representa al PDCA como un círculo o espiral continua en lugar de un diagrama de flujo lineal con inicio y fin?
+          </p>
+          <div class="quiz-options">
+            <button class="quiz-opt-btn" onclick="checkAnswer(5, this, true)">A) Porque cada ciclo terminado establece un nuevo estándar superior que sirve como punto de partida para la siguiente mejora.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(5, this, false)">B) Porque a los consultores de calidad les gustan las figuras geométricas cerradas.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(5, this, false)">C) Porque el software nunca puede considerarse libre de bugs, así que hay que dar vueltas en círculos.</button>
+            <button class="quiz-opt-btn" onclick="checkAnswer(5, this, false)">D) Porque sustituye por completo a los contratos y requisitos de los clientes.</button>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Banner de Resultado -->
+        <div class="quiz-result-banner" id="quizBanner">
+          <div id="quizMedal" style="font-size:3rem; margin-bottom:10px;">🏆</div>
+          <h3 id="quizTitle" style="font-size:1.6rem; color:#fff; margin-bottom:10px;"></h3>
+          <p id="quizMessage" style="color:var(--text-muted); font-size:1rem; max-width:650px; margin:0 auto 20px auto;"></p>
+          <button class="quiz-opt-btn" onclick="resetQuiz()" style="display:inline-flex; width:auto; margin:0 auto; background:var(--color-primary); color:#fff; font-weight:700;">
+            🔄 Repetir Desafío
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer Institucional -->
+    <footer style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-light); padding-top:24px; margin-top:20px; flex-wrap:wrap; gap:14px; font-size:0.88rem; color:var(--text-muted);">
+      <div>
+        <strong>Universidad Iberoamericana del Ecuador · UNIBE</strong>
+        <br>Verificación y Validación de Software · 5to Nivel
+      </div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="Semana 3.1 - Herramientas Estadísticas de Calidad y SCM.html" style="color:#93c5fd; text-decoration:none;">📖 Clase 3.1: Ishikawa & SCM</a>
+        <a href="Semana 3.3 - Análisis de Incidencias Post-Mortem y Técnica de los 5 Porqués.html" style="color:#67e8f9; text-decoration:none;">🔬 Clase 3.3: Post-Mortem & 5 Porqués</a>
+        <a href="Semana 3.4 - Taller Práctico de Ishikawa Pareto y SCM.html" style="color:#6ee7b7; text-decoration:none;">🧪 Taller 3.4</a>
+        <a href="../index.html" style="color:var(--color-accent); text-decoration:none;">🏠 Portal General</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+    });
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    // Interactive PDCA Wheel Logic
+    const phaseData = {
+      plan: {
+        badge: 'Fase 1: Planificar (Plan)',
+        badgeColor: 'rgba(59, 130, 246, 0.2)',
+        badgeText: '#93c5fd',
+        title: 'Diagnosticar con Datos y Definir la Estrategia',
+        desc: 'En esta etapa el equipo no adivina ni asume: recopila datos objetivos del problema. Se identifica el síntoma, se ejecuta un análisis de causa raíz (usando Diagramas de Ishikawa y análisis de Pareto) y se diseñan los objetivos SMART y las hipótesis verificables.',
+        keyTakeaway: '📌 En Software: Plan de Pruebas según ISO 29119, criterios de aceptación, diseño de casos de prueba y definición de métricas GQM.'
+      },
+      do: {
+        badge: 'Fase 2: Hacer (Do)',
+        badgeColor: 'rgba(245, 158, 11, 0.2)',
+        badgeText: '#fde68a',
+        title: 'Ejecutar el Piloto a Pequeña Escala',
+        desc: 'No se lanza la solución a ciegas a producción. Se implementa en un entorno controlado (un ambiente de Staging, una rama de feature o un despliegue canario) para medir su comportamiento real y recolectar telemetría.',
+        keyTakeaway: '📌 En Software: Desarrollo guiado por pruebas (TDD), ejecución de pruebas unitarias/integración y recopilación de métricas de ejecución.'
+      },
+      check: {
+        badge: 'Fase 3: Verificar (Check)',
+        badgeColor: 'rgba(16, 185, 129, 0.2)',
+        badgeText: '#a7f3d0',
+        title: 'Contrastar Resultados vs Metas Esperadas',
+        desc: 'Se realiza una auditoría rigurosa de los resultados obtenidos en el piloto. ¿Se alcanzó la meta esperada? ¿Bajó la latencia? ¿Se redujeron los defectos? Se aplican gráficos de control e histogramas para asegurar que el cambio no introdujo regresiones.',
+        keyTakeaway: '📌 En Software: Análisis de cobertura de código, métrica DRE (Defect Removal Efficiency), auditoría de logs y verificación de criterios de aceptación.'
+      },
+      act: {
+        badge: 'Fase 4: Actuar / Ajustar (Act)',
+        badgeColor: 'rgba(139, 92, 246, 0.2)',
+        badgeText: '#c4b5fd',
+        title: 'Estandarizar el Éxito o Aprender del Fracaso',
+        desc: 'Si la solución resolvió el problema, se institucionaliza: se actualizan las guías técnicas, se incorporan los nuevos tests al pipeline de CI/CD y se crea una línea base (Baseline) en el repositorio. Si no funcionó, se analiza por qué falló y se reinicia el ciclo.',
+        keyTakeaway: '📌 En Software: Etiquetado de versión Git (Release Tag), actualización de checklists de inspección formal y retrospectiva de equipo.'
+      }
+    };
+
+    function selectPhase(phaseKey) {
+      document.querySelectorAll('.wheel-quadrant').forEach(q => q.classList.remove('active'));
+      const activeBtn = document.querySelector(`.q-${phaseKey}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const data = phaseData[phaseKey];
+      const display = document.getElementById('phaseDisplay');
+      display.innerHTML = `
+        <div>
+          <span class="phase-badge" style="background:${data.badgeColor}; color:${data.badgeText};">${data.badge}</span>
+          <h3 style="font-size:1.4rem; color:#fff; margin-bottom:10px;">${data.title}</h3>
+          <p style="font-size:0.96rem; color:var(--text-muted); line-height:1.6; margin-bottom:14px;">${data.desc}</p>
+          <div style="background:rgba(255,255,255,0.04); border-left:3px solid ${data.badgeText}; padding:10px 14px; border-radius:6px; font-size:0.9rem; color:#fff;">
+            ${data.keyTakeaway}
+          </div>
+        </div>
+      `;
+    }
+
+    // Initialize Wheel on Load
+    selectPhase('plan');
+
+    // Fun Quiz Logic
+    let currentScore = 0;
+    let answeredQuestions = 0;
+    const totalQuestions = 5;
+
+    const explanations = {
+      1: {
+        correct: '🎉 ¡Exacto! Modificar producción directamente viola "Plan" (cero análisis de causa raíz) y "Check" (cero verificación en staging antes de liberar). Es la receta clásica para el desastre.',
+        wrong: '❌ ¡Incorrecto! Un buen ingeniero jamás hace parches ciegos en producción sin analizar la causa raíz (Plan) ni probarlo en staging (Check).'
+      },
+      2: {
+        correct: '🎉 ¡Brillante! La Retrospectiva es el momento cumbre del "Act": se reflexiona sobre los fallos y aciertos para ajustar el proceso antes de arrancar el siguiente Sprint.',
+        wrong: '❌ Casi. La retrospectiva no es solo verificar números (eso es Review); su objetivo es acordar ajustes en la forma de trabajar del equipo (Act).'
+      },
+      3: {
+        correct: '🎉 ¡Así se hace! El piloto protege al negocio. Si la hipótesis estaba equivocada, fallar a pequeña escala cuesta casi cero y deja aprendizaje inmediato.',
+        wrong: '❌ No. La prueba piloto existe precisamente para reducir el riesgo operacional y comprobar si la solución en verdad soluciona el problema antes de generalizarla.'
+      },
+      4: {
+        correct: '🎉 ¡Totalmente cierto! Si no estandarizas (documentación, linters, tests automáticos en CI), el conocimiento se evapora y el equipo está condenado a repetir los mismos bugs.',
+        wrong: '❌ Incorrecto. Lo que falló fue "Act" (Estandarización): el equipo resolvió el bug pero no creó defensas ni estándares para evitar su recurrencia futura.'
+      },
+      5: {
+        correct: '🎉 ¡Sensei Kaizen! El PDCA es una espiral porque la calidad no tiene fin: cada estándar alcanzado es el peldaño para plantear la siguiente meta de excelencia.',
+        wrong: '❌ No. Es un ciclo continuo porque cada vuelta consolida una línea base estable que sirve de trampolín para la siguiente iteración de mejora.'
+      }
+    };
+
+    function checkAnswer(qNum, btn, isCorrect) {
+      const card = document.querySelector(`[data-q="${qNum}"]`);
+      const buttons = card.querySelectorAll('.quiz-opt-btn');
+      const feedback = card.querySelector('.quiz-feedback');
+
+      buttons.forEach(b => b.disabled = true);
+
+      feedback.style.display = 'block';
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+        currentScore++;
+        feedback.style.background = 'rgba(16, 185, 129, 0.15)';
+        feedback.style.color = '#34d399';
+        feedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+        feedback.innerHTML = explanations[qNum].correct;
+      } else {
+        btn.classList.add('incorrect');
+        // Highlight correct button
+        buttons.forEach(b => {
+          if (b.innerText.includes('B)') && qNum === 1) b.classList.add('correct');
+          if (b.innerText.includes('C)') && (qNum === 2 || qNum === 4)) b.classList.add('correct');
+          if (b.innerText.includes('A)') && (qNum === 3 || qNum === 5)) b.classList.add('correct');
+        });
+        feedback.style.background = 'rgba(239, 68, 68, 0.15)';
+        feedback.style.color = '#fca5a5';
+        feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        feedback.innerHTML = explanations[qNum].wrong;
+      }
+
+      document.getElementById('quizScore').innerText = currentScore;
+      answeredQuestions++;
+
+      if (answeredQuestions === totalQuestions) {
+        showQuizSummary();
+      }
+    }
+
+    function showQuizSummary() {
+      const banner = document.getElementById('quizBanner');
+      const medal = document.getElementById('quizMedal');
+      const title = document.getElementById('quizTitle');
+      const msg = document.getElementById('quizMessage');
+
+      banner.style.display = 'block';
+
+      if (currentScore === 5) {
+        medal.innerText = '🥋🏆';
+        title.innerText = '¡Sensei Supremo de la Calidad Kaizen! (5/5)';
+        msg.innerText = 'Dominas a la perfección la disciplina del PDCA. No dejas espacio para la improvisación ni para los parches de viernes por la tarde. Estás listo para liderar procesos de V&V de clase mundial.';
+        banner.style.borderColor = 'var(--color-success)';
+      } else if (currentScore >= 3) {
+        medal.innerText = '🎖️';
+        title.innerText = '¡Auditor de Calidad en Ascenso! (' + currentScore + '/5)';
+        msg.innerText = 'Buen trabajo. Comprendes el valor de no saltarse las fases Check y Act, aunque debes tener cuidado con no caer en la tentación de parches rápidos.';
+        banner.style.borderColor = 'var(--color-warning)';
+      } else {
+        medal.innerText = '🚒';
+        title.innerText = '¡Bombero de Software en Alerta! (' + currentScore + '/5)';
+        msg.innerText = 'Cuidado: vives apagando incendios en producción. Dale una lectura a los recursos de Leansis y Asana arriba para adoptar el hábito del PDCA antes de que tu base de datos colapse.';
+        banner.style.borderColor = 'var(--color-danger)';
+      }
+
+      banner.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetQuiz() {
+      currentScore = 0;
+      answeredQuestions = 0;
+      document.getElementById('quizScore').innerText = '0';
+      document.getElementById('quizBanner').style.display = 'none';
+
+      document.querySelectorAll('.quiz-card').forEach(card => {
+        const buttons = card.querySelectorAll('.quiz-opt-btn');
+        const feedback = card.querySelector('.quiz-feedback');
+        buttons.forEach(b => {
+          b.disabled = false;
+          b.classList.remove('correct', 'incorrect');
+        });
+        feedback.style.display = 'none';
+      });
+
+      document.getElementById('test-divertido').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
