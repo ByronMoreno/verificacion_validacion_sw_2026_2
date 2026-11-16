@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ejemplos Detallados de Historias de Usuario: Clase 100% animada e interactiva con 10 simuladores en vivo, personajes chibi, sonido, narración y comparativa | UNIBE.">
+  <title>🧠 Ejemplos Detallados de Historias de Usuario (Animadas) | UNIBE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #080c18;
+      --bg-card: rgba(18, 26, 48, 0.9);
+      --bg-card-hover: rgba(28, 38, 70, 0.98);
+
+      --color-cyan: #00f2fe;
+      --color-pink: #ff416c;
+      --color-yellow: #ffb703;
+      --color-green: #06d6a0;
+      --color-purple: #9d4edd;
+      --color-orange: #fb8500;
+      --color-blue: #3b82f6;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+
+      --font-fun: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* MAGIC BACKGROUND */
+    .magic-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: 
+        radial-gradient(circle at 10% 15%, rgba(0, 242, 254, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(255, 65, 108, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.08) 0%, transparent 60%);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .particles-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* FLOATING SOUND DOCK */
+    .audio-dock {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(15px);
+      border: 2px solid var(--color-cyan);
+      padding: 8px 18px;
+      border-radius: 50px;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+      animation: floatDock 4s ease-in-out infinite;
+    }
+    @keyframes floatDock {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+    }
+    .sound-btn:hover {
+      background: var(--color-cyan);
+      color: #000;
+      transform: scale(1.15) rotate(6deg);
+      box-shadow: 0 0 15px var(--color-cyan);
+    }
+    .sound-btn.active {
+      background: linear-gradient(135deg, var(--color-cyan), #4facfe);
+      color: #000;
+      border-color: #fff;
+    }
+    .sound-label {
+      font-family: var(--font-fun);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 40px 24px 100px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 45px;
+    }
+
+    /* HERO BANNER */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(25, 20, 55, 0.95), rgba(15, 30, 60, 0.9));
+      border: 3px solid rgba(0, 242, 254, 0.4);
+      border-radius: 32px;
+      padding: 45px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: center;
+      gap: 30px;
+    }
+    .badge-class {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(90deg, rgba(255, 65, 108, 0.25), rgba(255, 183, 3, 0.25));
+      border: 1px solid var(--color-yellow);
+      color: var(--color-yellow);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-family: var(--font-fun);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      animation: pulseGlow 2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(255, 183, 3, 0.2); }
+      to { box-shadow: 0 0 25px rgba(255, 65, 108, 0.5); }
+    }
+    .hero-title {
+      font-family: var(--font-fun);
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 20%, var(--color-cyan) 60%, var(--color-pink) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 8px 30px rgba(0, 242, 254, 0.3);
+    }
+    .hero-objective {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .hero-objective strong { color: var(--color-cyan); }
+
+    .hero-img-box {
+      border-radius: 24px;
+      overflow: hidden;
+      border: 3px solid var(--color-cyan);
+      box-shadow: 0 0 35px rgba(0, 242, 254, 0.4);
+      animation: floatImg 6s ease-in-out infinite;
+    }
+    @keyframes floatImg {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .hero-img-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s;
+    }
+    .hero-img-box:hover img { transform: scale(1.03); }
+
+    /* RECORDATORIO FORMATO CANÓNICO */
+    .canonical-format-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border: 2px solid var(--color-yellow);
+      border-radius: 24px;
+      padding: 26px 32px;
+      box-shadow: 0 10px 30px rgba(255, 183, 3, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .canonical-title {
+      font-family: var(--font-fun);
+      font-size: 1.3rem;
+      color: var(--color-yellow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .canonical-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .canonical-item {
+      background: rgba(0,0,0,0.3);
+      padding: 14px 18px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-left: 3px solid var(--color-cyan);
+    }
+    .canonical-kw {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-cyan);
+    }
+    .canonical-desc {
+      font-size: 0.92rem;
+      color: #e2e8f0;
+    }
+
+    /* QUICK NAVIGATION MENU */
+    .quick-nav {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+    .nav-pill {
+      background: rgba(20, 27, 48, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-family: var(--font-fun);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.25s;
+    }
+    .nav-pill:hover, .nav-pill.active {
+      background: var(--color-cyan);
+      color: #000;
+      font-weight: 700;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35);
+    }
+
+    /* USER STORY CARDS (THE 10 ANIMATED EXAMPLES) */
+    .story-section {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .example-card {
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.09);
+      border-radius: 28px;
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      transition: all 0.35s ease;
+    }
+    .example-card:hover {
+      border-color: var(--color-cyan);
+      box-shadow: 0 20px 45px rgba(0, 242, 254, 0.2);
+    }
+    .example-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 16px;
+    }
+    .example-context {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .context-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      animation: floatSmall 3s ease-in-out infinite;
+    }
+    @keyframes floatSmall {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .example-num-title {
+      font-family: var(--font-fun);
+      font-size: 1.55rem;
+      color: #fff;
+    }
+    .meta-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .badge-user {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.35);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .badge-priority {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .prio-veryhigh { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .prio-high { background: rgba(251, 133, 0, 0.2); color: #fed7aa; border: 1px solid rgba(251, 133, 0, 0.4); }
+    .prio-med { background: rgba(255, 183, 3, 0.2); color: #fef08a; border: 1px solid rgba(255, 183, 3, 0.4); }
+
+    /* TARJETA VISUAL DE LA HISTORIA */
+    .story-statement-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.85));
+      border: 2px solid rgba(0, 242, 254, 0.3);
+      border-radius: 18px;
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .statement-row {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      font-size: 1.15rem;
+      line-height: 1.55;
+    }
+    .stmt-kw {
+      font-family: var(--font-fun);
+      font-weight: 700;
+      color: var(--color-cyan);
+      min-width: 80px;
+    }
+    .stmt-txt { color: #f1f5f9; }
+
+    /* CRITERIOS DE ACEPTACIÓN CHECKLIST INTERACTIVO */
+    .criteria-box {
+      background: rgba(10, 15, 30, 0.6);
+      border-radius: 18px;
+      padding: 20px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .criteria-header {
+      font-family: var(--font-fun);
+      font-size: 1.1rem;
+      color: var(--color-yellow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .criteria-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .criteria-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .criteria-item:hover {
+      background: rgba(6, 214, 160, 0.1);
+    }
+    .criteria-item.checked {
+      background: rgba(6, 214, 160, 0.15);
+      border-left: 3px solid var(--color-green);
+      color: #6ee7b7;
+    }
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--color-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .criteria-item.checked .custom-checkbox {
+      background: var(--color-green);
+      border-color: var(--color-green);
+      color: #000;
+    }
+
+    /* VALOR DE NEGOCIO BOX */
+    .business-value-box {
+      background: rgba(255, 65, 108, 0.08);
+      border-left: 4px solid var(--color-pink);
+      padding: 12px 18px;
+      border-radius: 0 12px 12px 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #fed7aa;
+    }
+    .business-value-box strong { color: var(--color-pink); }
+
+    /* SIMULADOR EN VIVO DE CADA HISTORIA */
+    .story-sim-panel {
+      background: linear-gradient(135deg, rgba(20, 30, 60, 0.8), rgba(10, 18, 38, 0.95));
+      border: 2px dashed rgba(0, 242, 254, 0.35);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-fun);
+      font-size: 1rem;
+      color: var(--color-cyan);
+    }
+    .sim-arena {
+      min-height: 90px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ACTION BUTTONS */
+    .story-actions-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-action-sim {
+      background: linear-gradient(135deg, var(--color-cyan), #3b82f6);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-family: var(--font-fun);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+    .btn-action-sim:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(0, 242, 254, 0.4);
+    }
+    .btn-speak-story {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-family: var(--font-fun);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-speak-story:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: var(--color-yellow);
+      transform: translateY(-2px);
+    }
+
+    /* COMPARATIVA TABLA ANIMADA */
+    .comparison-section {
+      background: var(--bg-card);
+      border: 2px solid var(--color-cyan);
+      border-radius: 28px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .comparison-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 16px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(10, 15, 30, 0.8);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th {
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--color-cyan);
+      font-family: var(--font-fun);
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      text-transform: uppercase;
+    }
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td {
+      background: rgba(0, 242, 254, 0.06);
+    }
+
+    /* FOOTER */
+    .site-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px 0 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .hero-banner { grid-template-columns: 1fr; }
+      .canonical-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 2.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="magic-backdrop"></div>
+  <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+
+  <!-- CONTROL DE AUDIO FLOTANTE -->
+  <aside class="audio-dock">
+    <button class="sound-btn" id="bgmToggleBtn" onclick="toggleBGM()" title="Música Relajante de Fondo">
+      🎵
+    </button>
+    <button class="sound-btn active" id="sfxToggleBtn" onclick="toggleSFX()" title="Efectos de Sonido">
+      🔊
+    </button>
+    <button class="sound-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="Voz de Personajes (Narración en Español)">
+      🗣️
+    </button>
+    <span class="sound-label" id="soundStatusText">Sonido: SFX Listo</span>
+  </aside>
+
+  <div class="container">
+
+    <!-- HERO HEADER -->
+    <header class="hero-banner">
+      <div>
+        <div class="badge-class">🧠 Clase Magistral Interactiva</div>
+        <h1 class="hero-title">10 Ejemplos Detallados de Historias de Usuario</h1>
+        <p class="hero-objective">
+          <strong>🎯 Objetivo de Aprendizaje:</strong> Aprenderás a redactar, analizar y evaluar historias de usuario completas, incluyendo su contexto real de negocio, criterios de aceptación verificables y valor económico tangible, todo a través de <strong>10 simuladores interactivos en vivo</strong>.
+        </p>
+        <div class="cta-group" style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="#ejemplo-1" class="btn-action-sim" onclick="playSfx('click')">
+            <span>🚀 Ver Ejemplos Animados</span>
+          </a>
+          <a href="#tabla-comparativa" class="btn-speak-story" onclick="playSfx('click')">
+            <span>🧮 Comparativa Global</span>
+          </a>
+          <a href="../HISTORIAS%20DE%20USUARIOS%20ANIMADAS/historias-de-usuarios-animadas.html" class="btn-speak-story" onclick="playSfx('click')">
+            <span>✨ Taller Mágico</span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-img-box">
+        <img src="user_stories_squad.jpg" alt="10 Real World User Stories Squad: Los 10 Personajes de la Clase">
+      </div>
+    </header>
+
+    <!-- RECORDATORIO CANÓNICO -->
+    <section class="canonical-format-box">
+      <div class="canonical-title">
+        <span>📘 Recordatorio Fundamental: La Estructura Estándar</span>
+      </div>
+      <div class="canonical-grid">
+        <div class="canonical-item">
+          <span class="canonical-kw">COMO...</span>
+          <span class="canonical-desc">[Tipo de usuario / Rol protagonista específico]</span>
+        </div>
+        <div class="canonical-item" style="border-left-color: var(--color-yellow);">
+          <span class="canonical-kw" style="color: var(--color-yellow);">QUIERO...</span>
+          <span class="canonical-desc">[Una funcionalidad o acción clara]</span>
+        </div>
+        <div class="canonical-item" style="border-left-color: var(--color-green);">
+          <span class="canonical-kw" style="color: var(--color-green);">PARA...</span>
+          <span class="canonical-desc">[Obtener un beneficio, valor o resultado concreto]</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK NAV PILLS -->
+    <nav class="quick-nav">
+      <a href="#ejemplo-1" class="nav-pill active">💡 1. Moodle</a>
+      <a href="#ejemplo-2" class="nav-pill">💬 2. Banca Móvil</a>
+      <a href="#ejemplo-3" class="nav-pill">🧾 3. Facturación</a>
+      <a href="#ejemplo-4" class="nav-pill">🧑💼 4. Portal Empleo</a>
+      <a href="#ejemplo-5" class="nav-pill">🧘 5. Salud & Sueño</a>
+      <a href="#ejemplo-6" class="nav-pill">🛒 6. Tienda Online</a>
+      <a href="#ejemplo-7" class="nav-pill">🧑🏫 7. Calificaciones Docente</a>
+      <a href="#ejemplo-8" class="nav-pill">📱 8. Mensajería</a>
+      <a href="#ejemplo-9" class="nav-pill">💳 9. App Transporte</a>
+      <a href="#ejemplo-10" class="nav-pill">🧑💻 10. Soporte Técnico</a>
+      <a href="#tabla-comparativa" class="nav-pill" style="border-color: var(--color-cyan); color: #67e8f9;">🧮 Comparativa</a>
+    </nav>
+
+    <!-- LISTA DE LOS 10 EJEMPLOS -->
+    <div class="story-section">
+
+      <!-- EJEMPLO 1: MOODLE -->
+      <article id="ejemplo-1" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(14, 165, 233, 0.2);">💡</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-cyan);">EJEMPLO 01 • PLATAFORMA EDUCATIVA</span>
+              <h3 class="example-num-title">Moodle Académico: Consulta de Calificaciones</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Estudiante</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">estudiante,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">ver mis calificaciones en línea,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">saber cómo voy avanzando en el curso y corregir a tiempo mi rendimiento.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación (Haz clic para verificar):</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema muestra una tabla clara con calificaciones detalladas por actividad evaluada.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El estudiante <strong>solo puede ver sus propias notas</strong> (aislamiento total de privacidad).</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Las calificaciones deben actualizarse automáticamente al ser publicadas por el docente.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Permite al estudiante conocer su rendimiento de forma autónoma sin depender de citas presenciales con el docente, reduciendo un 80% las consultas administrativas.
+        </div>
+
+        <!-- SIMULADOR EN VIVO -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Simulador en Vivo: Portal Estudiante</span>
+            <span id="sim1-status" style="font-family: var(--font-mono); font-size: 0.8rem; color: #a7f3d0;">Modo Activo</span>
+          </div>
+          <div class="sim-arena" id="sim1-arena">
+            <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.88rem; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
+                <span>Actividad</span>
+                <span>Ponderación</span>
+                <span>Calificación</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                <span>Taller 1: Pruebas Estáticas</span>
+                <span>20%</span>
+                <span style="color: #34d399; font-weight: 700;">9.5 / 10</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                <span>Examen Parcial I</span>
+                <span>40%</span>
+                <span id="sim1-grade" style="color: #facc15; font-weight: 700;">Pendiente de publicar</span>
+              </div>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim1()">
+              ⚡ Simular Publicación de Calificación
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como estudiante, quiero ver mis calificaciones en línea para saber cómo voy avanzando en el curso.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 2: BANCA MÓVIL -->
+      <article id="ejemplo-2" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(239, 68, 68, 0.2);">💬</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #f87171;">EJEMPLO 02 • BANCA DIGITAL</span>
+              <h3 class="example-num-title">Banca Móvil: Transferencias entre Cuentas Propias</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Cliente</span>
+            <span class="badge-priority prio-veryhigh">Prioridad: Muy Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">cliente del banco,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">transferir dinero entre mis cuentas,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">gestionar mis fondos fácilmente desde mi teléfono.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Solo se permiten transferencias entre cuentas del <strong>mismo titular</strong>.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema debe mostrar una pantalla de confirmación antes de ejecutar la transacción.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>La transferencia debe reflejarse de inmediato en el saldo disponible de ambas cuentas.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Aumenta la autonomía del usuario, la velocidad operativa y disminuye la afluencia de personas en ventanillas bancarias.
+        </div>
+
+        <!-- SIMULADOR EN VIVO BANCA -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Simulador: Billetera Digital</span>
+            <span style="color: var(--color-green);">Cuentas Conectadas</span>
+          </div>
+          <div class="sim-arena" id="sim2-arena">
+            <div style="display: flex; gap: 24px; align-items: center; justify-content: center; flex-wrap: wrap;">
+              <div style="background: rgba(255,255,255,0.06); padding: 10px 16px; border-radius: 12px; text-align: center;">
+                <span style="font-size: 0.8rem; color: #94a3b8;">Cuenta Corriente</span>
+                <div style="font-family: var(--font-fun); font-size: 1.4rem; color: #fff;" id="sim2-acc1">$500.00</div>
+              </div>
+              <span style="font-size: 1.8rem; color: var(--color-cyan);">➔</span>
+              <div style="background: rgba(255,255,255,0.06); padding: 10px 16px; border-radius: 12px; text-align: center;">
+                <span style="font-size: 0.8rem; color: #94a3b8;">Cuenta de Ahorros</span>
+                <div style="font-family: var(--font-fun); font-size: 1.4rem; color: #34d399;" id="sim2-acc2">$150.00</div>
+              </div>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim2()">
+              💸 Transferir $100.00 Inmediatos
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como cliente del banco, quiero transferir dinero entre mis cuentas para gestionar mis fondos fácilmente.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 3: FACTURACIÓN -->
+      <article id="ejemplo-3" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(255, 183, 3, 0.2);">🧾</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-yellow);">EJEMPLO 03 • FACTURACIÓN EMPRESARIAL</span>
+              <h3 class="example-num-title">Sistema de Facturación: Reportes de Ventas</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Administrador</span>
+            <span class="badge-priority prio-med">Prioridad: Media</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">administrador del sistema,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">generar reportes de ventas mensuales,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">analizar el desempeño del negocio y tomar decisiones financieras.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El reporte debe incluir total de ventas, clientes recurrentes y productos más vendidos.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema debe permitir exportar a formatos <strong>PDF y Excel (.xlsx)</strong>.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El reporte solo puede generarse para meses contablemente cerrados.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Permite a la gerencia tomar decisiones estratégicas basadas en datos históricos sólidos y trazables.
+        </div>
+
+        <!-- SIMULADOR EN VIVO REPORTE -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Generador de Reporte Financiero</span>
+            <span id="sim3-status">Listo para exportar</span>
+          </div>
+          <div class="sim-arena" id="sim3-arena">
+            <div style="font-family: var(--font-fun); font-size: 1.1rem; color: #cbd5e1; text-align: center;">
+              Mes Seleccionado: <strong>Octubre 2026 (Mes Cerrado)</strong><br>
+              <span style="font-size: 0.9rem; color: #94a3b8;">Total ventas: $48,250.00 • 312 Transacciones</span>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim3()">
+              📄 Exportar a PDF & Excel
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como administrador del sistema, quiero generar reportes de ventas mensuales para analizar el desempeño del negocio.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 4: PORTAL DE EMPLEO -->
+      <article id="ejemplo-4" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(157, 78, 221, 0.2);">🧑💼</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #c084fc;">EJEMPLO 04 • RECURSOS HUMANOS</span>
+              <h3 class="example-num-title">Portal de Empleo: Filtro Avanzado de Candidatos</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Reclutador</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">reclutador,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">filtrar candidatos por experiencia y habilidades,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">encontrar más rápido los perfiles más adecuados para las vacantes.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema permite filtrar simultáneamente por años de experiencia, país y tecnología.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Los resultados deben ordenarse automáticamente por porcentaje de relevancia/coincidencia.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El reclutador puede guardar búsquedas frecuentes con un solo clic.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Acelera drásticamente el proceso de contratación, ahorrando semanas de revisión manual de hojas de vida.
+        </div>
+
+        <!-- SIMULADOR EN VIVO RECLUTADOR -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Simulador: Filtro de Talento</span>
+            <span id="sim4-match" style="color: var(--color-cyan);">3 Candidatos encontrados</span>
+          </div>
+          <div class="sim-arena" id="sim4-arena">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+              <span class="builder-chip selected">Tecnología: QA / Testing</span>
+              <span class="builder-chip selected">Experiencia: &gt; 3 años</span>
+              <span class="builder-chip selected">País: Ecuador</span>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim4()">
+              🔍 Aplicar Filtro & Ordenar por Relevancia
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como reclutador, quiero filtrar candidatos por experiencia y habilidades para encontrar más rápido los perfiles adecuados.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 5: SALUD Y BIENESTAR -->
+      <article id="ejemplo-5" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(6, 214, 160, 0.2);">🧘</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #34d399;">EJEMPLO 05 • HEALTH & WELLNESS</span>
+              <h3 class="example-num-title">App de Salud: Registro y Hábitos de Sueño</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Usuario Final</span>
+            <span class="badge-priority prio-med">Prioridad: Media</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">usuario de la app de salud,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">registrar mis horas de sueño diarias,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">hacer seguimiento a mis hábitos de descanso y mejorar mi energía.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Debe permitir registrar la hora exacta de inicio (acostarse) y fin (despertar).</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Mostrar el promedio semanal de horas dormidas con gráfico comparativo.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Permitir editar o corregir registros de días anteriores fácilmente.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Fomenta hábitos de vida saludables mediante la autoevaluación, aumentando la retención de usuarios en la aplicación.
+        </div>
+
+        <!-- SIMULADOR EN VIVO SUEÑO -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Tracker de Sueño Semanal</span>
+            <span id="sim5-avg" style="color: #6ee7b7; font-weight: 700;">Promedio: 7.5 hrs/noche</span>
+          </div>
+          <div class="sim-arena" id="sim5-arena">
+            <div style="text-align: center;">
+              🌙 Registro de hoy: <strong>11:00 PM &rarr; 07:00 AM (8.0 horas de sueño reparador)</strong>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim5()">
+              💤 Registrar Nueva Noche de Sueño
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como usuario de la app, quiero registrar mis horas de sueño para hacer seguimiento a mis hábitos de descanso.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 6: TIENDA EN LÍNEA -->
+      <article id="ejemplo-6" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(251, 133, 0, 0.2);">🛒</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #fb923c;">EJEMPLO 06 • E-COMMERCE</span>
+              <h3 class="example-num-title">Tienda Online: Carrito de Compras Persistente</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Cliente</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">cliente,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">agregar productos a mi carrito de compras,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">comprarlos después cuando esté listo sin perder mi selección.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El carrito conserva los productos guardados incluso si el usuario cierra su sesión.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Se muestra el precio total actualizado en tiempo real al agregar o eliminar artículos.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Al confirmar la compra, las unidades adquiridas se descuentan del inventario en vivo.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Mejora la tasa de conversión, reduce carritos abandonados y optimiza la fidelización de clientes.
+        </div>
+
+        <!-- SIMULADOR EN VIVO CARRITO -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Carrito de Compras en Vivo</span>
+            <span id="sim6-count" style="color: var(--color-cyan); font-weight: 700;">Artículos: 1 ($45.00)</span>
+          </div>
+          <div class="sim-arena" id="sim6-arena">
+            <div id="sim6-cart-items" style="font-family: var(--font-fun); font-size: 1.1rem; color: #fff;">
+              🎧 Auriculares Inalámbricos Pro ($45.00)
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim6()">
+              🛍️ Agregar Smartwatch ($80.00)
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como cliente, quiero agregar productos a mi carrito de compras para comprarlos después.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 7: CALIFICACIONES DOCENTE (CSV) -->
+      <article id="ejemplo-7" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(0, 242, 254, 0.2);">🧑🏫</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-cyan);">EJEMPLO 07 • SISTEMA DOCENTE</span>
+              <h3 class="example-num-title">Gestión Docente: Carga Masiva de Calificaciones (CSV)</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Docente</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">docente,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">subir las calificaciones de mis estudiantes en formato CSV,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">ahorrar tiempo y evitar ingresar nota por nota manualmente.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El archivo CSV debe tener validaciones automáticas de formato y rango de notas (0 a 10).</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Mostrar una vista previa editable de los datos antes de guardar en el sistema.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Permitir corregir errores detectados en la misma pantalla sin reiniciar la carga.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Reduce hasta un 90% el tiempo que los profesores dedican al asentamiento de calificaciones al final del ciclo.
+        </div>
+
+        <!-- SIMULADOR CSV -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Simulador: Carga de Archivo CSV</span>
+            <span id="sim7-status">Listo para importar</span>
+          </div>
+          <div class="sim-arena" id="sim7-arena">
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: #a7f3d0; text-align: left;">
+              notas_parcial_semana4.csv [45 registros validados sin errores]
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim7()">
+              📂 Simular Subida y Validación de CSV
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como docente, quiero subir las calificaciones de mis estudiantes en formato CSV para ahorrar tiempo.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 8: APLICACIÓN DE MENSAJERÍA -->
+      <article id="ejemplo-8" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(14, 165, 233, 0.2);">📱</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #38bdf8;">EJEMPLO 08 • COMUNICACIÓN</span>
+              <h3 class="example-num-title">App de Mensajería: Eliminar Mensajes por Error</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Usuario Final</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">usuario,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">poder eliminar mensajes enviados por error,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">mantener mis conversaciones limpias y corregir equivocaciones.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Solo se puede eliminar un mensaje en los primeros <strong>5 minutos</strong> posteriores al envío.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Debe mostrar un aviso claro de <em>“Mensaje eliminado”</em> en el chat del destinatario.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>La eliminación no debe afectar la estabilidad ni el orden cronológico del chat.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Da control y tranquilidad al usuario sobre su propia privacidad, evitando momentos incómodos en la app.
+        </div>
+
+        <!-- SIMULADOR MENSAJE -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Chat en Tiempo Real</span>
+            <span style="color: var(--color-yellow);">Enviado hace 1 min (Ventana activa)</span>
+          </div>
+          <div class="sim-arena" id="sim8-arena">
+            <div id="sim8-bubble" style="background: #2563eb; color: #fff; padding: 10px 18px; border-radius: 18px 18px 4px 18px; font-size: 0.95rem;">
+              "¡Oye, aquí te envío la clave secreta por equivocación!" ⚠️
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim8()">
+              🗑️ Eliminar Mensaje para Todos
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como usuario, quiero poder eliminar mensajes enviados por error para mantener mis conversaciones limpias.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 9: APP DE TRANSPORTE (UBER) -->
+      <article id="ejemplo-9" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(255, 65, 108, 0.2);">💳</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #ff758c;">EJEMPLO 09 • MOVILIDAD</span>
+              <h3 class="example-num-title">App de Transporte: Estimación de Tarifa</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Pasajero</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">pasajero,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">ver el costo estimado del viaje antes de confirmarlo,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">decidir con certeza y transparencia si tomo el servicio.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema calcula el costo según distancia en km y tiempo estimado de tráfico.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Debe mostrar un rango claro de precios antes de pulsar el botón de solicitud.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El costo final no puede variar en más del <strong>20%</strong> respecto a la estimación previa.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Aumenta la transparencia, elimina la desconfianza del usuario e incrementa las solicitudes completadas.
+        </div>
+
+        <!-- SIMULADOR UBER -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Simulador: Estimador de Tarifa</span>
+            <span id="sim9-range" style="color: var(--color-cyan); font-weight: 700;">Ruta: UNIBE &rarr; Centro Histórico</span>
+          </div>
+          <div class="sim-arena" id="sim9-arena">
+            <div style="font-family: var(--font-fun); font-size: 1.3rem; color: #fef08a;" id="sim9-cost">
+              Tarifa Estimada: $3.50 – $4.20 (Distancia: 6.2 km • 18 min)
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim9()">
+              🚗 Simular Variación de Tráfico
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como pasajero, quiero ver el costo estimado del viaje antes de confirmarlo para decidir si lo tomo.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- EJEMPLO 10: SISTEMA DE SOPORTE TÉCNICO -->
+      <article id="ejemplo-10" class="example-card">
+        <div class="example-header">
+          <div class="example-context">
+            <div class="context-icon" style="background: rgba(6, 214, 160, 0.2);">🧑💻</div>
+            <div>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #6ee7b7;">EJEMPLO 10 • IT SERVICE DESK</span>
+              <h3 class="example-num-title">Soporte Técnico: Registro y Seguimiento de Incidencias</h3>
+            </div>
+          </div>
+          <div class="meta-badges">
+            <span class="badge-user">👤 Técnico de Soporte</span>
+            <span class="badge-priority prio-high">Prioridad: Alta</span>
+          </div>
+        </div>
+
+        <div class="story-statement-box">
+          <div class="statement-row">
+            <span class="stmt-kw">COMO</span>
+            <span class="stmt-txt">técnico de soporte,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">QUIERO</span>
+            <span class="stmt-txt">registrar las incidencias de los usuarios,</span>
+          </div>
+          <div class="statement-row">
+            <span class="stmt-kw">PARA</span>
+            <span class="stmt-txt">darles seguimiento estructurado hasta su solución definitiva.</span>
+          </div>
+        </div>
+
+        <div class="criteria-box">
+          <div class="criteria-header">
+            <span>📋 Criterios de Aceptación:</span>
+          </div>
+          <ul class="criteria-list">
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>Cada incidencia registrada debe generar un número único e irrepetible de ticket.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El sistema permite actualizar el estado cíclico: <code>Pendiente</code> &rarr; <code>En proceso</code> &rarr; <code>Resuelto</code>.</span>
+            </li>
+            <li class="criteria-item" onclick="toggleCriteria(this)">
+              <div class="custom-checkbox">✓</div>
+              <span>El cliente recibe notificación por correo electrónico cada vez que cambia el estado.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="business-value-box">
+          <strong>💎 Valor de Negocio:</strong> Mejora la trazabilidad de incidentes, asegura el cumplimiento de Acuerdos de Nivel de Servicio (SLA) y eleva la satisfacción del cliente.
+        </div>
+
+        <!-- SIMULADOR TICKET -->
+        <div class="story-sim-panel">
+          <div class="sim-header">
+            <span>🎮 Mesa de Ayuda: Ticket Activo</span>
+            <span id="sim10-id" style="font-family: var(--font-mono); color: var(--color-cyan);">Ticket #TCK-2026-9812</span>
+          </div>
+          <div class="sim-arena" id="sim10-arena">
+            <div style="font-family: var(--font-fun); font-size: 1.15rem; color: #fff;">
+              Estado Actual: <span id="sim10-state" style="background: #eab308; color: #000; padding: 4px 12px; border-radius: 20px;">Pendiente</span>
+            </div>
+          </div>
+          <div class="story-actions-row">
+            <button class="btn-action-sim" onclick="runSim10()">
+              🔄 Avanzar Estado del Ticket
+            </button>
+            <button class="btn-speak-story" onclick="speakStory('Como técnico de soporte, quiero registrar las incidencias de los usuarios para darles seguimiento hasta su solución.')">
+              🗣️ Hablar Historia
+            </button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- TABLA COMPARATIVA GLOBAL DE LOS 10 EJEMPLOS -->
+    <section id="tabla-comparativa" class="comparison-section">
+      <div class="comparison-header">
+        <span class="badge-class" style="background: rgba(0, 242, 254, 0.2); border-color: var(--color-cyan); color: var(--color-cyan);">
+          🧮 Consolidado Metodológico
+        </span>
+        <h2 style="font-family: var(--font-fun); font-size: 2.2rem; color: #fff; margin-top: 8px;">
+          Comparativa de los 10 Ejemplos de Historias de Usuario
+        </h2>
+        <p style="color: #cbd5e1; font-size: 1rem; margin-top: 4px;">
+          Matriz comparativa para evaluar el contexto de dominio, rol del usuario, nivel de prioridad y el valor económico o funcional principal:
+        </p>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th style="width: 20%;">Contexto</th>
+              <th style="width: 20%;">Tipo de Usuario</th>
+              <th style="width: 15%;">Prioridad</th>
+              <th style="width: 40%;">Valor Principal para el Negocio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1</strong></td>
+              <td>Educación (Moodle)</td>
+              <td><code>Estudiante</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Seguimiento oportuno del rendimiento académico.</td>
+            </tr>
+            <tr>
+              <td><strong>2</strong></td>
+              <td>Banca Digital</td>
+              <td><code>Cliente</code></td>
+              <td><span class="table-badge" style="background: rgba(239, 68, 68, 0.25); color: #fca5a5;">Muy alta</span></td>
+              <td>Autonomía y rapidez en transferencias financieras.</td>
+            </tr>
+            <tr>
+              <td><strong>3</strong></td>
+              <td>Facturación</td>
+              <td><code>Administrador</code></td>
+              <td><span class="table-badge" style="background: rgba(255, 183, 3, 0.25); color: #fef08a;">Media</span></td>
+              <td>Análisis de ventas para toma de decisiones contables.</td>
+            </tr>
+            <tr>
+              <td><strong>4</strong></td>
+              <td>Empleo (Recruiting)</td>
+              <td><code>Reclutador</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Eficiencia y celeridad en selección de perfiles.</td>
+            </tr>
+            <tr>
+              <td><strong>5</strong></td>
+              <td>Salud & Bienestar</td>
+              <td><code>Usuario final</code></td>
+              <td><span class="table-badge" style="background: rgba(255, 183, 3, 0.25); color: #fef08a;">Media</span></td>
+              <td>Fomento de hábitos saludables mediante autoevaluación.</td>
+            </tr>
+            <tr>
+              <td><strong>6</strong></td>
+              <td>E-commerce</td>
+              <td><code>Cliente</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Comodidad en compra diferida y fidelización.</td>
+            </tr>
+            <tr>
+              <td><strong>7</strong></td>
+              <td>Educación Docente</td>
+              <td><code>Docente</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Ahorro masivo de tiempo en gestión de notas.</td>
+            </tr>
+            <tr>
+              <td><strong>8</strong></td>
+              <td>Mensajería</td>
+              <td><code>Usuario final</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Control de contenido propio y corrección de errores.</td>
+            </tr>
+            <tr>
+              <td><strong>9</strong></td>
+              <td>Transporte (Uber)</td>
+              <td><code>Pasajero</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Transparencia de tarifas y confianza del usuario.</td>
+            </tr>
+            <tr>
+              <td><strong>10</strong></td>
+              <td>Soporte Técnico</td>
+              <td><code>Técnico</code></td>
+              <td><span class="table-badge" style="background: rgba(251, 133, 0, 0.25); color: #fed7aa;">Alta</span></td>
+              <td>Seguimiento efectivo y trazabilidad de incidencias.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div>
+        <strong>UNIBE 2026</strong> • Verificación y Validación de Software • Cátedra de Calidad
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <a href="../HISTORIAS%20DE%20USUARIOS/historias-de-usuario-guia-paso-a-paso.html" style="color: var(--color-cyan); text-decoration: none;">📖 Guía Formal</a>
+        <a href="../HISTORIAS%20DE%20USUARIOS%20ANIMADAS/historias-de-usuarios-animadas.html" style="color: var(--color-cyan); text-decoration: none;">✨ Taller Mágico</a>
+        <a href="../index.html" style="color: var(--color-cyan); text-decoration: none;">🏠 Portal UNIBE</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPT ENGINE (AUDIO, INTERACCIÓN Y SIMULADORES EN VIVO) -->
+  <script>
+    // --- CANVAS PARTICLES ---
+    const canvas = document.getElementById('particlesCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2 + 0.8,
+          alpha: Math.random(),
+          speed: Math.random() * 0.02 + 0.005,
+          color: Math.random() > 0.5 ? 'rgba(0, 242, 254,' : 'rgba(255, 65, 108,'
+        });
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.alpha += p.speed;
+        if (p.alpha > 1 || p.alpha < 0) p.speed = -p.speed;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `${p.color} ${Math.abs(p.alpha) * 0.7})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- AUDIO ENGINE ---
+    let audioCtx = null;
+    let isBgmPlaying = false;
+    let sfxEnabled = true;
+    let voiceEnabled = false;
+    let bgmInterval = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSfx(type) {
+      if (!sfxEnabled) return;
+      initAudioContext();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'success') {
+        // Melodía alegre de éxito
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          const t = now + (idx * 0.08);
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(0.2, t);
+          g.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+          o.start(t);
+          o.stop(t + 0.2);
+        });
+      } else if (type === 'chime') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, now);
+        osc.frequency.exponentialRampToValueAtTime(1500, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      }
+    }
+
+    // Melodía BGM Relajante
+    const chords = [
+      [261.63, 329.63, 392.00, 523.25], // C
+      [220.00, 261.63, 329.63, 440.00], // Am
+      [174.61, 220.00, 261.63, 349.23], // F
+      [196.00, 246.94, 293.66, 392.00]  // G
+    ];
+    let chIdx = 0;
+
+    function playBgmStep() {
+      if (!isBgmPlaying || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const ch = chords[chIdx];
+      chIdx = (chIdx + 1) % chords.length;
+
+      ch.forEach((freq, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, now + i * 0.25);
+        g.gain.setValueAtTime(0.04, now + i * 0.25);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + 0.4);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start(now + i * 0.25);
+        o.stop(now + i * 0.25 + 0.45);
+      });
+    }
+
+    function toggleBGM() {
+      initAudioContext();
+      isBgmPlaying = !isBgmPlaying;
+      const btn = document.getElementById('bgmToggleBtn');
+      const label = document.getElementById('soundStatusText');
+      if (isBgmPlaying) {
+        btn.classList.add('active');
+        playBgmStep();
+        bgmInterval = setInterval(playBgmStep, 1100);
+        label.innerText = 'BGM: En reproducción 🎵';
+        playSfx('click');
+      } else {
+        btn.classList.remove('active');
+        clearInterval(bgmInterval);
+        label.innerText = 'BGM: Pausada';
+      }
+    }
+
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfxToggleBtn');
+      if (sfxEnabled) {
+        btn.classList.add('active');
+        playSfx('click');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const btn = document.getElementById('voiceToggleBtn');
+      if (voiceEnabled) {
+        btn.classList.add('active');
+        speakStory('¡Voz activada! Puedes escuchar cualquiera de las 10 historias haciendo clic en su botón.');
+      } else {
+        btn.classList.remove('active');
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function speakStory(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-ES';
+      u.rate = 1.05;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    }
+
+    // CHECKLIST DE CRITERIOS INTERACTIVO
+    function toggleCriteria(item) {
+      initAudioContext();
+      item.classList.toggle('checked');
+      playSfx('chime');
+    }
+
+    // --- 10 SIMULADORES EN VIVO ---
+    function runSim1() {
+      initAudioContext();
+      const grade = document.getElementById('sim1-grade');
+      grade.innerText = '10.0 / 10 (¡Publicada con éxito!)';
+      grade.style.color = '#34d399';
+      document.getElementById('sim1-status').innerText = 'Notificación enviada al alumno';
+      playSfx('success');
+      speakStory('Calificación publicada. El estudiante visualiza 10 sobre 10 de inmediato.');
+    }
+
+    let acc1 = 500, acc2 = 150;
+    function runSim2() {
+      initAudioContext();
+      if (acc1 >= 100) {
+        acc1 -= 100;
+        acc2 += 100;
+        document.getElementById('sim2-acc1').innerText = `$${acc1.toFixed(2)}`;
+        document.getElementById('sim2-acc2').innerText = `$${acc2.toFixed(2)}`;
+        playSfx('success');
+        speakStory(`Transferencia confirmada. Nuevo saldo en ahorros: ${acc2} dólares.`);
+      }
+    }
+
+    function runSim3() {
+      initAudioContext();
+      const st = document.getElementById('sim3-status');
+      st.innerHTML = '✅ Archivo descargado: <strong>ventas_octubre_2026.pdf</strong>';
+      st.style.color = '#34d399';
+      playSfx('success');
+      speakStory('Reporte mensual generado y exportado en PDF y Excel.');
+    }
+
+    function runSim4() {
+      initAudioContext();
+      const m = document.getElementById('sim4-match');
+      m.innerHTML = '⭐ 1er Lugar: <strong>Ana Gómez (98% match)</strong>';
+      playSfx('success');
+      speakStory('Filtro aplicado. Candidatos ordenados por mayor coincidencia técnica.');
+    }
+
+    function runSim5() {
+      initAudioContext();
+      const avg = document.getElementById('sim5-avg');
+      avg.innerText = 'Promedio Actualizado: 8.2 hrs/noche (¡Excelente descanso!)';
+      playSfx('success');
+      speakStory('Nueva noche registrada. Tu promedio semanal subió a 8.2 horas.');
+    }
+
+    let cartCount = 1, cartTotal = 45;
+    function runSim6() {
+      initAudioContext();
+      cartCount++;
+      cartTotal += 80;
+      document.getElementById('sim6-count').innerText = `Artículos: ${cartCount} ($${cartTotal}.00)`;
+      document.getElementById('sim6-cart-items').innerHTML += '<br>⌚ Smartwatch Deportivo ($80.00)';
+      playSfx('success');
+      speakStory(`Smartwatch agregado. Total del carrito: ${cartTotal} dólares.`);
+    }
+
+    function runSim7() {
+      initAudioContext();
+      const st = document.getElementById('sim7-status');
+      st.innerHTML = '✅ 45 Calificaciones validadas y listas para confirmar';
+      st.style.color = '#34d399';
+      playSfx('success');
+      speakStory('Archivo CSV validado con éxito. Vista previa disponible para correcciones.');
+    }
+
+    function runSim8() {
+      initAudioContext();
+      const b = document.getElementById('sim8-bubble');
+      b.style.background = '#475569';
+      b.innerHTML = '<em>🚫 Mensaje eliminado</em>';
+      playSfx('chime');
+      speakStory('Mensaje eliminado para todos dentro de la ventana de 5 minutos.');
+    }
+
+    function runSim9() {
+      initAudioContext();
+      const c = document.getElementById('sim9-cost');
+      c.innerHTML = 'Tarifa Estimada: <strong>$3.80 – $4.50</strong> (Tráfico moderado detectado)';
+      playSfx('chime');
+      speakStory('Tarifa estimada recalculada con rango transparente.');
+    }
+
+    let tState = 0;
+    const states = ['Pendiente', 'En proceso', 'Resuelto'];
+    const colors = ['#eab308', '#38bdf8', '#34d399'];
+    function runSim10() {
+      initAudioContext();
+      tState = (tState + 1) % states.length;
+      const el = document.getElementById('sim10-state');
+      el.innerText = states[tState];
+      el.style.background = colors[tState];
+      playSfx('success');
+      speakStory(`Estado del ticket actualizado a: ${states[tState]}. Correo enviado al usuario.`);
+    }
+  </script>
+</body>
+</html>
