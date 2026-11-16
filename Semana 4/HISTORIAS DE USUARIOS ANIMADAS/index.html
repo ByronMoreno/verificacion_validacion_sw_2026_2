@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Historias de Usuario Animadas: Explicación 100% interactiva, con muñecos anime, analogías divertidas, efectos de sonido y cero código técnico | UNIBE.">
+  <title>✨ Historias de Usuario Animadas: El Taller Mágico | UNIBE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: rgba(20, 27, 48, 0.88);
+      --bg-card-hover: rgba(30, 42, 75, 0.95);
+
+      --candy-cyan: #00f2fe;
+      --candy-pink: #ff4b72;
+      --candy-yellow: #ffb703;
+      --candy-green: #06d6a0;
+      --candy-purple: #9d4edd;
+      --candy-orange: #fb8500;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+
+      --font-fun: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* FONDO DE BURBUJAS Y POLVO MÁGICO */
+    .magic-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 80%, rgba(255, 75, 114, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.08) 0%, transparent 60%);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    .particles-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* CONTROL DE SONIDO FLOTANTE */
+    .audio-dock {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(15px);
+      border: 2px solid var(--candy-cyan);
+      padding: 8px 18px;
+      border-radius: 50px;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+      animation: floatWidget 4s ease-in-out infinite;
+    }
+    @keyframes floatWidget {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+    }
+    .sound-btn:hover {
+      background: var(--candy-cyan);
+      color: #000;
+      transform: scale(1.15) rotate(6deg);
+      box-shadow: 0 0 15px var(--candy-cyan);
+    }
+    .sound-btn.active {
+      background: linear-gradient(135deg, var(--candy-cyan), #4facfe);
+      color: #000;
+      border-color: #fff;
+    }
+    .sound-label {
+      font-family: var(--font-fun);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    /* CONTENEDOR CENTRAL */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 90px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    /* HERO BANNER ANIME */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(25, 20, 55, 0.95), rgba(15, 30, 55, 0.9));
+      border: 3px solid rgba(0, 242, 254, 0.4);
+      border-radius: 32px;
+      padding: 45px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 30px;
+    }
+    .banner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(90deg, rgba(255, 75, 114, 0.25), rgba(255, 183, 3, 0.25));
+      border: 1px solid var(--candy-yellow);
+      color: var(--candy-yellow);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-family: var(--font-fun);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      animation: pulseGlow 2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(255, 183, 3, 0.2); }
+      to { box-shadow: 0 0 25px rgba(255, 75, 114, 0.5); }
+    }
+    .banner-title {
+      font-family: var(--font-fun);
+      font-size: 3.3rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 15%, var(--candy-cyan) 60%, var(--candy-pink) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 8px 30px rgba(0, 242, 254, 0.3);
+    }
+    .banner-desc {
+      font-size: 1.12rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .cta-group {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      background: linear-gradient(135deg, var(--candy-cyan), #4facfe);
+      color: #000;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-family: var(--font-fun);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .cta-btn:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.6);
+    }
+    .cta-btn-alt {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-family: var(--font-fun);
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .cta-btn-alt:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: var(--candy-cyan);
+      transform: translateY(-2px);
+    }
+
+    .hero-img-box {
+      border-radius: 24px;
+      overflow: hidden;
+      border: 3px solid var(--candy-cyan);
+      box-shadow: 0 0 35px rgba(0, 242, 254, 0.4);
+      animation: floatHero 6s ease-in-out infinite;
+    }
+    @keyframes floatHero {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+    .hero-img-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s;
+    }
+    .hero-img-box:hover img {
+      transform: scale(1.03);
+    }
+
+    /* TIMELINE DE NAVEGACIÓN */
+    .timeline-nav {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 10px 4px 18px 4px;
+    }
+    .nav-chip {
+      background: rgba(20, 27, 48, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 18px;
+      border-radius: 30px;
+      color: var(--text-muted);
+      font-family: var(--font-fun);
+      font-size: 0.92rem;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+    .nav-chip:hover, .nav-chip.active {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.25));
+      border-color: var(--candy-cyan);
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.25);
+    }
+
+    /* CAPÍTULOS DE HISTORIA */
+    .chapter-card {
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .chapter-card:hover {
+      border-color: rgba(0, 242, 254, 0.35);
+    }
+    .chapter-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 18px;
+    }
+    .chapter-badge {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #000;
+      background: var(--candy-cyan);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+      flex-shrink: 0;
+    }
+    .chapter-title {
+      font-family: var(--font-fun);
+      font-size: 1.85rem;
+      color: #fff;
+    }
+    .chapter-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    /* DIALOGUE BUBBLE CARTOON */
+    .dialogue-box {
+      background: rgba(12, 17, 34, 0.92);
+      border: 2px solid var(--candy-cyan);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .speaker-avatar {
+      width: 75px;
+      height: 75px;
+      border-radius: 20px;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      flex-shrink: 0;
+      border: 2px solid var(--candy-yellow);
+      animation: floatAvatar 3s ease-in-out infinite;
+    }
+    @keyframes floatAvatar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .speaker-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+    .speaker-name {
+      font-family: var(--font-fun);
+      font-size: 1.2rem;
+      color: var(--candy-yellow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .speaker-text {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #f1f5f9;
+    }
+    .speaker-text strong { color: var(--candy-cyan); }
+
+    /* CARDS GRID DE MUÑECOS / ANALOGÍAS */
+    .chibi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin: 10px 0;
+    }
+    .chibi-item {
+      background: rgba(15, 23, 42, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chibi-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--candy-cyan);
+      box-shadow: 0 15px 35px rgba(0, 242, 254, 0.2);
+      background: var(--bg-card-hover);
+    }
+    .chibi-bubble {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .chibi-bubble::after {
+      content: '';
+      position: absolute;
+      width: 115%;
+      height: 115%;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      animation: spinDashed 12s linear infinite;
+    }
+    @keyframes spinDashed {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .chibi-title {
+      font-family: var(--font-fun);
+      font-size: 1.25rem;
+      color: #fff;
+    }
+    .chibi-analogy {
+      background: rgba(255, 255, 255, 0.06);
+      border-left: 3px solid var(--candy-cyan);
+      padding: 8px 12px;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      text-align: left;
+      line-height: 1.5;
+      width: 100%;
+    }
+    .chibi-analogy strong { color: var(--candy-yellow); }
+
+    /* TARJETA DE HISTORIA GIGANTE ANIMADA */
+    .giant-story-card {
+      background: linear-gradient(135deg, #fef08a, #fde047);
+      color: #713f12;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(250, 204, 21, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border: 3px solid #eab308;
+      position: relative;
+      animation: gentleRotate 5s ease-in-out infinite;
+    }
+    @keyframes gentleRotate {
+      0%, 100% { transform: rotate(-0.5deg); }
+      50% { transform: rotate(0.5deg); }
+    }
+    .story-card-pin {
+      position: absolute;
+      top: -15px; left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 32px;
+      background: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+      border: 3px solid #fff;
+    }
+    .card-formula-row {
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+      font-size: 1.25rem;
+      font-family: var(--font-fun);
+      line-height: 1.5;
+    }
+    .card-kw {
+      background: #854d0e;
+      color: #fef08a;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    /* SHOWCASE DE IMAGEN ARTÍSTICA */
+    .comic-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 2px solid var(--candy-cyan);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .comic-showcase img {
+      width: 100%;
+      max-height: 580px;
+      object-fit: contain;
+      border-radius: 16px;
+      display: block;
+      transition: transform 0.4s;
+    }
+    .comic-showcase:hover img {
+      transform: scale(1.02);
+    }
+
+    /* PLANNING POKER MINIJUEGO */
+    .poker-arena {
+      background: linear-gradient(135deg, rgba(20, 30, 60, 0.9), rgba(15, 20, 45, 0.9));
+      border: 2px solid var(--candy-yellow);
+      border-radius: 24px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+    .cards-deck {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .poker-card-btn {
+      width: 65px;
+      height: 95px;
+      background: linear-gradient(135deg, #ffffff, #f1f5f9);
+      color: #0f172a;
+      border-radius: 12px;
+      border: 3px solid var(--candy-cyan);
+      font-family: var(--font-fun);
+      font-size: 1.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .poker-card-btn:hover {
+      transform: translateY(-12px) scale(1.1);
+      box-shadow: 0 15px 30px var(--candy-cyan);
+      background: var(--candy-cyan);
+      color: #000;
+    }
+    .poker-result-box {
+      min-height: 60px;
+      background: rgba(0,0,0,0.4);
+      border: 1px dashed var(--candy-yellow);
+      padding: 14px 24px;
+      border-radius: 16px;
+      font-family: var(--font-fun);
+      font-size: 1.1rem;
+      color: #fef08a;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* CONSTRUCTOR INTERACTIVO DE HISTORIAS */
+    .builder-workshop {
+      background: linear-gradient(135deg, rgba(30, 20, 50, 0.95), rgba(15, 25, 45, 0.95));
+      border: 2px solid var(--candy-pink);
+      border-radius: 28px;
+      padding: 35px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 15px 40px rgba(255, 75, 114, 0.25);
+    }
+    .builder-step {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .step-title {
+      font-family: var(--font-fun);
+      font-size: 1.15rem;
+      color: var(--candy-cyan);
+    }
+    .chips-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .builder-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: var(--font-fun);
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .builder-chip:hover, .builder-chip.selected {
+      background: var(--candy-pink);
+      color: #fff;
+      border-color: #fff;
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 75, 114, 0.4);
+    }
+    .preview-card-result {
+      background: rgba(10, 15, 30, 0.9);
+      border: 2px solid var(--candy-green);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    /* FOOTER */
+    .anime-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px 0 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 900px) {
+      .hero-banner { grid-template-columns: 1fr; }
+      .banner-title { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="magic-backdrop"></div>
+  <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+
+  <!-- CONTROLES FLOTANTES DE SONIDO Y VOZ -->
+  <aside class="audio-dock">
+    <button class="sound-btn" id="bgmToggleBtn" onclick="toggleBGM()" title="Música Relajante de Fondo">
+      🎵
+    </button>
+    <button class="sound-btn active" id="sfxToggleBtn" onclick="toggleSFX()" title="Efectos de Sonido">
+      🔊
+    </button>
+    <button class="sound-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="Voz de Personajes (Narración en Español)">
+      🗣️
+    </button>
+    <span class="sound-label" id="soundStatusText">Sonido: SFX Listo</span>
+  </aside>
+
+  <div class="container">
+
+    <!-- HERO BANNER -->
+    <header class="hero-banner">
+      <div>
+        <div class="banner-badge">✨ UNIBE • Experiencia 100% Animada</div>
+        <h1 class="banner-title">Historias de Usuario: ¡El Taller Mágico!</h1>
+        <p class="banner-desc">
+          ¡Cero código aburrido, cero lenguaje técnico intimidante! Acompaña a nuestro escuadrón anime a descubrir cómo transformar los deseos de la gente en historias mágicas llenas de valor, listas para convertirse en realidad.
+        </p>
+        <div class="cta-group">
+          <a href="#acto-1" class="cta-btn" onclick="playSfx('click')">
+            <span>🚀 Comenzar Aventura</span>
+          </a>
+          <a href="#taller-builder" class="cta-btn-alt" onclick="playSfx('click')">
+            <span>✨ Construir mi Historia</span>
+          </a>
+          <a href="../HISTORIAS%20DE%20USUARIOS/historias-de-usuario-guia-paso-a-paso.html" class="cta-btn-alt" onclick="playSfx('click')">
+            <span>📖 Guía Formal Teórica</span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-img-box">
+        <img src="magic_workshop_user_stories.jpg" alt="The Magic Workshop of User Stories">
+      </div>
+    </header>
+
+    <!-- TIMELINE DE ACTOS -->
+    <nav class="timeline-nav">
+      <a href="#acto-1" class="nav-chip active" onclick="playSfx('click')">☕ Acto 1: El Café Mágico</a>
+      <a href="#acto-2" class="nav-chip" onclick="playSfx('click')">📇 Acto 2: Las 3 C</a>
+      <a href="#acto-3" class="nav-chip" onclick="playSfx('click')">💎 Acto 3: Los 6 Cristales INVEST</a>
+      <a href="#acto-4" class="nav-chip" onclick="playSfx('click')">🍰 Acto 4: La Rebanada de Pastel</a>
+      <a href="#acto-5" class="nav-chip" onclick="playSfx('click')">🚦 Acto 5: El Semáforo (Gherkin)</a>
+      <a href="#acto-6" class="nav-chip" onclick="playSfx('click')">🃏 Acto 6: Planning Poker</a>
+      <a href="#taller-builder" class="nav-chip" onclick="playSfx('click')">🎮 Acto 7: Taller Interactivo</a>
+    </nav>
+
+    <!-- ACTO 1: LA ANALOGÍA DE LA CAFETERÍA (QUÉ ES UNA HISTORIA) -->
+    <section id="acto-1" class="chapter-card">
+      <div class="chapter-header">
+        <div class="chapter-badge">01</div>
+        <div>
+          <h2 class="chapter-title">Acto 1: La Analogía del Pedido en la Cafetería</h2>
+          <p class="chapter-subtitle">¿Qué es realmente una historia de usuario y por qué la gente la ama?</p>
+        </div>
+      </div>
+
+      <div class="dialogue-box">
+        <div class="speaker-avatar">☕</div>
+        <div class="speaker-body">
+          <div class="speaker-name">Aiko (La Creadora de Historias)</div>
+          <div class="speaker-text">
+            "¡Imaginen que entran a una cafetería muertos de sueño antes de su examen final! Si el cliente le dijera al barista: <em>'Exijo un termo cilíndrico con infusión de granos tostados a 92 grados de presión con lípidos pasteurizados'</em>... ¡el barista se quedaría con cara de signo de interrogación! En cambio, dices:"
+          </div>
+        </div>
+      </div>
+
+      <!-- LA TARJETA AMARILLA GIGANTE -->
+      <div class="giant-story-card">
+        <div class="story-card-pin"></div>
+        <div class="card-formula-row">
+          <span class="card-kw">COMO...</span>
+          <span>Estudiante universitario en semana de exámenes finales,</span>
+        </div>
+        <div class="card-formula-row">
+          <span class="card-kw">QUIERO...</span>
+          <span>un café capuchino caliente con canela y espuma suave,</span>
+        </div>
+        <div class="card-formula-row">
+          <span class="card-kw">PARA...</span>
+          <span>mantenerme despierto, concentrado y aprobar mi materia sin que me dé taquicardia.</span>
+        </div>
+      </div>
+
+      <div class="chibi-grid">
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #00f2fe, #4facfe);">👤</div>
+          <h3 class="chibi-title">1. El Héroe (¿Quién?)</h3>
+          <p class="chibi-analogy"><strong>No digas 'usuario':</strong> Identifica al protagonista real (el estudiante con sueño, la abuelita comprando boletos, el cajero apurado).</p>
+        </div>
+
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #ffb703, #fb8500);">⚡</div>
+          <h3 class="chibi-title">2. El Deseo (¿Qué?)</h3>
+          <p class="chibi-analogy"><strong>Lo que quiere lograr:</strong> La acción clara y hermosa que necesita hacer en el sistema sin enredarse en cómo se construyó.</p>
+        </div>
+
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #06d6a0, #1b9aaa);">🎁</div>
+          <h3 class="chibi-title">3. El Tesoro (¿Para qué?)</h3>
+          <p class="chibi-analogy"><strong>La felicidad y el valor:</strong> ¡La parte más importante! Si algo no le ahorra tiempo, dinero o lágrimas a la persona, ¿para qué crearlo?</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center;">
+        <button class="cta-btn" onclick="playVoiceText('Una historia de usuario cuenta qué necesita una persona y qué felicidad le dará, no cómo se programan las tuercas.'); playSfx('dialogue');">
+          🗣️ Escuchar Explicación de Aiko
+        </button>
+      </div>
+    </section>
+
+    <!-- ACTO 2: LAS 3 C (TARJETA, CONVERSACIÓN, CONFIRMACIÓN) -->
+    <section id="acto-2" class="chapter-card">
+      <div class="chapter-header">
+        <div class="chapter-badge">02</div>
+        <div>
+          <h2 class="chapter-title">Acto 2: Las 3 C Mágicas de las Historias</h2>
+          <p class="chapter-subtitle">Una historia de usuario nunca viaja sola: ¡necesita a sus dos mejores amigas!</p>
+        </div>
+      </div>
+
+      <div class="comic-showcase">
+        <img src="three_cs_user_stories.jpg" alt="Las 3 Cs: Card, Conversation y Confirmation">
+      </div>
+
+      <div class="chibi-grid">
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-yellow);">
+          <div class="chibi-bubble" style="background: #facc15; color: #000;">📇</div>
+          <h3 class="chibi-title">1. Card (La Tarjeta)</h3>
+          <p class="chibi-analogy">
+            <strong>Es un boleto de avión:</strong> No es un contrato legal aburrido. Es una nota brillante que dice: <em>'¡Oigan, tenemos que hablar sobre este deseo del cliente!'</em>.
+          </p>
+        </div>
+
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-cyan);">
+          <div class="chibi-bubble" style="background: #38bdf8; color: #000;">☕</div>
+          <h3 class="chibi-title">2. Conversation (La Charla)</h3>
+          <p class="chibi-analogy">
+            <strong>El café de amigos:</strong> El cliente y el equipo se sientan a platicar: <em>'¿Lo quieres con leche deslactosada? ¿El botón debe ser grande para celular? ¡Genial!'</em>.
+          </p>
+        </div>
+
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-green);">
+          <div class="chibi-bubble" style="background: #34d399; color: #000;">⭐</div>
+          <h3 class="chibi-title">3. Confirmation (El Sello)</h3>
+          <p class="chibi-analogy">
+            <strong>Los Criterios de Aceptación:</strong> La detective con su estrella dorada: <em>'Si el café está caliente, no tiene azúcar y huele a canela, ¡misión cumplida y aprobada!'</em>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTO 3: LOS 6 CRISTALES DE INVEST -->
+    <section id="acto-3" class="chapter-card">
+      <div class="chapter-header">
+        <div class="chapter-badge">03</div>
+        <div>
+          <h2 class="chapter-title">Acto 3: Los 6 Cristales Mágicos de INVEST</h2>
+          <p class="chapter-subtitle">El hechizo que protege a las historias de convertirse en monstruos gigantes</p>
+        </div>
+      </div>
+
+      <div class="chibi-grid">
+        <!-- I -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #00f2fe, #4facfe);">🧩</div>
+          <h3 class="chibi-title">I • Independiente</h3>
+          <div class="chibi-analogy">
+            <strong>Como una pieza de LEGO:</strong> Puedes construirla y jugar con ella sin que esté encadenada obligatoriamente a otra pieza rota.
+          </div>
+        </div>
+
+        <!-- N -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #ff4b72, #ff758c);">🍕</div>
+          <h3 class="chibi-title">N • Negociable</h3>
+          <div class="chibi-analogy">
+            <strong>Como pedir una pizza:</strong> Podemos conversar: <em>'¿Qué tal si le quitamos las cebollas y le ponemos extra queso para terminar más rápido?'</em>.
+          </div>
+        </div>
+
+        <!-- V -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #ffb703, #fb8500);">👑</div>
+          <h3 class="chibi-title">V • Valiosa</h3>
+          <div class="chibi-analogy">
+            <strong>Si no alegra al usuario, ¡no existe!</strong> No escribas cosas raras que solo le interesan a las máquinas. Escribe cosas que hagan sonreír a las personas.
+          </div>
+        </div>
+
+        <!-- E -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #9d4edd, #c77dff);">🎒</div>
+          <h3 class="chibi-title">E • Estimable</h3>
+          <div class="chibi-analogy">
+            <strong>Como empacar tu mochila:</strong> Miras lo que vas a llevar y sabes si cabe en tu espalda o si necesitas alquilar un camión de mudanza.
+          </div>
+        </div>
+
+        <!-- S -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #06d6a0, #1b9aaa);">🍪</div>
+          <h3 class="chibi-title">S • Small (Pequeña)</h3>
+          <div class="chibi-analogy">
+            <strong>Un bocado de galleta:</strong> Si intentas morder un pastel de 5 pisos de un solo bocado, ¡te atragantas! Debe caber en el viaje de 2 semanas.
+          </div>
+        </div>
+
+        <!-- T -->
+        <div class="chibi-item">
+          <div class="chibi-bubble" style="background: linear-gradient(135deg, #38bdf8, #818cf8);">🎯</div>
+          <h3 class="chibi-title">T • Testable (Comprobable)</h3>
+          <div class="chibi-analogy">
+            <strong>Como medir la fiebre con termómetro:</strong> O tienes temperatura normal o tienes fiebre. ¡No se vale decir <em>'el sistema más o menos funciona'</em>!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTO 4: LA REBANADA DE PASTEL VERTICAL -->
+    <section id="acto-4" class="chapter-card">
+      <div class="chapter-header">
+        <div class="chapter-badge">04</div>
+        <div>
+          <h2 class="chapter-title">Acto 4: La Analogía de la Rebanada de Pastel</h2>
+          <p class="chapter-subtitle">Por qué dividimos las historias como rebanadas ricas y no por ingredientes crudos</p>
+        </div>
+      </div>
+
+      <div class="dialogue-box">
+        <div class="speaker-avatar">🎂</div>
+        <div class="speaker-body">
+          <div class="speaker-name">Kenji (El Sensei de las Historias)</div>
+          <div class="speaker-text">
+            "Imaginen que van a un cumpleaños y el mozo les sirve un plato con un puñado de <strong>harina cruda</strong>. Dice: <em>'En dos semanas les traigo los huevos crudos, y el próximo año les traigo la cereza'</em>. ¡Nadie se come un pastel así! En Scrum cortamos una <strong>rebanada vertical</strong> que tiene masa esponjosa, crema y fresa. ¡Te la comes de inmediato y eres feliz!"
+          </div>
+        </div>
+      </div>
+
+      <div class="chibi-grid">
+        <div class="chibi-item" style="border: 2px solid #ef4444; background: rgba(239, 68, 68, 0.08);">
+          <span style="font-size: 2.5rem;">❌</span>
+          <h3 class="chibi-title" style="color: #fca5a5;">División Horizontal (Mala Idea)</h3>
+          <p class="chibi-analogy" style="border-left-color: #ef4444;">
+            • Semana 1: Solo compramos cajas vacías.<br>
+            • Semana 2: Solo instalamos cables.<br>
+            <strong>Resultado:</strong> El cliente pasa un mes entero mirando cajas vacías sin poder hacer nada.
+          </p>
+        </div>
+
+        <div class="chibi-item" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.08);">
+          <span style="font-size: 2.5rem;">✅</span>
+          <h3 class="chibi-title" style="color: #86efac;">División Vertical (¡El Pastel Feliz!)</h3>
+          <p class="chibi-analogy" style="border-left-color: #10b981;">
+            • Semana 1: El botón de enviar mensaje funciona completito de inicio a fin.<br>
+            <strong>Resultado:</strong> ¡El usuario ya puede comunicarse y probarlo en el acto!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTO 5: EL SEMÁFORO MÁGICO (GHERKIN DADO, CUANDO, ENTONCES) -->
+    <section id="acto-5" class="chapter-card">
+      <div class="chapter-header">
+        <div class="chapter-tag" style="background: var(--candy-yellow);">05</div>
+        <div>
+          <h2 class="chapter-title">Acto 5: El Juego del Semáforo Mágico (Dado, Cuando, Entonces)</h2>
+          <p class="chapter-subtitle">Cómo explicarle a cualquiera lo que debe suceder sin inventar palabras raras</p>
+        </div>
+      </div>
+
+      <div class="chibi-grid">
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-cyan);">
+          <span style="font-size: 2.5rem;">🚲</span>
+          <h4 class="chibi-title" style="color: var(--candy-cyan);">DADO (El Momento Inicial)</h4>
+          <p class="chibi-analogy">
+            <em>"Dado que voy en mi bicicleta y llego a la esquina de la avenida..."</em><br>
+            (Es la foto antes de que hagas cualquier travesura).
+          </p>
+        </div>
+
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-yellow);">
+          <span style="font-size: 2.5rem;">🚦</span>
+          <h4 class="chibi-title" style="color: var(--candy-yellow);">CUANDO (La Acción)</h4>
+          <p class="chibi-analogy">
+            <em>"Cuando la luz del semáforo cambia a rojo..."</em><br>
+            (Es lo que tú o el mundo hacen).
+          </p>
+        </div>
+
+        <div class="chibi-item" style="border-top: 4px solid var(--candy-green);">
+          <span style="font-size: 2.5rem;">🛑</span>
+          <h4 class="chibi-title" style="color: var(--candy-green);">ENTONCES (El Resultado Mágico)</h4>
+          <p class="chibi-analogy">
+            <em>"Entonces presiono los frenos y me detengo con seguridad antes de la línea."</em><br>
+            (¡La consecuencia feliz y verificable!).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTO 6: PLANNING POKER CON CARTAS DE SUPERPODERES -->
+    <section id="acto-6" class="poker-arena">
+      <span class="banner-badge" style="background: rgba(255, 183, 3, 0.2); border-color: #facc15; color: #fde047;">
+        🃏 Minijuego Interactivo
+      </span>
+      <h2 style="font-family: var(--font-fun); font-size: 2.3rem; color: #fff;">
+        ¡Torneo de Planning Poker!
+      </h2>
+      <p style="color: #cbd5e1; font-size: 1rem; max-width: 700px;">
+        En las historias no usamos horas de reloj (porque cada persona trabaja a ritmo distinto). ¡Usamos cartas mágicas de tamaño relativo! Haz clic en una carta de superpoder para ver qué criatura representa:
+      </p>
+
+      <div class="cards-deck">
+        <button class="poker-card-btn" onclick="revealCard(1, '🐜 1 Punto: Como una hormiguita. ¡Un cambio diminuto que se hace en un parpadeo!')">1</button>
+        <button class="poker-card-btn" onclick="revealCard(2, '🐱 2 Puntos: Como un gatito juguetón. Fácil, rápido y sin sorpresas.')">2</button>
+        <button class="poker-card-btn" onclick="revealCard(3, '🐶 3 Puntos: Como un perrito noble. Un trabajo mediano que conoces bien.')">3</button>
+        <button class="poker-card-btn" onclick="revealCard(5, '🐴 5 Puntos: Como un caballo veloz. Requiere fuerza y atención, pero se domina.')">5</button>
+        <button class="poker-card-btn" onclick="revealCard(8, '🦁 8 Puntos: Como un león rugiente. ¡Cuidado! Mucha complejidad y detalles.')">8</button>
+        <button class="poker-card-btn" onclick="revealCard(13, '🐘 13 Puntos: Como un elefante gigante. ¡Es enorme! Casi llena todo el Sprint.')">13</button>
+        <button class="poker-card-btn" onclick="revealCard(21, '🦖 21 Puntos: ¡UN DINOSAURIO MONSTRUOSO! ¡Peligro! Es demasiado grande y hay que dividirlo.')">21</button>
+      </div>
+
+      <div class="poker-result-box" id="pokerDisplay">
+        👉 ¡Haz clic en cualquier carta mágica de arriba para ver su tamaño animal!
+      </div>
+    </section>
+
+    <!-- ACTO 7: TALLER INTERACTIVO CONSTRUCTOR DE HISTORIAS -->
+    <section id="taller-builder" class="builder-workshop">
+      <div style="text-align: center;">
+        <span class="banner-badge" style="background: rgba(255, 75, 114, 0.2); border-color: #ff4b72; color: #ff758c;">
+          🎮 El Laboratorio Creador
+        </span>
+        <h2 style="font-family: var(--font-fun); font-size: 2.2rem; color: #fff; margin-top: 6px;">
+          ¡Construye tu Propia Historia de Usuario en Vivo!
+        </h2>
+        <p style="color: #cbd5e1; font-size: 0.95rem;">
+          Selecciona un héroe, un deseo y un tesoro. ¡Observa cómo tu tarjeta mágica cobra vida con confeti!
+        </p>
+      </div>
+
+      <!-- PASO 1: QUIEN -->
+      <div class="builder-step">
+        <div class="step-title">1. ¿Quién es el Héroe? (COMO...)</div>
+        <div class="chips-selector">
+          <button class="builder-chip selected" onclick="setPart('who', 'estudiante universitario con sueño', this)">🎓 Estudiante con sueño</button>
+          <button class="builder-chip" onclick="setPart('who', 'docente que califica 80 exámenes', this)">🧑‍🏫 Docente con 80 exámenes</button>
+          <button class="builder-chip" onclick="setPart('who', 'secretaria apurada por matrículas', this)">📋 Secretaria de matrículas</button>
+          <button class="builder-chip" onclick="setPart('who', 'capitán pirata buscando su tesoro', this)">🏴‍☠️ Capitán pirata</button>
+        </div>
+      </div>
+
+      <!-- PASO 2: QUE -->
+      <div class="builder-step">
+        <div class="step-title">2. ¿Qué Desea Hacer? (QUIERO...)</div>
+        <div class="chips-selector">
+          <button class="builder-chip selected" onclick="setPart('what', 'ver mis calificaciones con un solo clic en mi celular', this)">📱 Ver calificaciones en 1 clic</button>
+          <button class="builder-chip" onclick="setPart('what', 'recibir una alerta cuando se abra un cupo en mi materia', this)">🔔 Alerta de cupo disponible</button>
+          <button class="builder-chip" onclick="setPart('what', 'descargar mi comprobante con sello oficial automático', this)">📄 Comprobante con sello digital</button>
+          <button class="builder-chip" onclick="setPart('what', 'activar el modo turbo sin filas presenciales', this)">⚡ Activar modo sin filas</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: PARA -->
+      <div class="builder-step">
+        <div class="step-title">3. ¿Qué Tesoro o Felicidad Obtendrá? (PARA...)</div>
+        <div class="chips-selector">
+          <button class="builder-chip selected" onclick="setPart('why', 'dormir tranquilo sabiendo que aprobé mi semestre.', this)">😴 Dormir tranquilo y celebrar</button>
+          <button class="builder-chip" onclick="setPart('why', 'no perder tiempo en filas interminables bajo el sol.', this)">☀️ Ahorrarme filas bajo el sol</button>
+          <button class="builder-chip" onclick="setPart('why', 'planificar mis vacaciones sin incertidumbre académica.', this)">🏖️ Planificar mis vacaciones</button>
+          <button class="builder-chip" onclick="setPart('why', 'llegar a tiempo a mi graduación con mi familia.', this)">🎓 Graduarme feliz con mi familia</button>
+        </div>
+      </div>
+
+      <!-- VISTA PREVIA DE LA HISTORIA GENERADA -->
+      <div class="preview-card-result" id="storyPreviewBox">
+        <span style="font-family: var(--font-fun); color: var(--candy-yellow); font-size: 1.2rem;">✨ ¡Tu Historia de Usuario Mágica!</span>
+        <div id="builtStoryText">
+          <strong>COMO</strong> estudiante universitario con sueño,<br>
+          <strong>QUIERO</strong> ver mis calificaciones con un solo clic en mi celular,<br>
+          <strong>PARA</strong> dormir tranquilo sabiendo que aprobé mi semestre.
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button class="cta-btn" onclick="speakCurrentStory()">
+            🗣️ Escuchar en Voz Alta
+          </button>
+          <button class="cta-btn-alt" onclick="stampApproval()">
+            ⭐ Sellar Aprobada
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="anime-footer">
+      <div>
+        <strong>UNIBE 2026</strong> • Verificación y Validación de Software • Taller Creativo
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <a href="../HISTORIAS%20DE%20USUARIOS/historias-de-usuario-guia-paso-a-paso.html" style="color: var(--candy-cyan); text-decoration: none;">📖 Versión Formal</a>
+        <a href="../SCRUM%20ANIMADO/scrum-animado.html" style="color: var(--candy-cyan); text-decoration: none;">⚡ Scrum Animado</a>
+        <a href="../index.html" style="color: var(--candy-cyan); text-decoration: none;">🏠 Portal UNIBE</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- MOTOR DE AUDIO (WEB AUDIO API) Y SCRIPT DE INTERACTIVIDAD -->
+  <script>
+    // --- ESTRELLITAS DE FONDO MÁGICO ---
+    const canvas = document.getElementById('particlesCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2 + 0.8,
+          alpha: Math.random(),
+          speed: Math.random() * 0.02 + 0.005,
+          color: Math.random() > 0.5 ? 'rgba(0, 242, 254,' : 'rgba(255, 75, 114,'
+        });
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.alpha += p.speed;
+        if (p.alpha > 1 || p.alpha < 0) p.speed = -p.speed;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `${p.color} ${Math.abs(p.alpha) * 0.8})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- MOTOR DE SONIDO (WEB AUDIO API SINTETIZADO) ---
+    let audioCtx = null;
+    let isBgmPlaying = false;
+    let sfxEnabled = true;
+    let voiceEnabled = false;
+    let bgmInterval = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSfx(type) {
+      if (!sfxEnabled) return;
+      initAudioContext();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(550, now);
+        osc.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'dialogue') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(500, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'stamp') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.18);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+        osc.start(now);
+        osc.stop(now + 0.18);
+      } else if (type === 'card') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.09);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      }
+    }
+
+    // Melodía BGM Procedural (Lofi Alegre)
+    const cheerfulChords = [
+      [329.63, 392.00, 493.88, 587.33], // Em7
+      [261.63, 329.63, 392.00, 523.25], // Cmaj7
+      [220.00, 261.63, 329.63, 392.00], // Am7
+      [293.66, 369.99, 440.00, 587.33]  // D7
+    ];
+    let chordIdx = 0;
+
+    function playBgmArp() {
+      if (!isBgmPlaying || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const chord = cheerfulChords[chordIdx];
+      chordIdx = (chordIdx + 1) % cheerfulChords.length;
+
+      chord.forEach((freq, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, now + i * 0.25);
+        g.gain.setValueAtTime(0.04, now + i * 0.25);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.25 + 0.38);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start(now + i * 0.25);
+        o.stop(now + i * 0.25 + 0.4);
+      });
+    }
+
+    function toggleBGM() {
+      initAudioContext();
+      isBgmPlaying = !isBgmPlaying;
+      const btn = document.getElementById('bgmToggleBtn');
+      const label = document.getElementById('soundStatusText');
+
+      if (isBgmPlaying) {
+        btn.classList.add('active');
+        playBgmArp();
+        bgmInterval = setInterval(playBgmArp, 1100);
+        label.innerText = 'BGM: Reproduciendo 🎵';
+        playSfx('click');
+      } else {
+        btn.classList.remove('active');
+        clearInterval(bgmInterval);
+        label.innerText = 'BGM: Pausada';
+      }
+    }
+
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('sfxToggleBtn');
+      if (sfxEnabled) {
+        btn.classList.add('active');
+        playSfx('click');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const btn = document.getElementById('voiceToggleBtn');
+      if (voiceEnabled) {
+        btn.classList.add('active');
+        playVoiceText('¡Voz activada! Bienvenido al taller animado de Historias de Usuario.');
+      } else {
+        btn.classList.remove('active');
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function playVoiceText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-ES';
+      u.rate = 1.05;
+      u.pitch = 1.15;
+      window.speechSynthesis.speak(u);
+    }
+
+    // --- REVELAR CARTAS PLANNING POKER ---
+    function revealCard(num, desc) {
+      initAudioContext();
+      playSfx('card');
+      const display = document.getElementById('pokerDisplay');
+      display.style.transform = 'scale(1.05)';
+      display.innerHTML = `<strong>Carta ${num}:</strong> ${desc}`;
+      setTimeout(() => { display.style.transform = 'scale(1)'; }, 200);
+      playVoiceText(`Carta número ${num}. ${desc}`);
+    }
+
+    // --- CONSTRUCTOR INTERACTIVO DE HISTORIAS ---
+    let storyBuilder = {
+      who: 'estudiante universitario con sueño',
+      what: 'ver mis calificaciones con un solo clic en mi celular',
+      why: 'dormir tranquilo sabiendo que aprobé mi semestre.'
+    };
+
+    function setPart(part, value, btnEl) {
+      initAudioContext();
+      playSfx('click');
+      storyBuilder[part] = value;
+
+      // Actualizar chips seleccionados en el grupo
+      const parent = btnEl.parentElement;
+      parent.querySelectorAll('.builder-chip').forEach(b => b.classList.remove('selected'));
+      btnEl.classList.add('selected');
+
+      // Actualizar vista previa
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const box = document.getElementById('builtStoryText');
+      box.innerHTML = `
+        <strong>COMO</strong> ${storyBuilder.who},<br>
+        <strong>QUIERO</strong> ${storyBuilder.what},<br>
+        <strong>PARA</strong> ${storyBuilder.why}
+      `;
+    }
+
+    function speakCurrentStory() {
+      const fullText = `Como ${storyBuilder.who}, quiero ${storyBuilder.what}, para ${storyBuilder.why}`;
+      playVoiceText(fullText);
+    }
+
+    function stampApproval() {
+      initAudioContext();
+      playSfx('stamp');
+      const box = document.getElementById('storyPreviewBox');
+      box.style.borderColor = 'var(--candy-yellow)';
+      box.style.boxShadow = '0 0 35px rgba(250, 204, 21, 0.5)';
+      playVoiceText('¡Excelente! Tu historia cumple INVEST y tiene el sello dorado de confirmación.');
+      setTimeout(() => {
+        box.style.borderColor = 'var(--candy-green)';
+        box.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

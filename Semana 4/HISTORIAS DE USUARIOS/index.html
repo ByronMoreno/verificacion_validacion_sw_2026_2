@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Historias de Usuario (User Stories): Explicación completa paso a paso con INVEST, 3C, Criterios de Aceptación, Gherkin BDD, Pruebas en Java Spring Boot y PostgreSQL | UNIBE.">
+  <title>Historias de Usuario (User Stories): Guía Paso a Paso | UNIBE V&V</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-glow: rgba(14, 165, 233, 0.3);
+      --border-light: rgba(255, 255, 255, 0.08);
+
+      --color-primary: #0ea5e9;
+      --color-secondary: #6366f1;
+      --color-accent: #38bdf8;
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --color-purple: #8b5cf6;
+
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-bright: #ffffff;
+
+      --sidebar-width: 300px;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    .bg-glow-1 { position: fixed; top: -15%; left: -10%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+    .bg-glow-2 { position: fixed; bottom: -20%; right: -10%; width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%); z-index: -2; pointer-events: none; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+
+    .progress-bar-container { position: fixed; top: 0; left: var(--sidebar-width); right: 0; height: 4px; background: rgba(0,0,0,0.5); z-index: 101; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-success)); transition: width 0.1s ease; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      background: rgba(11, 17, 33, 0.95);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+    .sidebar-header {
+      padding: 24px 20px 18px 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .course-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--color-accent);
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .sidebar-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1.3;
+    }
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .sidebar-menu {
+      list-style: none;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .sidebar-menu li a .num-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--color-primary);
+    }
+    .sidebar-menu li a:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-bright);
+      transform: translateX(3px);
+    }
+    .sidebar-menu li a.active {
+      background: rgba(14, 165, 233, 0.15);
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-accent);
+    }
+    .sidebar-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sidebar-footer a {
+      color: var(--color-accent);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .sidebar-footer a:hover { text-decoration: underline; }
+
+    /* MOBILE NAV */
+    .top-nav {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 17, 33, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 14px 20px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 99;
+    }
+    .menu-btn {
+      background: none;
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    /* MAIN VIEWPORT */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      padding: 40px 48px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      max-width: 1320px;
+    }
+
+    /* HERO BANNER */
+    .hero-section {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.55));
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 45px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    }
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+    .badge-semana { background: rgba(14, 165, 233, 0.15); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.3); }
+    .badge-qa { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-stack { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+    .hero-title {
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 70%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+    .hero-desc {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 950px;
+    }
+    .quick-nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .nav-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .nav-pill:hover {
+      background: rgba(14, 165, 233, 0.2);
+      color: var(--color-accent);
+      border-color: rgba(14, 165, 233, 0.4);
+    }
+
+    /* CONTENT SECTIONS */
+    .content-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 16px;
+    }
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1.3;
+    }
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .prose {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text-main);
+    }
+    .prose p { margin-bottom: 14px; }
+    .prose strong { color: var(--text-bright); }
+
+    /* CALLOUT BOXES */
+    .callout {
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      border: 1px solid transparent;
+      margin: 10px 0;
+    }
+    .callout-qa {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+    }
+    .callout-info {
+      background: rgba(14, 165, 233, 0.08);
+      border-color: rgba(14, 165, 233, 0.3);
+      color: #bae6fd;
+    }
+    .callout-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+    }
+    .callout-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .callout-content h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-bright);
+    }
+    .callout-content p { font-size: 0.92rem; line-height: 1.6; margin: 0; }
+
+    /* USER STORY CARD COMPONENT */
+    .story-card-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      border-radius: 16px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 12px 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    .story-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+    .story-id {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--color-accent);
+      background: rgba(14, 165, 233, 0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .story-clause {
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+    .clause-label {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--color-accent);
+      min-width: 85px;
+    }
+    .clause-text { color: var(--text-bright); }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 10px 0;
+    }
+    .card-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-glow);
+      background: var(--bg-card-hover);
+      box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* TABLES */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-light);
+      background: rgba(15, 23, 42, 0.6);
+      margin: 12px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+    th {
+      background: rgba(30, 41, 59, 0.85);
+      color: var(--text-bright);
+      font-weight: 600;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-light);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.8px;
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.03); }
+
+    .table-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .badge-mid { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .badge-low { background: rgba(16, 185, 129, 0.2); color: #86efac; }
+
+    /* IMAGE SHOWCASES */
+    .image-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 20px;
+      margin: 16px 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .image-showcase:hover {
+      border-color: var(--border-glow);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .image-container {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #090d16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-container img {
+      width: 100%;
+      max-height: 540px;
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
+      transition: transform 0.4s ease;
+    }
+    .image-container img:hover {
+      transform: scale(1.015);
+    }
+    .image-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      padding: 4px 6px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .image-caption strong { color: var(--color-accent); }
+
+    /* CODE BLOCKS */
+    .code-box {
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      overflow-x: auto;
+      position: relative;
+      margin: 12px 0;
+    }
+    .code-box-header {
+      display: flex;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .kw { color: #f472b6; }
+    .ann { color: #38bdf8; }
+    .str { color: #34d399; }
+    .typ { color: #facc15; }
+    .cmt { color: #64748b; font-style: italic; }
+
+    /* GHERKIN CARDS */
+    .gherkin-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .gherkin-line {
+      display: flex;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .gherkin-kw {
+      font-weight: 700;
+      min-width: 65px;
+    }
+    .kw-given { color: #38bdf8; }
+    .kw-when { color: #facc15; }
+    .kw-then { color: #34d399; }
+
+    /* INTERACTIVE EVALUATION ENGINE */
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 16px 0;
+    }
+    .quiz-question-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s;
+    }
+    .quiz-question-box.correct { border-color: var(--color-success); background: rgba(16, 185, 129, 0.05); }
+    .quiz-question-box.incorrect { border-color: var(--color-danger); background: rgba(239, 68, 68, 0.05); }
+    .question-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      transition: all 0.2s;
+    }
+    .option-label:hover {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: rgba(14, 165, 233, 0.4);
+    }
+    .option-label input[type="radio"] {
+      accent-color: var(--color-primary);
+      width: 18px;
+      height: 18px;
+    }
+    .quiz-feedback {
+      font-size: 0.88rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .btn-grade {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
+      transition: all 0.3s;
+    }
+    .btn-grade:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(14, 165, 233, 0.5);
+    }
+
+    /* FOOTER */
+    .site-footer {
+      border-top: 1px solid var(--border-light);
+      padding: 30px 0 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .sidebar.open { display: flex; }
+      .top-nav { display: flex; }
+      .main-content { margin-left: 0; padding: 24px; margin-top: 60px; }
+      .progress-bar-container { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- TOP NAV FOR MOBILE -->
+  <header class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="course-badge" style="margin: 0;">UNIBE V&V</span>
+      <span style="font-weight: 700; font-size: 0.95rem;">Historias de Usuario (User Stories)</span>
+    </div>
+    <button class="menu-btn" onclick="toggleSidebar()">☰ Menú</button>
+  </header>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="course-badge">Semana 4 • UNIBE</span>
+      <h2 class="sidebar-title">Historias de Usuario</h2>
+      <p class="sidebar-subtitle">De los Requisitos a la Calidad (V&V)</p>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#sec-1"><span class="num-pill">01</span> ¿Qué es una HU?</a></li>
+      <li><a href="#sec-2"><span class="num-pill">02</span> ¿Por qué utilizarlas?</a></li>
+      <li><a href="#sec-3"><span class="num-pill">03</span> Estructura Canónica</a></li>
+      <li><a href="#sec-4"><span class="num-pill">04</span> Criterios INVEST</a></li>
+      <li><a href="#sec-5"><span class="num-pill">05</span> Las 3 C de las Historias</a></li>
+      <li><a href="#sec-6"><span class="num-pill">06</span> Criterios de Aceptación</a></li>
+      <li><a href="#sec-7"><span class="num-pill">07</span> Gherkin (Given When Then)</a></li>
+      <li><a href="#sec-8"><span class="num-pill">08</span> Épicas vs Features vs HU</a></li>
+      <li><a href="#sec-9"><span class="num-pill">09</span> Story Splitting (Vertical)</a></li>
+      <li><a href="#sec-10"><span class="num-pill">10</span> Priorización (MoSCoW)</a></li>
+      <li><a href="#sec-11"><span class="num-pill">11</span> Estimación (Planning Poker)</a></li>
+      <li><a href="#sec-12"><span class="num-pill">12</span> Construcción desde Cero</a></li>
+      <li><a href="#sec-13"><span class="num-pill">13</span> HU y Pruebas en Spring Boot</a></li>
+      <li><a href="#sec-14"><span class="num-pill">14</span> Definition of Ready (DoR)</a></li>
+      <li><a href="#sec-15"><span class="num-pill">15</span> Errores Frecuentes</a></li>
+      <li><a href="#sec-16"><span class="num-pill">16</span> Product Backlog Completo</a></li>
+      <li><a href="#sec-17"><span class="num-pill">17</span> Actividad Práctica Taller</a></li>
+      <li><a href="#sec-18"><span class="num-pill">18</span> Evaluación Interactiva</a></li>
+      <li><a href="#sec-19"><span class="num-pill">19</span> Resumen Síntesis</a></li>
+      <li><a href="#sec-20"><span class="num-pill">20</span> Bibliografía Oficial</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <span>Verificación & Validación</span>
+      <a href="../index.html">← Volver al Portal</a>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="main-content">
+
+    <!-- HERO SECTION -->
+    <header class="hero-section">
+      <div class="hero-meta">
+        <span class="hero-badge badge-semana">Semana 4 • Requisitos y Calidad</span>
+        <span class="hero-badge badge-qa">Verificación & Validación (V&V)</span>
+        <span class="hero-badge badge-stack">Stack: Java 21 + Spring Boot 3 + PostgreSQL</span>
+      </div>
+      <h1 class="hero-title">Historias de Usuario (User Stories): Explicación Completa Paso a Paso</h1>
+      <p class="hero-desc">
+        Guía integral orientada a la <strong>Calidad de Software</strong>. Aprende a no enseñar las historias de usuario como un mero formulario textual, sino como el puente vivo que conecta la necesidad del usuario final con la arquitectura, los criterios de aceptación medibles, las pruebas automatizadas y la validación en producción.
+      </p>
+
+      <div class="quick-nav-pills">
+        <a href="#sec-1" class="nav-pill">⚡ 01. Definición</a>
+        <a href="#sec-4" class="nav-pill">🛡️ 04. INVEST</a>
+        <a href="#sec-6" class="nav-pill">📋 06. Criterios de Aceptación</a>
+        <a href="#sec-7" class="nav-pill">🥒 07. Gherkin BDD</a>
+        <a href="#sec-9" class="nav-pill">🍰 09. División Vertical</a>
+        <a href="#sec-13" class="nav-pill">☕ 13. Spring Boot Testing</a>
+        <a href="#sec-18" class="nav-pill">📝 18. Evaluación Interactiva</a>
+      </div>
+    </header>
+
+    <!-- INFOGRAFÍA MASTER PIPELINE -->
+    <figure class="image-showcase">
+      <div class="image-container">
+        <img src="user_story_to_automated_testing_pipeline.jpg" alt="Pipeline de Ingeniería: De la Historia de Usuario a la Prueba Automatizada en Java Spring Boot">
+      </div>
+      <figcaption class="image-caption">
+        <span><strong>Figura 1.0:</strong> Flujo integral de calidad: Desde la necesidad (HU) validada con INVEST, pasando por escenarios Gherkin BDD, hasta la prueba automatizada JUnit/MockMvc en Spring Boot.</span>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">Generado para UNIBE V&V</span>
+      </figcaption>
+    </figure>
+
+    <!-- 01. ¿QUÉ ES UNA HISTORIA DE USUARIO? -->
+    <section id="sec-1" class="content-section">
+      <div class="section-header">
+        <div class="section-num">01</div>
+        <div>
+          <h2 class="section-title">¿Qué es una Historia de Usuario?</h2>
+          <p class="section-subtitle">Descripción breve de una necesidad funcional expresada desde la perspectiva del usuario final</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          Una <strong>Historia de Usuario (User Story)</strong> es una descripción breve y en lenguaje natural de una necesidad o funcionalidad del software, formulada directamente desde el punto de vista de la persona u actor que utilizará el sistema.
+        </p>
+        <p>Su propósito fundamental no es redactar un contrato técnico inmodificable, sino comunicar con absoluta claridad:</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item">
+          <span style="font-size: 1.8rem;">👤</span>
+          <h4 class="card-title">1. ¿Quién? (Who)</h4>
+          <p class="card-desc">Identifica al usuario o rol concreto que experimenta el dolor o la necesidad dentro del dominio del negocio.</p>
+        </div>
+        <div class="card-item">
+          <span style="font-size: 1.8rem;">🎯</span>
+          <h4 class="card-title">2. ¿Qué? (What)</h4>
+          <p class="card-desc">Describe la acción o capacidad específica que el usuario desea ejecutar dentro del sistema.</p>
+        </div>
+        <div class="card-item">
+          <span style="font-size: 1.8rem;">💡</span>
+          <h4 class="card-title">3. ¿Para qué? (Why)</h4>
+          <p class="card-desc">Expresa el valor real, beneficio o motivación de negocio que se obtiene al completar la acción.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">🏛️</div>
+        <div class="callout-content" style="width: 100%;">
+          <h4>Ejemplo Práctico Rector: Sistema de Gestión Académica Universitaria</h4>
+          <p>Imaginemos que la universidad necesita gestionar el proceso de matrículas semestrales:</p>
+          
+          <div class="story-card-box">
+            <div class="story-card-header">
+              <span class="story-id">HISTORIA DE USUARIO • HU-001</span>
+              <span class="table-badge badge-high">Prioridad: Muy Alta</span>
+            </div>
+            <div class="story-clause">
+              <span class="clause-label">COMO</span>
+              <span class="clause-text">estudiante regular de la universidad,</span>
+            </div>
+            <div class="story-clause">
+              <span class="clause-label">QUIERO</span>
+              <span class="clause-text">matricularme en las asignaturas disponibles para mi ciclo,</span>
+            </div>
+            <div class="story-clause">
+              <span class="clause-label">PARA</span>
+              <span class="clause-text">poder cursar las materias correspondientes a mi período académico sin retrasos.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-qa">
+        <div class="callout-icon">💡</div>
+        <div class="callout-content">
+          <h4>Idea Clave para tus Estudiantes</h4>
+          <p>
+            Observa que en la historia <strong>no estamos indicando cómo se programará la funcionalidad</strong>, qué tablas tendrá PostgreSQL ni qué controladores se implementarán en Spring Boot. Una historia describe el <em>qué</em> necesita el usuario y el <em>por qué</em>, dejando la solución técnica a la conversación y diseño de ingeniería del equipo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02. ¿POR QUÉ UTILIZAMOS HISTORIAS DE USUARIO? -->
+    <section id="sec-2" class="content-section">
+      <div class="section-header">
+        <div class="section-num">02</div>
+        <div>
+          <h2 class="section-title">¿Por qué Utilizamos Historias de Usuario?</h2>
+          <p class="section-subtitle">Superando la desconexión entre especificaciones tradicionales y necesidades de valor real</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          En el desarrollo tradicional en cascada se redactaban extensos documentos de especificación técnica de requisitos de cientos de páginas. Los desarrolladores pasaban meses construyendo exactamente lo especificado, solo para descubrir al final que el cliente necesitaba algo completamente diferente.
+        </p>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 50%;">Requisito Tradicional Mal Planteado</th>
+              <th style="width: 50%;">Historia de Usuario Enfocada en Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: #fca5a5;">
+                ❌ <em>«El sistema debe disponer de un formulario para registrar estudiantes».</em><br><br>
+                <small style="color: var(--text-muted);"><strong>Defectos:</strong> No sabemos quién registra, qué información ingresa, quién valida ni cuál es el propósito de negocio.</small>
+              </td>
+              <td style="color: #86efac;">
+                ✅ <em>«Como secretario académico, quiero registrar nuevos estudiantes para mantener actualizada la información académica de la universidad».</em><br><br>
+                <small style="color: var(--text-muted);"><strong>Aciertos:</strong> Identifica al actor institucional, la acción concreta y el valor de auditoría institucional.</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item">
+          <h4 class="card-title">Beneficios en la Asignatura de Calidad</h4>
+          <ul style="padding-left: 18px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+            <li>Facilita la comunicación fluida entre el Product Owner y los Developers.</li>
+            <li>Evita ambigüedades mediante criterios de aceptación verificables.</li>
+            <li>Permite derivar directamente <strong>casos de prueba funcionales y no funcionales</strong>.</li>
+            <li>Permite ordenar y priorizar el Product Backlog según el valor económico.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03. ESTRUCTURA DE UNA HISTORIA DE USUARIO -->
+    <section id="sec-3" class="content-section">
+      <div class="section-header">
+        <div class="section-num">03</div>
+        <div>
+          <h2 class="section-title">Estructura de una Historia de Usuario</h2>
+          <p class="section-subtitle">Desglose de los tres componentes canónicos (Who, What, Why)</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 20%;">Componente</th>
+              <th style="width: 25%;">Pregunta Clave</th>
+              <th style="width: 55%;">Ejemplo en el Sistema Universitario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: var(--color-accent);">Como (Who)</strong></td>
+              <td>¿Quién lo necesita?</td>
+              <td><code>Secretario académico</code>, <code>Estudiante regular</code>, <code>Docente titular</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #facc15;">Quiero (What)</strong></td>
+              <td>¿Qué acción necesita realizar?</td>
+              <td><code>Consultar mis calificaciones</code>, <code>Registrar asignaturas</code>, <code>Generar acta PDF</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #4ade80;">Para (Why)</strong></td>
+              <td>¿Para qué lo necesita? (Valor)</td>
+              <td><code>Para conocer mi rendimiento académico</code>, <code>Para habilitar mi proceso de titulación</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-content">
+          <h4>Regla de Oro en Aula</h4>
+          <p>
+            <strong>Evita el rol genérico:</strong> Nunca permitas que tus estudiantes escriban <em>«Como usuario quiero...»</em> cuando pueden precisar si se trata de un <em>Estudiante</em>, un <em>Docente</em>, un <em>Administrador de Base de Datos</em> o un <em>Coordinador de Carrera</em>. La especificidad del rol delimita los permisos de seguridad y las reglas de negocio.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04. ¿QUÉ ES INVEST? -->
+    <section id="sec-4" class="content-section">
+      <div class="section-header">
+        <div class="section-num">04</div>
+        <div>
+          <h2 class="section-title">¿Qué es INVEST?</h2>
+          <p class="section-subtitle">Las seis características de calidad indispensables para evaluar una Historia de Usuario (Bill Wake)</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          El acrónimo <strong>INVEST</strong> es el estándar de la industria para verificar si una historia de usuario está bien concebida y lista para ingresar a un Sprint de desarrollo:
+        </p>
+      </div>
+
+      <div class="cards-grid">
+        <!-- I -->
+        <div class="card-item" style="border-top: 3px solid #38bdf8;">
+          <h3 class="card-title"><span style="color: #38bdf8; font-family: var(--font-mono);">I</span> • Independent (Independiente)</h3>
+          <p class="card-desc">
+            Debe poder implementarse, probarse y entregarse sin depender rígidamente de que otra historia específica esté terminada en el mismo ciclo.
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            <strong>Mala práctica:</strong> HU-01 (Consultar notas) no puede probarse porque HU-02 (Registrar notas) aún no existe. <br>
+            <strong>Solución:</strong> Usar mocks o datos de prueba precargados en PostgreSQL para independizar el testing.
+          </div>
+        </div>
+
+        <!-- N -->
+        <div class="card-item" style="border-top: 3px solid #818cf8;">
+          <h3 class="card-title"><span style="color: #818cf8; font-family: var(--font-mono);">N</span> • Negotiable (Negociable)</h3>
+          <p class="card-desc">
+            No es un contrato legal rígido tallado en piedra. Captura la esencia de la necesidad, pero los detalles finos se dialogan entre el PO y los desarrolladores.
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            <strong>Ejemplo:</strong> El equipo negocia si el comprobante de matrícula se descarga directamente en PDF o se envía por correo electrónico con SendGrid.
+          </div>
+        </div>
+
+        <!-- V -->
+        <div class="card-item" style="border-top: 3px solid #34d399;">
+          <h3 class="card-title"><span style="color: #34d399; font-family: var(--font-mono);">V</span> • Valuable (Valiosa)</h3>
+          <p class="card-desc">
+            Debe brindar un beneficio tangible y perceptible para el usuario final o para la organización, no ser una tarea técnica interna.
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            <strong>Error frecuente:</strong> <em>«Como programador quiero crear la tabla 'matriculas' en PostgreSQL»</em>. Eso es una tarea técnica, no una historia de usuario.
+          </div>
+        </div>
+
+        <!-- E -->
+        <div class="card-item" style="border-top: 3px solid #facc15;">
+          <h3 class="card-title"><span style="color: #facc15; font-family: var(--font-mono);">E</span> • Estimable (Estimable)</h3>
+          <p class="card-desc">
+            El Scrum Team debe comprender suficientemente el dominio y los requisitos para estimar su esfuerzo relativo en Story Points.
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            <strong>Inestimable:</strong> <em>«Quiero gestionar toda la universidad»</em> (demasiado difusa). <br>
+            <strong>Estimable:</strong> <em>«Validar prerrequisitos al seleccionar una materia»</em> (alcance claro: 3 puntos).
+          </div>
+        </div>
+
+        <!-- S -->
+        <div class="card-item" style="border-top: 3px solid #fb923c;">
+          <h3 class="card-title"><span style="color: #fb923c; font-family: var(--font-mono);">S</span> • Small (Pequeña / Ajustada)</h3>
+          <p class="card-desc">
+            Debe ser lo suficientemente acotada para diseñarse, codificarse y probarse completamente dentro de un solo Sprint (típicamente de 2 semanas).
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            Si una historia supera los 13 Story Points o abarca múltiples flujos, debe dividirse mediante <em>Story Splitting</em>.
+          </div>
+        </div>
+
+        <!-- T -->
+        <div class="card-item" style="border-top: 3px solid #f472b6;">
+          <h3 class="card-title"><span style="color: #f472b6; font-family: var(--font-mono);">T</span> • Testable (Comprobable / Verificable)</h3>
+          <p class="card-desc">
+            La historia debe tener criterios de aceptación tan objetivos que un evaluador de QA pueda decir con una prueba binaria: <strong>PASA o FALLA</strong>.
+          </p>
+          <div style="font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;">
+            <strong>No comprobable:</strong> <em>«El sistema debe ser intuitivo»</em>. <br>
+            <strong>Comprobable:</strong> <em>«El 95% de los alumnos completa su matrícula en menos de 3 pasos sin errores de validación»</em>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05. LAS 3 C DE LAS HISTORIAS DE USUARIO -->
+    <section id="sec-5" class="content-section">
+      <div class="section-header">
+        <div class="section-num">05</div>
+        <div>
+          <h2 class="section-title">Las 3 C de las Historias de Usuario (Ron Jeffries)</h2>
+          <p class="section-subtitle">Card (Tarjeta), Conversation (Conversación) y Confirmation (Confirmación)</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item">
+          <span style="font-size: 2rem;">📇</span>
+          <h3 class="card-title">1. Card (Tarjeta)</h3>
+          <p class="card-desc">
+            Es la descripción sintética escrita en una tarjeta física o ticket de Jira. No contiene todos los detalles; actúa como un <strong>recordatorio para conversar</strong> sobre la necesidad.
+          </p>
+        </div>
+
+        <div class="card-item">
+          <span style="font-size: 2rem;">🗣️</span>
+          <h3 class="card-title">2. Conversation (Conversación)</h3>
+          <p class="card-desc">
+            El diálogo colaborativo y continuo entre el Product Owner, los usuarios finales y los Developers durante el Refinamiento y Planning para resolver dudas y acordar el alcance.
+          </p>
+        </div>
+
+        <div class="card-item">
+          <span style="font-size: 2rem;">✅</span>
+          <h3 class="card-title">3. Confirmation (Confirmación)</h3>
+          <p class="card-desc">
+            Los <strong>Criterios de Aceptación</strong> verificables que dictaminan formalmente cuándo la historia está completada a satisfacción y lista para superar la prueba de QA.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">📌</div>
+        <div class="callout-content">
+          <h4>Lección Vital de Calidad</h4>
+          <p>
+            Una historia de usuario nunca debe reducirse a una frase solitaria pegada en un tablero de Jira. Sin la <strong>conversación</strong> que aclara los límites del sistema y sin la <strong>confirmación</strong> verificable de pruebas, la historia genera defectos costosos en producción.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06. CRITERIOS DE ACEPTACIÓN -->
+    <section id="sec-6" class="content-section">
+      <div class="section-header">
+        <div class="section-num">06</div>
+        <div>
+          <h2 class="section-title">¿Qué son los Criterios de Aceptación?</h2>
+          <p class="section-subtitle">Las condiciones de satisfacción específicas que garantizan el cumplimiento de la necesidad</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          Los <strong>Criterios de Aceptación (Acceptance Criteria)</strong> son las condiciones específicas, observables y medibles que el software debe cumplir para que el Product Owner acepte la historia de usuario como completada.
+        </p>
+      </div>
+
+      <div class="story-card-box">
+        <div class="story-card-header">
+          <span class="story-id">HU-002 • Consultar Calificaciones</span>
+          <span class="table-badge badge-mid">Prioridad: Media</span>
+        </div>
+        <p style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px;">
+          <em>Como estudiante regular, quiero consultar mis calificaciones en línea para conocer mi rendimiento académico actual.</em>
+        </p>
+
+        <h4 style="color: var(--color-accent); font-size: 0.95rem; margin-top: 6px;">Criterios de Aceptación Verificables:</h4>
+        <ul style="padding-left: 20px; font-size: 0.92rem; line-height: 1.8; color: #f1f5f9;">
+          <li>✓ <strong>Seguridad:</strong> El estudiante debe estar debidamente autenticado con token JWT válido.</li>
+          <li>✓ <strong>Aislamiento de Datos:</strong> El sistema debe mostrar <em>únicamente</em> las calificaciones del estudiante logueado (cero fuga de datos ajenos).</li>
+          <li>✓ <strong>Filtro Temporal:</strong> El usuario debe poder seleccionar el período académico (ejemplo: 2026-1) y visualizar notas parciales y final.</li>
+          <li>✓ <strong>Estado Académico:</strong> Si la nota final es &ge; 7.0/10, debe mostrar el estado visual en verde: <code>APROBADO</code>; en caso contrario, <code>REPROBADO</code>.</li>
+          <li>✓ <strong>Escenario Vacío:</strong> Si no existen calificaciones registradas, debe mostrar un mensaje amigable: <em>"Aún no se registran notas para este ciclo"</em> en lugar de una pantalla en blanco o error 500.</li>
+          <li>✓ <strong>Rendimiento:</strong> La consulta del endpoint REST <code>GET /api/calificaciones</code> debe responder en menos de <strong>1.5 segundos</strong> con 500 consultas simultáneas.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 07. GHERKIN (GIVEN, WHEN, THEN) -->
+    <section id="sec-7" class="content-section">
+      <div class="section-header">
+        <div class="section-num">07</div>
+        <div>
+          <h2 class="section-title">¿Qué es Gherkin y cómo se utiliza Given, When, Then?</h2>
+          <p class="section-subtitle">El lenguaje del Desarrollo Guiado por Comportamiento (BDD) que conecta requisitos con pruebas automáticas</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          <strong>Gherkin</strong> es un lenguaje estructurado y legible tanto por personas de negocio como por computadoras (mediante frameworks como Cucumber o JBehave). Utiliza la tríada fundamental:
+        </p>
+        <ul style="padding-left: 20px; line-height: 1.8;">
+          <li><strong>Given (Dado):</strong> Establece el contexto, estado del sistema o precondición inicial.</li>
+          <li><strong>When (Cuando):</strong> Describe la acción específica ejecutada por el usuario o evento del sistema.</li>
+          <li><strong>Then (Entonces):</strong> Dictamina el resultado observable, postcondición o cambio de estado esperado.</li>
+        </ul>
+      </div>
+
+      <!-- ESCENARIOS GHERKIN -->
+      <div class="gherkin-card">
+        <div style="font-weight: 700; color: #c4b5fd; font-size: 0.95rem;">Escenario 1: Consulta Exitosa de Calificaciones</div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-given">Given</span>
+          <span>que el estudiante con ID "EST-2026-99" ha iniciado sesión y tiene notas registradas en el período "2026-1"</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-when">When</span>
+          <span>el estudiante ingresa a la sección de calificaciones y selecciona el ciclo "2026-1"</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-then">Then</span>
+          <span>el sistema retorna el código HTTP 200 OK con el listado de materias, notas parciales y estado de aprobación</span>
+        </div>
+      </div>
+
+      <div class="gherkin-card">
+        <div style="font-weight: 700; color: #fcd34d; font-size: 0.95rem;">Escenario 2: Estudiante sin Calificaciones Registradas</div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-given">Given</span>
+          <span>que el estudiante ha iniciado sesión y es su primer ciclo matriculado sin notas cargadas</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-when">When</span>
+          <span>solicita consultar sus calificaciones del ciclo actual</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-then">Then</span>
+          <span>el sistema muestra un mensaje informativo indicando: "No existen calificaciones registradas aún"</span>
+        </div>
+      </div>
+
+      <div class="gherkin-card" style="border-color: rgba(239, 68, 68, 0.4);">
+        <div style="font-weight: 700; color: #fca5a5; font-size: 0.95rem;">Escenario 3 (Seguridad & QA): Intento de Consulta No Autorizada de Notas Ajenas</div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-given">Given</span>
+          <span>que el estudiante "A" ha iniciado sesión con su propio token JWT</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-when">When</span>
+          <span>intenta enviar una petición GET con el parámetro ID perteneciente al estudiante "B"</span>
+        </div>
+        <div class="gherkin-line">
+          <span class="gherkin-kw kw-then">Then</span>
+          <span>el sistema intercepta la petición, deniega el acceso con código HTTP 403 Forbidden y registra un evento de auditoría de seguridad</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08. ÉPICAS VS CARACTERÍSTICAS VS HISTORIAS -->
+    <section id="sec-8" class="content-section">
+      <div class="section-header">
+        <div class="section-num">08</div>
+        <div>
+          <h2 class="section-title">¿Cuál es la Diferencia entre Épicas, Características e Historias?</h2>
+          <p class="section-subtitle">Jerarquía de granularidad para descomponer sistemas grandes sin perder el rumbo</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 20%;">Nivel</th>
+              <th style="width: 35%;">Definición y Alcance</th>
+              <th style="width: 45%;">Ejemplo en el Sistema Universitario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: #c084fc;">Épica</strong></td>
+              <td>Objetivo estratégico de gran tamaño que abarca múltiples meses o Sprints y requiere descomposición.</td>
+              <td><code>ÉPICA: Gestión Académica Integral</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #60a5fa;">Característica (Feature)</strong></td>
+              <td>Capacidad funcional concreta del producto que resuelve un módulo específico del negocio.</td>
+              <td><code>FEATURE: Módulo de Matrículas en Línea</code></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #34d399;">Historia de Usuario</strong></td>
+              <td>Requerimiento atómico con valor directo que cabe cómodamente dentro de un solo Sprint.</td>
+              <td>
+                • HU-001: Consultar materias con cupo.<br>
+                • HU-002: Validar prerrequisitos aprobados.<br>
+                • HU-003: Confirmar y generar comprobante.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 09. CÓMO DIVIDIR HISTORIAS: VERTICAL VS HORIZONTAL -->
+    <section id="sec-9" class="content-section">
+      <div class="section-header">
+        <div class="section-num">09</div>
+        <div>
+          <h2 class="section-title">¿Cómo Dividir una Historia de Usuario? (Story Splitting)</h2>
+          <p class="section-subtitle">Por qué la división vertical de valor es superior a la división por capas técnicas</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          Uno de los errores más comunes en proyectos de estudiantes es dividir las historias de forma <strong>horizontal</strong> (por capas de arquitectura tecnológica). Veamos la comparación gráfica:
+        </p>
+      </div>
+
+      <!-- INFOGRAFÍA SLICING -->
+      <figure class="image-showcase">
+        <div class="image-container">
+          <img src="vertical_vs_horizontal_slicing.jpg" alt="Story Splitting: División Horizontal vs División Vertical en Ingeniería de Software">
+        </div>
+        <figcaption class="image-caption">
+          <span><strong>Figura 9.1:</strong> División Horizontal (Anti-patrón sin valor) vs División Vertical (Rebanada completa de valor funcional de extremo a extremo).</span>
+          <span style="font-family: var(--font-mono); font-size: 0.78rem;">Generado para UNIBE V&V</span>
+        </figcaption>
+      </figure>
+
+      <div class="analogy-vs-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 14px; padding: 20px;">
+          <h4 style="color: #fca5a5; margin-bottom: 8px;">❌ División Horizontal (Técnica)</h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+            • Sprint 1: Crear tablas en PostgreSQL.<br>
+            • Sprint 2: Crear entidades JPA y repositorios.<br>
+            • Sprint 3: Crear controladores REST.<br>
+            • Sprint 4: Diseñar interfaz en React.<br>
+            <strong>Problema:</strong> Al terminar el Sprint 1, el estudiante no puede hacer absolutamente nada con unas tablas vacías. No hay incremento utilizable ni valor.
+          </p>
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; padding: 20px;">
+          <h4 style="color: #86efac; margin-bottom: 8px;">✅ División Vertical (Recomendada)</h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+            • HU-01: Consultar asignaturas disponibles.<br>
+            Atraviesa toda la rebanada tecnológica: UI básica + Controller Spring Boot + Servicio + Base de datos PostgreSQL + Pruebas automatizadas.<br>
+            <strong>Resultado:</strong> En 2 semanas el usuario real ya puede consultar sus materias. ¡Valor inmediato y verificable!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. PRIORIZACIÓN CON MOSCOW -->
+    <section id="sec-10" class="content-section">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div>
+          <h2 class="section-title">¿Cómo se Priorizan las Historias de Usuario? (Técnica MoSCoW)</h2>
+          <p class="section-subtitle">Maximizando el retorno de inversión y la viabilidad del producto en cada Sprint</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 20%;">Categoría MoSCoW</th>
+              <th style="width: 35%;">Significado de Negocio</th>
+              <th style="width: 45%;">Ejemplo en Sistema Académico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="table-badge badge-high">MUST HAVE</span></td>
+              <td><strong>Imprescindible:</strong> Sin esto, el sistema no puede operar legal o funcionalmente.</td>
+              <td>Autenticación de alumnos, registro de matrícula, validación de cupos.</td>
+            </tr>
+            <tr>
+              <td><span class="table-badge badge-mid">SHOULD HAVE</span></td>
+              <td><strong>Importante:</strong> Muy deseable, pero el sistema puede arrancar temporalmente sin él.</td>
+              <td>Descarga de comprobante de matrícula en formato PDF, notificaciones por email.</td>
+            </tr>
+            <tr>
+              <td><span class="table-badge badge-low">COULD HAVE</span></td>
+              <td><strong>Deseable:</strong> Añade confort si queda tiempo y presupuesto disponible.</td>
+              <td>Tema oscuro en la interfaz, personalización de colores del perfil del alumno.</td>
+            </tr>
+            <tr>
+              <td><span class="table-badge" style="background: rgba(100,116,139,0.3); color: #cbd5e1;">WON'T HAVE</span></td>
+              <td><strong>Fuera de Alcance:</strong> No se construirá en esta versión o ciclo actual.</td>
+              <td>Integración con redes sociales externas, predicción por IA de notas futuras.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 11. ESTIMACIÓN CON STORY POINTS Y PLANNING POKER -->
+    <section id="sec-11" class="content-section">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <div>
+          <h2 class="section-title">¿Cómo se Estiman las Historias? (Story Points & Fibonacci)</h2>
+          <p class="section-subtitle">Estimación relativa de esfuerzo, complejidad e incertidumbre vs. horas tradicionales</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          Los <strong>Story Points</strong> no equivalen a horas hombre de reloj. Representan una medida holística relativa que combina:
+          <strong>1) Complejidad técnica</strong>, <strong>2) Cantidad de esfuerzo</strong> y <strong>3) Grado de incertidumbre / riesgo</strong>.
+        </p>
+        <p>Se utiliza comúnmente la escala de <strong>Fibonacci modificada (1, 2, 3, 5, 8, 13, 21)</strong> porque a mayor tamaño, mayor es la incertidumbre:</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item">
+          <span style="font-family: var(--font-mono); font-size: 1.5rem; color: #38bdf8;">1 - 2 Puntos</span>
+          <h4 class="card-title">Trivial / Muy Baja</h4>
+          <p class="card-desc">Cambios menores, textos estáticos o consultas simples ya conocidas (ej. consultar datos personales de perfil).</p>
+        </div>
+
+        <div class="card-item">
+          <span style="font-family: var(--font-mono); font-size: 1.5rem; color: #4ade80;">3 - 5 Puntos</span>
+          <h4 class="card-title">Complejidad Media</h4>
+          <p class="card-desc">Flujo CRUD estándar con validaciones en Spring Boot y pruebas unitarias (ej. registrar nuevo estudiante).</p>
+        </div>
+
+        <div class="card-item">
+          <span style="font-family: var(--font-mono); font-size: 1.5rem; color: #facc15;">8 Puntos</span>
+          <h4 class="card-title">Alta Complejidad</h4>
+          <p class="card-desc">Lógica de negocio densa, concurrencia, transaccionalidad en BD y múltiples pruebas (ej. realizar matrícula con bloqueo de cupos).</p>
+        </div>
+
+        <div class="card-item" style="border-color: rgba(239, 68, 68, 0.4);">
+          <span style="font-family: var(--font-mono); font-size: 1.5rem; color: #f87171;">&ge; 13 - 21 Puntos</span>
+          <h4 class="card-title">Demasiado Grande (Alerta)</h4>
+          <p class="card-desc">Indica que la historia es una épica encubierta y <strong>debe dividirse en historias más pequeñas</strong> antes de entrar al Sprint.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">🃏</div>
+        <div class="callout-content">
+          <h4>Dinámica de Planning Poker en Clase</h4>
+          <p>
+            Cada integrante del equipo tiene un mazo de cartas con números Fibonacci. El PO explica la historia, los desarrolladores debaten dudas y muestran su carta al mismo tiempo. Si hay disparidad (ej. alguien vota 2 y otro 13), los extremos explican su razonamiento técnico, descubriendo riesgos ocultos hasta consensuar una estimación sólida.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. CONSTRUCCIÓN DE UNA HISTORIA DESDE CERO -->
+    <section id="sec-12" class="content-section">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <div>
+          <h2 class="section-title">¿Cómo se Construye una Historia de Usuario desde Cero?</h2>
+          <p class="section-subtitle">Los 8 pasos prácticos para guiar a tus estudiantes en un proyecto real</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p><strong>Requerimiento solicitado por la universidad:</strong> <em>«Los estudiantes olvidan constantemente su contraseña y saturan la secretaría académica solicitando que se las reseteen manualmente»</em>.</p>
+      </div>
+
+      <div class="step-list" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; border-left: 3px solid var(--color-primary);">
+          <strong>Paso 1: Identificar al Usuario:</strong> Estudiante regular de la universidad.
+        </div>
+        <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; border-left: 3px solid var(--color-primary);">
+          <strong>Paso 2: Identificar la Necesidad:</strong> Restablecer la contraseña olvidada mediante un enlace seguro enviado a su correo institucional.
+        </div>
+        <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; border-left: 3px solid var(--color-primary);">
+          <strong>Paso 3: Identificar el Beneficio:</strong> Recuperar acceso inmediato a sus clases y servicios académicos de forma autónoma sin depender de secretaría.
+        </div>
+        <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; border-left: 3px solid var(--color-primary);">
+          <strong>Paso 4: Redacción Canónica:</strong><br>
+          <em>«Como estudiante regular, quiero solicitar la recuperación de mi contraseña mediante un token temporal a mi correo institucional, para recuperar el acceso a mis servicios académicos sin trámites presenciales»</em>.
+        </div>
+        <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; border-left: 3px solid var(--color-primary);">
+          <strong>Paso 5: Definir Criterios de Aceptación:</strong><br>
+          1. El correo debe pertenecer al dominio institucional <code>@unibe.edu.ec</code>.<br>
+          2. El enlace contiene un token criptográfico que expira en exactamente 15 minutos.<br>
+          3. La nueva contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula y número.<br>
+          4. El enlace se invalida de forma inmediata tras el primer uso exitoso.
+        </div>
+      </div>
+
+      <h4 style="font-size: 1.1rem; color: var(--text-bright); margin-top: 10px;">Paso 6: Matriz de Casos de Prueba Derivados</h4>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Prueba</th>
+              <th>Condición de Entrada</th>
+              <th>Resultado Esperado (Validación)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>TC-REC-01</code></td>
+              <td>Correo registrado y activo</td>
+              <td>Se genera token, se envía email y se responde HTTP 200 con mensaje genérico.</td>
+            </tr>
+            <tr>
+              <td><code>TC-REC-02</code></td>
+              <td>Correo inexistente o inactivo</td>
+              <td>Se responde el mismo mensaje genérico para evitar enumeración de usuarios (Seguridad).</td>
+            </tr>
+            <tr>
+              <td><code>TC-REC-03</code></td>
+              <td>Token con más de 15 minutos</td>
+              <td>Se rechaza la operación con mensaje: <em>"El enlace ha expirado. Solicite uno nuevo"</em>.</td>
+            </tr>
+            <tr>
+              <td><code>TC-REC-04</code></td>
+              <td>Reutilización de token ya usado</td>
+              <td>Se bloquea la operación y se registra alerta de intento sospechoso.</td>
+            </tr>
+            <tr>
+              <td><code>TC-REC-05</code></td>
+              <td>Contraseña débil (ej. "123456")</td>
+              <td>El formulario bloquea el envío indicando las reglas de complejidad faltantes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 13. RELACIÓN ENTRE HISTORIAS Y PRUEBAS EN SPRING BOOT -->
+    <section id="sec-13" class="content-section" style="border: 2px solid rgba(14, 165, 233, 0.4);">
+      <div class="section-header">
+        <div class="section-num" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8;">13</div>
+        <div>
+          <h2 class="section-title">Historias de Usuario y su Implementación en Spring Boot & PostgreSQL</h2>
+          <p class="section-subtitle">Conexión directa entre la especificación ágil, el código backend y las pruebas automatizadas (JUnit 5 / MockMvc)</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          En la asignatura de <strong>Verificación y Validación</strong>, los estudiantes deben comprender que la historia de usuario es la especificación viva que rige la implementación y las pruebas automatizadas.
+        </p>
+      </div>
+
+      <div class="code-box">
+        <div class="code-box-header">
+          <span>Java 21 • Spring Boot 3 REST Controller</span>
+          <span>CalificacionController.java</span>
+        </div>
+<pre><code><span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span>(<span class="str">"/api/v1/calificaciones"</span>)
+<span class="ann">@RequiredArgsConstructor</span>
+<span class="kw">public class</span> <span class="typ">CalificacionController</span> {
+
+    <span class="kw">private final</span> <span class="typ">CalificacionService</span> calificacionService;
+
+    <span class="cmt">// HU-002: Consultar calificaciones del estudiante autenticado</span>
+    <span class="ann">@GetMapping</span>(<span class="str">"/mis-notas"</span>)
+    <span class="ann">@PreAuthorize</span>(<span class="str">"hasRole('ESTUDIANTE')"</span>)
+    <span class="kw">public</span> <span class="typ">ResponseEntity</span>&lt;<span class="typ">List</span>&lt;<span class="typ">CalificacionDTO</span>&gt;&gt; consultarMisNotas(
+            <span class="ann">@AuthenticationPrincipal</span> <span class="typ">UserPrincipal</span> principal,
+            <span class="ann">@RequestParam</span>(name = <span class="str">"periodo"</span>) <span class="typ">String</span> periodo) {
+
+        <span class="typ">List</span>&lt;<span class="typ">CalificacionDTO</span>&gt; notas = calificacionService
+                .obtenerNotasPorEstudianteYPeriodo(principal.getId(), periodo);
+
+        <span class="kw">return</span> <span class="typ">ResponseEntity</span>.ok(notas);
+    }
+}</code></pre>
+      </div>
+
+      <div class="code-box">
+        <div class="code-box-header">
+          <span>Prueba Automatizada de Verificación • JUnit 5 + MockMvc</span>
+          <span>CalificacionControllerTest.java</span>
+        </div>
+<pre><code><span class="ann">@WebMvcTest</span>(<span class="typ">CalificacionController</span>.<span class="kw">class</span>)
+<span class="kw">class</span> <span class="typ">CalificacionControllerTest</span> {
+
+    <span class="ann">@Autowired</span> <span class="kw">private</span> <span class="typ">MockMvc</span> mockMvc;
+    <span class="ann">@MockBean</span> <span class="kw">private</span> <span class="typ">CalificacionService</span> calificacionService;
+
+    <span class="cmt">// Verifica Criterio de Aceptación 1: Estudiante autenticado consulta con éxito</span>
+    <span class="ann">@Test</span>
+    <span class="ann">@WithMockUser</span>(roles = <span class="str">"ESTUDIANTE"</span>, username = <span class="str">"estudiante@unibe.edu.ec"</span>)
+    <span class="kw">void</span> deberiaRetornarCalificacionesCuandoEstudianteEstaAutenticado() <span class="kw">throws</span> <span class="typ">Exception</span> {
+        <span class="typ">List</span>&lt;<span class="typ">CalificacionDTO</span>&gt; mockNotas = <span class="typ">List</span>.of(
+            <span class="kw">new</span> <span class="typ">CalificacionDTO</span>(<span class="str">"V&V de Software"</span>, <span class="str">9.5</span>, <span class="str">"APROBADO"</span>)
+        );
+        <span class="typ">Mockito</span>.when(calificacionService.obtenerNotasPorEstudianteYPeriodo(<span class="typ">any</span>(), <span class="typ">eq</span>(<span class="str">"2026-1"</span>)))
+               .thenReturn(mockNotas);
+
+        mockMvc.perform(get(<span class="str">"/api/v1/calificaciones/mis-notas?periodo=2026-1"</span>))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath(<span class="str">"$[0].asignatura"</span>).value(<span class="str">"V&V de Software"</span>))
+               .andExpect(jsonPath(<span class="str">"$[0].estado"</span>).value(<span class="str">"APROBADO"</span>));
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- 14. DEFINITION OF READY (DOR) VS DEFINITION OF DONE (DOD) -->
+    <section id="sec-14" class="content-section">
+      <div class="section-header">
+        <div class="section-num">14</div>
+        <div>
+          <h2 class="section-title">Definition of Ready (DoR) vs. Definition of Done (DoD)</h2>
+          <p class="section-subtitle">Las dos compuertas de control de calidad al inicio y al final del Sprint</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 50%;">Definition of Ready (DoR) • Compuerta de Entrada</th>
+              <th style="width: 50%;">Definition of Done (DoD) • Compuerta de Salida</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong style="color: var(--color-accent);">¿Cuándo está lista una historia para COMENZAR?</strong>
+                <ul style="padding-left: 18px; margin-top: 8px; font-size: 0.88rem; line-height: 1.7; color: var(--text-muted);">
+                  <li>✓ Cumple los 6 criterios <strong>INVEST</strong>.</li>
+                  <li>✓ Tiene definidos al menos 3 Criterios de Aceptación claros.</li>
+                  <li>✓ El equipo comprende las dependencias de datos en PostgreSQL.</li>
+                  <li>✓ Ha sido estimada en Planning Poker (&le; 8 puntos).</li>
+                  <li>✓ Se cuenta con los wireframes o contratos de API definidos.</li>
+                </ul>
+              </td>
+              <td>
+                <strong style="color: var(--color-success);">¿Cuándo está listo el incremento para ENTREGARSE?</strong>
+                <ul style="padding-left: 18px; margin-top: 8px; font-size: 0.88rem; line-height: 1.7; color: var(--text-muted);">
+                  <li>✓ Código revisado mediante Pull Request (2 aprobadores).</li>
+                  <li>✓ Cobertura de pruebas unitarias superior al 80%.</li>
+                  <li>✓ Pruebas de integración con PostgreSQL ejecutadas sin fallos.</li>
+                  <li>✓ Cero defectos críticos o de seguridad abiertos en SonarQube.</li>
+                  <li>✓ Despliegue automático exitoso en el entorno de staging.</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 15. ERRORES FRECUENTES AL REDACTAR HISTORIAS -->
+    <section id="sec-15" class="content-section">
+      <div class="section-header">
+        <div class="section-num">15</div>
+        <div>
+          <h2 class="section-title">¿Qué Errores Cometen los Estudiantes al Redactar Historias?</h2>
+          <p class="section-subtitle">Antipatrones comunes detectados en talleres universitarios y cómo corregirlos</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 32%;">Redacción Incorrecta</th>
+              <th style="width: 28%;">Problema Identificado</th>
+              <th style="width: 40%;">Redacción Profesional Corregida</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: #fca5a5;">«Como usuario quiero que funcione el sistema».</td>
+              <td>Demasiado general, sin alcance ni valor medible.</td>
+              <td style="color: #86efac;">«Como estudiante quiero consultar mis calificaciones para conocer mi rendimiento».</td>
+            </tr>
+            <tr>
+              <td style="color: #fca5a5;">«Como programador quiero crear una tabla de estudiantes».</td>
+              <td>Describe una tarea técnica, no una necesidad del usuario.</td>
+              <td style="color: #86efac;">«Como secretario quiero registrar estudiantes para mantener actualizada la información institucional».</td>
+            </tr>
+            <tr>
+              <td style="color: #fca5a5;">«Como administrador quiero gestionar todo».</td>
+              <td>Sin límites; equivale a una mega épica inestimable.</td>
+              <td style="color: #86efac;">«Como administrador quiero desactivar cuentas inactivas para controlar los accesos».</td>
+            </tr>
+            <tr>
+              <td style="color: #fca5a5;">«Como estudiante quiero un sistema rápido».</td>
+              <td>Subjetivo; no tiene condición verificable de prueba.</td>
+              <td style="color: #86efac;">«Como estudiante quiero consultar mis notas en un máximo de dos segundos bajo 500 conexiones concurrentes».</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 16. EJEMPLO COMPLETO DE PRODUCT BACKLOG -->
+    <section id="sec-16" class="content-section">
+      <div class="section-header">
+        <div class="section-num">16</div>
+        <div>
+          <h2 class="section-title">Ejemplo Completo de un Product Backlog con Historias</h2>
+          <p class="section-subtitle">El inventario priorizado para el sistema universitario listo para ser refinado</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 10%;">ID</th>
+              <th style="width: 65%;">Historia de Usuario Redactada</th>
+              <th style="width: 15%;">Prioridad</th>
+              <th style="width: 10%;">Story Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>HU-01</code></td>
+              <td>Como estudiante quiero iniciar sesión con credenciales institucionales para acceder a mis servicios.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>3 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-02</code></td>
+              <td>Como estudiante quiero recuperar mi contraseña vía correo para restablecer mi acceso autónomamente.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>5 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-03</code></td>
+              <td>Como secretario académico quiero registrar nuevos estudiantes para alimentar la base de datos institucional.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>5 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-04</code></td>
+              <td>Como estudiante quiero consultar asignaturas disponibles para conocer la oferta académica vigente.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>3 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-05</code></td>
+              <td>Como estudiante quiero matricularme en materias habilitadas para oficializar mi período lectivo.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>8 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-06</code></td>
+              <td>Como docente quiero asentar calificaciones parciales para mantener actualizado el récord estudiantil.</td>
+              <td><span class="table-badge badge-high">ALTA</span></td>
+              <td>5 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-07</code></td>
+              <td>Como estudiante quiero consultar mis notas en línea para evaluar mi aprobación académica.</td>
+              <td><span class="table-badge badge-mid">MEDIA</span></td>
+              <td>3 Pts</td>
+            </tr>
+            <tr>
+              <td><code>HU-08</code></td>
+              <td>Como coordinador de carrera quiero generar actas consolidadas en PDF para auditoría y archivo.</td>
+              <td><span class="table-badge badge-mid">MEDIA</span></td>
+              <td>8 Pts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 17. ACTIVIDAD PRÁCTICA (TALLER DE AULA) -->
+    <section id="sec-17" class="content-section">
+      <div class="section-header">
+        <div class="section-num">17</div>
+        <div>
+          <h2 class="section-title">Actividad Práctica: Taller de Construcción de Historias</h2>
+          <p class="section-subtitle">Dinámica colaborativa para afianzar redacción, INVEST, criterios y pruebas</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card-item">
+          <h4 class="card-title">1. Formación de Equipos</h4>
+          <p class="card-desc">Grupos de 4 estudiantes asumen roles de PO, Scrum Master, Developer y QA Tester para el sistema universitario.</p>
+        </div>
+        <div class="card-item">
+          <h4 class="card-title">2. Redacción e INVEST</h4>
+          <p class="card-desc">Redactan 10 historias de usuario completas asegurando el cumplimiento estricto de las 6 reglas INVEST.</p>
+        </div>
+        <div class="card-item">
+          <h4 class="card-title">3. Criterios & Gherkin</h4>
+          <p class="card-desc">Para cada historia definen mínimo 3 criterios de aceptación y 2 escenarios formales en Gherkin (Given, When, Then).</p>
+        </div>
+        <div class="card-item">
+          <h4 class="card-title">4. Estimación & Sprint</h4>
+          <p class="card-desc">Estiman con Fibonacci mediante Planning Poker y seleccionan 3 historias prioritarias para su primer Sprint.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18. EVALUACIÓN INTERACTIVA DEL APRENDIZAJE -->
+    <section id="sec-18" class="content-section" style="border: 2px solid var(--color-primary);">
+      <div class="section-header">
+        <div class="section-num" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8;">18</div>
+        <div>
+          <h2 class="section-title">Evaluación Interactiva del Aprendizaje</h2>
+          <p class="section-subtitle">Comprueba los conceptos explicados con calificación automática y retroalimentación en tiempo real</p>
+        </div>
+      </div>
+
+      <div class="quiz-container" id="quizContainer">
+        <!-- P1 -->
+        <div class="quiz-question-box" id="qBox1">
+          <div class="question-title">1. ¿Cuál es el propósito principal de una historia de usuario?</div>
+          <div class="options-group">
+            <label class="option-label"><input type="radio" name="q1" value="a"> Describir las tablas y llaves foráneas de la base de datos</label>
+            <label class="option-label"><input type="radio" name="q1" value="b"> Expresar una necesidad o funcionalidad desde la perspectiva del usuario final</label>
+            <label class="option-label"><input type="radio" name="q1" value="c"> Definir los controladores y microservicios de la arquitectura</label>
+            <label class="option-label"><input type="radio" name="q1" value="d"> Asignar órdenes de trabajo individuales a los programadores</label>
+          </div>
+          <div class="quiz-feedback" id="fb1"></div>
+        </div>
+
+        <!-- P2 -->
+        <div class="quiz-question-box" id="qBox2">
+          <div class="question-title">2. ¿Qué significa la letra 'T' en el acrónimo INVEST?</div>
+          <div class="options-group">
+            <label class="option-label"><input type="radio" name="q2" value="a"> Technical (Técnica)</label>
+            <label class="option-label"><input type="radio" name="q2" value="b"> Time (Tiempo de reloj)</label>
+            <label class="option-label"><input type="radio" name="q2" value="c"> Testable (Comprobable / Verificable mediante pruebas)</label>
+            <label class="option-label"><input type="radio" name="q2" value="d"> Task (Tarea técnica individual)</label>
+          </div>
+          <div class="quiz-feedback" id="fb2"></div>
+        </div>
+
+        <!-- P3 -->
+        <div class="quiz-question-box" id="qBox3">
+          <div class="question-title">3. ¿Qué representan las 3 C de las historias de usuario (Ron Jeffries)?</div>
+          <div class="options-group">
+            <label class="option-label"><input type="radio" name="q3" value="a"> Card (Tarjeta), Conversation (Conversación) y Confirmation (Confirmación)</label>
+            <label class="option-label"><input type="radio" name="q3" value="b"> Code (Código), Control (Control) y Check (Revisión)</label>
+            <label class="option-label"><input type="radio" name="q3" value="c"> Create (Crear), Configure (Configurar) y Compile (Compilar)</label>
+            <label class="option-label"><input type="radio" name="q3" value="d"> Customer (Cliente), Class (Clase) y Component (Componente)</label>
+          </div>
+          <div class="quiz-feedback" id="fb3"></div>
+        </div>
+
+        <!-- P4 -->
+        <div class="quiz-question-box" id="qBox4">
+          <div class="question-title">4. En la sintaxis de Gherkin BDD, ¿qué describe la palabra clave 'Given' (Dado)?</div>
+          <div class="options-group">
+            <label class="option-label"><input type="radio" name="q4" value="a"> El resultado final observable del sistema</label>
+            <label class="option-label"><input type="radio" name="q4" value="b"> La acción que ejecuta el usuario</label>
+            <label class="option-label"><input type="radio" name="q4" value="c"> El contexto, estado o condición inicial antes de ejecutar la acción</label>
+            <label class="option-label"><input type="radio" name="q4" value="d"> La estimación de esfuerzo en puntos de historia</label>
+          </div>
+          <div class="quiz-feedback" id="fb4"></div>
+        </div>
+
+        <!-- P5 -->
+        <div class="quiz-question-box" id="qBox5">
+          <div class="question-title">5. ¿Cuál es la diferencia entre Criterios de Aceptación y Definition of Done (DoD)?</div>
+          <div class="options-group">
+            <label class="option-label"><input type="radio" name="q5" value="a"> Son exactamente sinónimos y significan lo mismo</label>
+            <label class="option-label"><input type="radio" name="q5" value="b"> Los Criterios de Aceptación son específicos de una historia particular, mientras que la DoD es el estándar global de calidad para todo el incremento</label>
+            <label class="option-label"><input type="radio" name="q5" value="c"> La DoD solo aplica a pruebas unitarias en Java</label>
+            <label class="option-label"><input type="radio" name="q5" value="d"> Los Criterios de Aceptación son tareas que escribe el programador</label>
+          </div>
+          <div class="quiz-feedback" id="fb5"></div>
+        </div>
+
+        <button class="btn-grade" onclick="gradeQuiz()">
+          <span>📊 Calificar Evaluación</span>
+        </button>
+
+        <div id="quizFinalScore" style="display: none; padding: 18px 24px; border-radius: 12px; font-weight: 700; font-size: 1.1rem;"></div>
+      </div>
+    </section>
+
+    <!-- 19. RESUMEN: LO QUE DEBEN RECORDAR -->
+    <section id="sec-19" class="content-section">
+      <div class="section-header">
+        <div class="section-num">19</div>
+        <div>
+          <h2 class="section-title">Resumen: Lo que Deben Recordar</h2>
+          <p class="section-subtitle">Matriz de consolidación rápida para repaso de exámenes y aplicación profesional</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">Concepto</th>
+              <th style="width: 75%;">Idea Central Innegociable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Historia de Usuario</strong></td>
+              <td>Necesidad expresada desde la óptica y beneficio del usuario final (el qué y por qué, no el cómo).</td>
+            </tr>
+            <tr>
+              <td><strong>Como, Quiero, Para</strong></td>
+              <td>Fórmula canónica que identifica al Actor, la Acción y el Valor de Negocio.</td>
+            </tr>
+            <tr>
+              <td><strong>INVEST</strong></td>
+              <td>6 sellos de calidad: Independiente, Negociable, Valiosa, Estimable, Pequeña y Comprobable.</td>
+            </tr>
+            <tr>
+              <td><strong>3 C (Jeffries)</strong></td>
+              <td>Card (tarjeta), Conversation (conversación viva) y Confirmation (criterios de prueba).</td>
+            </tr>
+            <tr>
+              <td><strong>Criterios de Aceptación</strong></td>
+              <td>Condiciones de satisfacción observables que dictan si la historia cumple su objetivo.</td>
+            </tr>
+            <tr>
+              <td><strong>Gherkin (BDD)</strong></td>
+              <td>Dado (contexto), Cuando (acción) y Entonces (resultado observable).</td>
+            </tr>
+            <tr>
+              <td><strong>Story Splitting</strong></td>
+              <td>Descomposición vertical de punta a punta (UI + Backend + BD + QA) en lugar de silos horizontales.</td>
+            </tr>
+            <tr>
+              <td><strong>Story Points</strong></td>
+              <td>Estimación relativa de esfuerzo, complejidad e incertidumbre usando Fibonacci en Planning Poker.</td>
+            </tr>
+            <tr>
+              <td><strong>DoR vs. DoD</strong></td>
+              <td>DoR: lista para comenzar; DoD: lista y probada según los estándares de calidad para producción.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 20. BIBLIOGRAFÍA Y RECURSOS -->
+    <section id="sec-20" class="content-section">
+      <div class="section-header">
+        <div class="section-num">20</div>
+        <div>
+          <h2 class="section-title">Bibliografía Oficial y Recursos de Profundización</h2>
+          <p class="section-subtitle">Referencias primarias de la industria del software ágil</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <ul style="padding-left: 20px; line-height: 1.9;">
+          <li>📖 <strong>Agile Alliance:</strong> <em>User Stories Glossary and Guidelines</em>. <a href="https://agilealliance.org/glossary/user-stories/" target="_blank" rel="noopener" style="color: var(--color-accent);">agilealliance.org</a></li>
+          <li>📖 <strong>Atlassian Agile Coach:</strong> <em>User Stories with Examples and Templates</em>. <a href="https://www.atlassian.com/agile/project-management/user-stories" target="_blank" rel="noopener" style="color: var(--color-accent);">atlassian.com/agile</a></li>
+          <li>📖 <strong>U.S. Government Accountability Office (GAO):</strong> <em>Agile Assessment Guide: Best Practices for Agile Adoption</em>. <a href="https://www.gao.gov/assets/d24105506.pdf" target="_blank" rel="noopener" style="color: var(--color-accent);">gao.gov</a></li>
+          <li>📖 <strong>Salesforce Trailhead:</strong> <em>Construct a User Story Module</em>. <a href="https://trailhead.salesforce.com/content/learn/modules/user-story-creation/construct-a-user-story" target="_blank" rel="noopener" style="color: var(--color-accent);">trailhead.salesforce.com</a></li>
+        </ul>
+      </div>
+
+      <div class="callout callout-qa">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-content">
+          <h4>La Secuencia Pedagógica Recomendada para la Asignatura</h4>
+          <p>
+            <strong>Necesidad del Usuario</strong> &rarr; <strong>Historia de Usuario</strong> &rarr; <strong>Validación INVEST</strong> &rarr; <strong>Criterios de Aceptación</strong> &rarr; <strong>Escenarios Gherkin</strong> &rarr; <strong>Casos de Prueba (JUnit 5)</strong> &rarr; <strong>Desarrollo</strong> &rarr; <strong>Validación contra la Definition of Done</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="site-footer">
+        <div>
+          <strong>UNIBE</strong> • Verificación y Validación de Software • Cátedra de Calidad
+        </div>
+        <div>
+          Ciclo Académico 2026 • Java Spring Boot & PostgreSQL
+        </div>
+      </footer>
+    </section>
+
+  </main>
+
+  <script>
+    // Barra de progreso de lectura
+    window.onscroll = function() {
+      let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      let scrolled = (winScroll / height) * 100;
+      document.getElementById("progressBar").style.width = scrolled + "%";
+
+      // Resaltado de menú activo
+      let sections = document.querySelectorAll("section");
+      let navLinks = document.querySelectorAll(".sidebar-menu li a");
+
+      sections.forEach(sec => {
+        let top = window.scrollY;
+        let offset = sec.offsetTop - 150;
+        let height = sec.offsetHeight;
+        let id = sec.getAttribute("id");
+
+        if (top >= offset && top < offset + height) {
+          navLinks.forEach(link => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === "#" + id) {
+              link.classList.add("active");
+            }
+          });
+        }
+      });
+    };
+
+    // Toggle menú móvil
+    function toggleSidebar() {
+      let sb = document.getElementById("sidebar");
+      sb.classList.toggle("open");
+    }
+
+    // Motor de Calificación de la Evaluación Interactiva
+    function gradeQuiz() {
+      const correctAnswers = {
+        q1: 'b',
+        q2: 'c',
+        q3: 'a',
+        q4: 'c',
+        q5: 'b'
+      };
+
+      const explanations = {
+        q1: 'Correcto. La historia describe qué y para qué lo necesita el usuario, sin atarse a detalles de implementación.',
+        q2: 'Correcto. Testable (Comprobable) asegura que la historia pueda verificarse de forma binaria (pasa o no pasa).',
+        q3: 'Correcto. Card (tarjeta física/digital), Conversation (diálogo continuo) y Confirmation (criterios de prueba).',
+        q4: 'Correcto. Given establece el estado y contexto inicial previo a la acción del usuario.',
+        q5: 'Correcto. Los Criterios de Aceptación son únicos para cada historia; la DoD es el estándar global de calidad para todo incremento.'
+      };
+
+      let score = 0;
+      let total = 5;
+
+      for (let i = 1; i <= total; i++) {
+        const qName = 'q' + i;
+        const selected = document.querySelector(`input[name="${qName}"]:checked`);
+        const qBox = document.getElementById(`qBox${i}`);
+        const fb = document.getElementById(`fb${i}`);
+
+        fb.style.display = 'block';
+
+        if (selected && selected.value === correctAnswers[qName]) {
+          score++;
+          qBox.className = 'quiz-question-box correct';
+          fb.style.background = 'rgba(16, 185, 129, 0.15)';
+          fb.style.color = '#a7f3d0';
+          fb.innerHTML = `✅ <strong>¡Correcto!</strong> ${explanations[qName]}`;
+        } else {
+          qBox.className = 'quiz-question-box incorrect';
+          fb.style.background = 'rgba(239, 68, 68, 0.15)';
+          fb.style.color = '#fca5a5';
+          const corrLetter = correctAnswers[qName].toUpperCase();
+          fb.innerHTML = `❌ <strong>Incorrecto.</strong> La respuesta correcta es la opción (${corrLetter}). ${explanations[qName]}`;
+        }
+      }
+
+      const finalMsg = document.getElementById('quizFinalScore');
+      finalMsg.style.display = 'block';
+      if (score >= 4) {
+        finalMsg.style.background = 'rgba(16, 185, 129, 0.2)';
+        finalMsg.style.border = '2px solid var(--color-success)';
+        finalMsg.style.color = '#34d399';
+        finalMsg.innerHTML = `🎉 ¡Excelente trabajo! Puntuación: ${score} / ${total} (${(score/total)*100}%). Dominas los fundamentos de Historias de Usuario y Calidad de Software.`;
+      } else {
+        finalMsg.style.background = 'rgba(245, 158, 11, 0.2)';
+        finalMsg.style.border = '2px solid var(--color-warning)';
+        finalMsg.style.color = '#fcd34d';
+        finalMsg.innerHTML = `⚠️ Puntuación: ${score} / ${total} (${(score/total)*100}%). Repasa los conceptos de INVEST y Criterios de Aceptación y vuelve a intentarlo.`;
+      }
+    }
+  </script>
+</body>
+</html>
